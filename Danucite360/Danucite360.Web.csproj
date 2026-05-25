@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Danucite360.Data\Danucite360.Data.csproj" />
+    <ProjectReference Include="..\Danucite360.Services\Danucite360.Services.csproj" />
   </ItemGroup>
 
 </Project>

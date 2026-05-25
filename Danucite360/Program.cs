@@ -1,7 +1,10 @@
 using Danucite360.Data.Data;
 using Danucite360.Data.Models;
+using Danucite360.Services.Contracts;
+using Danucite360.Services.Implementations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.Design;
 
 public partial class Program
 {
@@ -24,7 +27,11 @@ public partial class Program
             })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
-
+        
+        builder.Services.AddScoped<IRegionService, RegionService>();
+        builder.Services.AddScoped<IBudgetService, BudgetService>();
+        builder.Services.AddScoped<ISourceService, SourceService>();
+       
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
 
