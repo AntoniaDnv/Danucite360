@@ -1,0 +1,20 @@
+<Solution>
+  <Project Path="Danucite360.Common/Danucite360.Common.csproj" />
+  <Project Path="Danucite360.Data/Danucite360.Data.csproj">
+    <BuildDependency Project="Danucite360.Common/Danucite360.Common.csproj" />
+  </Project>
+  <Project Path="Danucite360.Services/Danucite360.Services.csproj">
+    <BuildDependency Project="Danucite360.Common/Danucite360.Common.csproj" />
+    <BuildDependency Project="Danucite360.Data/Danucite360.Data.csproj" />
+  </Project>
+  <Project Path="Danucite360.Tests/Danucite360.Tests.csproj">
+    <BuildDependency Project="Danucite360.Common/Danucite360.Common.csproj" />
+    <BuildDependency Project="Danucite360.Data/Danucite360.Data.csproj" />
+    <BuildDependency Project="Danucite360.Services/Danucite360.Services.csproj" />
+  </Project>
+  <Project Path="Danucite360/Danucite360.Web.csproj">
+    <BuildDependency Project="Danucite360.Common/Danucite360.Common.csproj" />
+    <BuildDependency Project="Danucite360.Data/Danucite360.Data.csproj" />
+    <BuildDependency Project="Danucite360.Services/Danucite360.Services.csproj" />
+  </Project>
+</Solution>
