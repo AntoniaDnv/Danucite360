@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Danucite360.Common.Constants
 {
-    public static class mRoleConstants
+    public static class RoleConstants
     {
         public const string Admin = "Admin";
     }
