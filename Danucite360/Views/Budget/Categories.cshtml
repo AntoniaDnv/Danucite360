@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Danucite360.Services.Models.CategorySpendingServiceModel>
+
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="container py-5">
+    <div class="mb-4">
+        <h1 class="fw-bold">Spending Categories</h1>
+        <p class="text-muted">
+            Demo regional spending grouped by category.
+        </p>
+    </div>
+
+    <div class="alert alert-warning">
+        This page uses demo regional data for prototype purposes.
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Category Chart</h5>
+                    <canvas id="categoriesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Category Totals</h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-end">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var category in Model)
+                                {
+                                    <tr>
+                                        <td>@category.CategoryName</td>
+                                        <td class="text-end">@category.Amount.ToString("N1")</td>
+                                        <td class="text-end">@category.Percentage.ToString("N2")%</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/categories.js"></script>
+}

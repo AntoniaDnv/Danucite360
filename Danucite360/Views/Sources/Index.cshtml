@@ -1,0 +1,41 @@
+﻿@model IEnumerable<Danucite360.Services.Models.SourceServiceModel>
+
+@{
+    ViewData["Title"] = "Sources";
+}
+
+<div class="container py-5">
+    <div class="mb-4">
+        <h1 class="fw-bold">Budget Sources</h1>
+        <p class="text-muted">
+            Documents and references used by Danucite360.
+        </p>
+    </div>
+
+    <div class="alert alert-info">
+        National budget values are manually seeded from the source document.
+        Regional spending values are demo data for prototype purposes.
+    </div>
+
+    <div class="row g-4">
+        @foreach (var source in Model)
+        {
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h5>@source.Title</h5>
+                        <p class="text-muted mb-2">@source.Publisher</p>
+                        <p>@source.Notes</p>
+
+                        <a class="btn btn-outline-primary"
+                           asp-controller="Sources"
+                           asp-action="Details"
+                           asp-route-id="@source.Id">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

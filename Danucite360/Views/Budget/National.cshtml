@@ -1,0 +1,65 @@
+﻿@model Danucite360.Services.Models.NationalBudgetServiceModel
+
+@{
+    ViewData["Title"] = "National Budget";
+}
+
+<div class="container py-5">
+    <div class="mb-4">
+        <h1 class="fw-bold">National Budget Overview @Model.BudgetYear</h1>
+        <p class="text-muted">
+            Source-referenced national values from the 2026 draft budget document.
+        </p>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="small text-muted">Revenue</div>
+                    <div class="h4">@Model.Revenue.ToString("N1")</div>
+                    <div class="small text-muted">@Model.Unit</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="small text-muted">Expenses</div>
+                    <div class="h4">@Model.Expenses.ToString("N1")</div>
+                    <div class="small text-muted">@Model.Unit</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="small text-muted">Budget Balance</div>
+                    <div class="h4 @(Model.Balance < 0 ? "text-danger" : "text-success")">
+                        @Model.Balance.ToString("N1")
+                    </div>
+                    <div class="small text-muted">@Model.Unit</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">National Budget Chart</h5>
+            <p class="text-muted">Loaded through an API endpoint using JavaScript fetch.</p>
+            <canvas id="nationalBudgetChart"></canvas>
+        </div>
+    </div>
+
+    <div class="alert alert-info">
+        <strong>Source:</strong> @Model.SourceTitle
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/national-budget.js"></script>
+}

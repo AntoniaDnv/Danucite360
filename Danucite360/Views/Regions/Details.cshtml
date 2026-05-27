@@ -1,0 +1,53 @@
+﻿@model Danucite360.Services.Models.RegionDetailsServiceModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container py-5">
+    <div class="mb-4">
+        <a class="text-decoration-none" asp-controller="Map" asp-action="Index">
+            ← Back to Region Selector
+        </a>
+    </div>
+
+    <div class="row g-4 align-items-start">
+        <div class="col-lg-5">
+            <h1 class="fw-bold">@Model.Name</h1>
+            <p class="text-muted">@Model.Description</p>
+
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="small text-muted">Population</div>
+                    <div class="h4">@Model.Population.ToString("N0")</div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="small text-muted">Total Demo Spending</div>
+                    <div class="h4">@Model.TotalDemoSpending.ToString("N1") @Model.Unit</div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning">
+                @Model.DemoNotice
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Spending by Category</h5>
+                    <p class="text-muted">AJAX-loaded Chart.js visualization.</p>
+                    <canvas id="regionChart" data-region-slug="@Model.Slug"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/region-details.js"></script>
+}

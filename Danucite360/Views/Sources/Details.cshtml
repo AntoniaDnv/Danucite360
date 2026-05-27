@@ -1,0 +1,38 @@
+﻿@model Danucite360.Services.Models.SourceServiceModel
+
+@{
+    ViewData["Title"] = "Source Details";
+}
+
+<div class="container py-5">
+    <div class="mb-4">
+        <a class="text-decoration-none" asp-controller="Sources" asp-action="Index">
+            ← Back to Sources
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h1 class="h3 fw-bold">@Model.Title</h1>
+
+            <dl class="row mt-4">
+                <dt class="col-sm-3">Publisher</dt>
+                <dd class="col-sm-9">@Model.Publisher</dd>
+
+                <dt class="col-sm-3">URL / Reference</dt>
+                <dd class="col-sm-9">@Model.Url</dd>
+
+                <dt class="col-sm-3">Published On</dt>
+                <dd class="col-sm-9">
+                    @(Model.PublishedOn?.ToString("yyyy-MM-dd") ?? "Not specified")
+                </dd>
+
+                <dt class="col-sm-3">Retrieved On</dt>
+                <dd class="col-sm-9">@Model.RetrievedOn.ToString("yyyy-MM-dd")</dd>
+
+                <dt class="col-sm-3">Notes</dt>
+                <dd class="col-sm-9">@Model.Notes</dd>
+            </dl>
+        </div>
+    </div>
+</div>

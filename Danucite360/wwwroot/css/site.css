@@ -29,3 +29,15 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+.region-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .region-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 .75rem 1.5rem rgba(0, 0, 0, .12) !important;
+    }
+
+canvas {
+    max-height: 420px;
+}

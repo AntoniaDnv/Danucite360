@@ -31,18 +31,21 @@ public class BudgetService : IBudgetService
             .Where(r => r.RecordType == BudgetRecordTypes.NationalExpense)
             .Sum(r => r.Amount);
 
-        var balanceRecord = records
-            .FirstOrDefault(r => r.RecordType == BudgetRecordTypes.BudgetBalance);
+        var balance = records
+            .Where(r => r.RecordType == BudgetRecordTypes.BudgetBalance)
+            .Select(r => r.Amount)
+            .FirstOrDefault();
 
-        var source = records.FirstOrDefault()?.BudgetSource;
+        var firstRecord = records.FirstOrDefault();
+        var source = firstRecord?.BudgetSource;
 
         return new NationalBudgetServiceModel
         {
             BudgetYear = year,
             Revenue = revenue,
             Expenses = expenses,
-            Balance = balanceRecord?.Amount ?? revenue - expenses,
-            Unit = records.FirstOrDefault()?.Unit ?? DataConstants.DefaultUnit,
+            Balance = balance != 0 ? balance : revenue - expenses,
+            Unit = firstRecord?.Unit ?? DataConstants.DefaultUnit,
             SourceTitle = source?.Title ?? "No source available",
             SourceUrl = source?.Url ?? "#"
         };
@@ -90,7 +93,12 @@ public class BudgetService : IBudgetService
         {
             Year = year,
             Labels = new[] { "Revenue", "Expenses", "Budget Balance" },
-            Values = new[] { overview.Revenue, overview.Expenses, overview.Balance },
+            Values = new[]
+            {
+            overview.Revenue,
+            overview.Expenses,
+            overview.Balance
+        },
             Unit = overview.Unit
         };
     }

@@ -12,7 +12,7 @@ public class BudgetRecord
     [Range(2000, 2100)]
     public int BudgetYear { get; set; }
 
-    [Range(0.01, double.MaxValue)]
+    //[Range(0.01, double.MaxValue)]
     public decimal Amount { get; set; }
 
     [Required]

@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Danucite360.Services.Models.RegionListServiceModel>
+
+@{
+    ViewData["Title"] = "Map";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="fw-bold">Bulgaria Region Selector</h1>
+            <p class="text-muted">
+                Select a demo district to view regional spending by category.
+            </p>
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        This MVP uses a simplified region selector instead of a full geographic map.
+        Regional values are demo data for prototype purposes.
+    </div>
+
+    <div class="row g-4">
+        @foreach (var region in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <a class="text-decoration-none text-dark" href="/regions/@region.Slug">
+                    <div class="card h-100 shadow-sm border-0 region-card">
+                        <div class="card-body">
+                            <h4 class="card-title">@region.Name</h4>
+                            <p class="text-muted mb-2">
+                                Population: @region.Population.ToString("N0")
+                            </p>
+                            <p class="mb-0">
+                                <strong>@region.TotalDemoSpending.ToString("N1")</strong>
+                                <span class="text-muted">@region.Unit</span>
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
