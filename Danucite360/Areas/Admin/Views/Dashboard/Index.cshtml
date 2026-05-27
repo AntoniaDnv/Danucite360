@@ -1,0 +1,77 @@
+﻿@model Danucite360.Web.ViewModels.Admin.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container py-5">
+    <div class="mb-4">
+        <h1 class="fw-bold">Admin Dashboard</h1>
+        <p class="text-muted">
+            Manage Danucite360 MVP data for budget year @Model.BudgetYear.
+        </p>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="small text-muted">Regions</div>
+                    <div class="h2">@Model.RegionsCount</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="small text-muted">Categories</div>
+                    <div class="h2">@Model.CategoriesCount</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="small text-muted">Budget Records</div>
+                    <div class="h2">@Model.BudgetRecordsCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="small text-muted">Sources</div>
+                    <div class="h2">@Model.SourcesCount</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="small text-muted">Demo Budget Records</div>
+                    <div class="h2">@Model.DemoRecordsCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-primary" asp-area="Admin" asp-controller="Regions" asp-action="Index">
+            Manage Regions
+        </a>
+
+        <a class="btn btn-outline-primary" asp-area="Admin" asp-controller="BudgetRecords" asp-action="Index">
+            Manage Budget Records
+        </a>
+
+        <a class="btn btn-outline-secondary" asp-area="" asp-controller="Home" asp-action="Index">
+            Back to Public Site
+        </a>
+    </div>
+</div>

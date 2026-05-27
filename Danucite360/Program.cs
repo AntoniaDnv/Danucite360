@@ -55,6 +55,12 @@ public partial class Program
 
         app.UseAuthentication();
         app.UseAuthorization();
+       
+        app.MapControllers();
+
+        app.MapControllerRoute(
+            name: "admin",
+            pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
         app.MapControllerRoute(
             name: "default",
