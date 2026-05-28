@@ -23,7 +23,6 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Views\BudgetRecords\" />
-    <Folder Include="Areas\Admin\Views\Regions\" />
   </ItemGroup>
 
   <ItemGroup>

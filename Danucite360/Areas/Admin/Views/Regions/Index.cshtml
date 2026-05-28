@@ -1,0 +1,81 @@
+﻿@model IEnumerable<Danucite360.Data.Models.Region>
+
+@{
+    ViewData["Title"] = "Manage Regions";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold">Manage Regions</h1>
+            <p class="text-muted">Create, edit, and review demo regions.</p>
+        </div>
+
+        <a class="btn btn-primary" asp-area="Admin" asp-controller="Regions" asp-action="Create">
+            Create Region
+        </a>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th class="text-end">Population</th>
+                        <th>Demo</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var region in Model)
+                    {
+                        <tr>
+                            <td>@region.Name</td>
+                            <td>@region.Slug</td>
+                            <td class="text-end">@region.Population.ToString("N0")</td>
+                            <td>@(region.IsDemo ? "Yes" : "No")</td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-secondary"
+                                   asp-area="Admin"
+                                   asp-controller="Regions"
+                                   asp-action="Details"
+                                   asp-route-id="@region.Id">
+                                    Details
+                                </a>
+
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-area="Admin"
+                                   asp-controller="Regions"
+                                   asp-action="Edit"
+                                   asp-route-id="@region.Id">
+                                    Edit
+                                </a>
+
+                                <a class="btn btn-sm btn-outline-danger"
+                                   asp-area="Admin"
+                                   asp-controller="Regions"
+                                   asp-action="Delete"
+                                   asp-route-id="@region.Id">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>

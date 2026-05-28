@@ -1,0 +1,39 @@
+﻿@model Danucite360.Data.Models.Region
+
+@{
+    ViewData["Title"] = "Delete Region";
+}
+
+<div class="container py-5">
+    <h1 class="fw-bold mb-4 text-danger">Delete Region</h1>
+
+    <div class="alert alert-warning">
+        Are you sure you want to delete <strong>@Model.Name</strong>?
+        This will only work if the region has no budget records.
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <p><strong>Name:</strong> @Model.Name</p>
+            <p><strong>Slug:</strong> @Model.Slug</p>
+            <p><strong>Population:</strong> @Model.Population.ToString("N0")</p>
+
+            <form asp-area="Admin"
+                  asp-controller="Regions"
+                  asp-action="DeleteConfirmed"
+                  asp-route-id="@Model.Id"
+                  method="post">
+                @Html.AntiForgeryToken()
+
+                <button type="submit" class="btn btn-danger">Delete</button>
+
+                <a class="btn btn-outline-secondary"
+                   asp-area="Admin"
+                   asp-controller="Regions"
+                   asp-action="Index">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

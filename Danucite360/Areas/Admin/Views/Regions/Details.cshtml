@@ -1,0 +1,45 @@
+﻿@model Danucite360.Data.Models.Region
+
+@{
+    ViewData["Title"] = "Region Details";
+}
+
+<div class="container py-5">
+    <h1 class="fw-bold mb-4">@Model.Name</h1>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Slug</dt>
+                <dd class="col-sm-9">@Model.Slug</dd>
+
+                <dt class="col-sm-3">Population</dt>
+                <dd class="col-sm-9">@Model.Population.ToString("N0")</dd>
+
+                <dt class="col-sm-3">Demo</dt>
+                <dd class="col-sm-9">@(Model.IsDemo ? "Yes" : "No")</dd>
+
+                <dt class="col-sm-3">Description</dt>
+                <dd class="col-sm-9">@Model.Description</dd>
+            </dl>
+
+            <a class="btn btn-primary"
+               asp-area="Admin"
+               asp-controller="Regions"
+               asp-action="Edit"
+               asp-route-id="@Model.Id">
+                Edit
+            </a>
+
+            <a class="btn btn-outline-secondary"
+               asp-area="Admin"
+               asp-controller="Regions"
+               asp-action="Index">
+                Back
+            </a>
+        </div>
+    </div>
+</div>
