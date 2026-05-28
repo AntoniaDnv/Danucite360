@@ -16,6 +16,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Danucite360.Common\Danucite360.Common.csproj" />
+    <ProjectReference Include="..\Danucite360.Data\Danucite360.Data.csproj" />
+    <ProjectReference Include="..\Danucite360.Services\Danucite360.Services.csproj" />
+	      <ProjectReference Include="..\Danucite360\Danucite360.Web.csproj" />	  
+    <ProjectReference Include="..\Danucite360\Danucite360.Web.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

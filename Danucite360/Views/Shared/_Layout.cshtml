@@ -22,19 +22,48 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark"
+                               asp-area=""
+                               asp-controller="Home"
+                               asp-action="Index">
+                                Home
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Map" asp-action="Index">Map</a>
+                            <a class="nav-link text-dark"
+                               asp-area=""
+                               asp-controller="Map"
+                               asp-action="Index">
+                                Map
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Budget" asp-action="National">National Budget</a>
+                            <a class="nav-link text-dark"
+                               asp-area=""
+                               asp-controller="Budget"
+                               asp-action="National">
+                                National Budget
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Budget" asp-action="Categories">Categories</a>
+                            <a class="nav-link text-dark"
+                               asp-area=""
+                               asp-controller="Budget"
+                               asp-action="Categories">
+                                Categories
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Sources" asp-action="Index">Sources</a>
+                            <a class="nav-link text-dark"
+                               asp-area=""
+                               asp-controller="Sources"
+                               asp-action="Index">
+                                Sources
+                            </a>
                         </li>
                         @if (User.IsInRole(RoleConstants.Admin))
                         {

@@ -11,6 +11,7 @@
     <BuildDependency Project="Danucite360.Common/Danucite360.Common.csproj" />
     <BuildDependency Project="Danucite360.Data/Danucite360.Data.csproj" />
     <BuildDependency Project="Danucite360.Services/Danucite360.Services.csproj" />
+    <BuildDependency Project="Danucite360/Danucite360.Web.csproj" />
   </Project>
   <Project Path="Danucite360/Danucite360.Web.csproj">
     <BuildDependency Project="Danucite360.Common/Danucite360.Common.csproj" />
