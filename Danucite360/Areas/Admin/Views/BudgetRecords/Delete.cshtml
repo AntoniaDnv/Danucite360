@@ -1,0 +1,39 @@
+﻿@model Danucite360.Data.Models.BudgetRecord
+
+@{
+    ViewData["Title"] = "Delete Budget Record";
+}
+
+<div class="container py-5">
+    <h1 class="fw-bold mb-4 text-danger">Delete Budget Record</h1>
+
+    <div class="alert alert-warning">
+        Are you sure you want to delete this budget record?
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <p><strong>Type:</strong> @Model.RecordType</p>
+            <p><strong>Region:</strong> @(Model.Region?.Name ?? "National")</p>
+            <p><strong>Category:</strong> @Model.BudgetCategory.Name</p>
+            <p><strong>Amount:</strong> @Model.Amount.ToString("N1") @Model.Unit</p>
+
+            <form asp-area="Admin"
+                  asp-controller="BudgetRecords"
+                  asp-action="DeleteConfirmed"
+                  asp-route-id="@Model.Id"
+                  method="post">
+                @Html.AntiForgeryToken()
+
+                <button type="submit" class="btn btn-danger">Delete</button>
+
+                <a class="btn btn-outline-secondary"
+                   asp-area="Admin"
+                   asp-controller="BudgetRecords"
+                   asp-action="Index">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>  

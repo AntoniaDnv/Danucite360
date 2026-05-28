@@ -1,0 +1,82 @@
+﻿@model IEnumerable<Danucite360.Data.Models.BudgetRecord>
+
+@{
+    ViewData["Title"] = "Manage Budget Records";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold">Manage Budget Records</h1>
+            <p class="text-muted">Edit national values and demo regional spending.</p>
+        </div>
+
+        <a class="btn btn-primary" asp-area="Admin" asp-controller="BudgetRecords" asp-action="Create">
+            Create Budget Record
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th>Type</th>
+                            <th>Region</th>
+                            <th>Category</th>
+                            <th class="text-end">Amount</th>
+                            <th>Unit</th>
+                            <th>Demo</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var record in Model)
+                        {
+                            <tr>
+                                <td>@record.BudgetYear</td>
+                                <td>@record.RecordType</td>
+                                <td>@(record.Region?.Name ?? "National")</td>
+                                <td>@record.BudgetCategory.Name</td>
+                                <td class="text-end">@record.Amount.ToString("N1")</td>
+                                <td>@record.Unit</td>
+                                <td>@(record.IsDemo ? "Yes" : "No")</td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-secondary"
+                                       asp-area="Admin"
+                                       asp-controller="BudgetRecords"
+                                       asp-action="Details"
+                                       asp-route-id="@record.Id">
+                                        Details
+                                    </a>
+
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       asp-area="Admin"
+                                       asp-controller="BudgetRecords"
+                                       asp-action="Edit"
+                                       asp-route-id="@record.Id">
+                                        Edit
+                                    </a>
+
+                                    <a class="btn btn-sm btn-outline-danger"
+                                       asp-area="Admin"
+                                       asp-controller="BudgetRecords"
+                                       asp-action="Delete"
+                                       asp-route-id="@record.Id">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>

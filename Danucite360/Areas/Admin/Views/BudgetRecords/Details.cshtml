@@ -1,0 +1,57 @@
+﻿@model Danucite360.Data.Models.BudgetRecord
+
+@{
+    ViewData["Title"] = "Budget Record Details";
+}
+
+<div class="container py-5">
+    <h1 class="fw-bold mb-4">Budget Record Details</h1>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Year</dt>
+                <dd class="col-sm-9">@Model.BudgetYear</dd>
+
+                <dt class="col-sm-3">Type</dt>
+                <dd class="col-sm-9">@Model.RecordType</dd>
+
+                <dt class="col-sm-3">Region</dt>
+                <dd class="col-sm-9">@(Model.Region?.Name ?? "National")</dd>
+
+                <dt class="col-sm-3">Category</dt>
+                <dd class="col-sm-9">@Model.BudgetCategory.Name</dd>
+
+                <dt class="col-sm-3">Amount</dt>
+                <dd class="col-sm-9">@Model.Amount.ToString("N1") @Model.Unit</dd>
+
+                <dt class="col-sm-3">Currency</dt>
+                <dd class="col-sm-9">@Model.Currency</dd>
+
+                <dt class="col-sm-3">Demo</dt>
+                <dd class="col-sm-9">@(Model.IsDemo ? "Yes" : "No")</dd>
+
+                <dt class="col-sm-3">Source</dt>
+                <dd class="col-sm-9">@Model.BudgetSource.Title</dd>
+
+                <dt class="col-sm-3">Notes</dt>
+                <dd class="col-sm-9">@Model.Notes</dd>
+            </dl>
+
+            <a class="btn btn-primary"
+               asp-area="Admin"
+               asp-controller="BudgetRecords"
+               asp-action="Edit"
+               asp-route-id="@Model.Id">
+                Edit
+            </a>
+
+            <a class="btn btn-outline-secondary"
+               asp-area="Admin"
+               asp-controller="BudgetRecords"
+               asp-action="Index">
+                Back
+            </a>
+        </div>
+    </div>
+</div>
