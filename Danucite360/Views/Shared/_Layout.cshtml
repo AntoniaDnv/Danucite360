@@ -1,98 +1,132 @@
 ﻿@using Danucite360.Common.Constants
- <!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Danucite360</title>
-    <script type="importmap"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Danucite360.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Danucite360</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+    <header class="app-header">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="brand-mark">D</span>
+                    <span>
+                        Danucite360
+                        <span class="brand-subtitle d-none d-md-block">See where public money goes.</span>
+                    </span>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <ul class="navbar-nav mx-auto gap-lg-2">
                         <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-area=""
-                               asp-controller="Home"
-                               asp-action="Index">
-                                Home
-                            </a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-area=""
-                               asp-controller="Map"
-                               asp-action="Index">
-                                Map
-                            </a>
+                            <a class="nav-link" asp-area="" asp-controller="Budget" asp-action="National">National Budget</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-area=""
-                               asp-controller="Budget"
-                               asp-action="National">
-                                National Budget
-                            </a>
+                            <a class="nav-link" asp-area="" asp-controller="Map" asp-action="Index">Regions</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-area=""
-                               asp-controller="Budget"
-                               asp-action="Categories">
-                                Categories
-                            </a>
+                            <a class="nav-link" asp-area="" asp-controller="Budget" asp-action="Categories">Categories</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-area=""
-                               asp-controller="Sources"
-                               asp-action="Index">
-                                Sources
-                            </a>
+                            <a class="nav-link" asp-area="" asp-controller="Sources" asp-action="Index">Sources</a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">About</a>
+                        </li>
+
                         @if (User.IsInRole(RoleConstants.Admin))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                                    Admin
-                                </a>
+                                <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Admin</a>
                             </li>
                         }
                     </ul>
-                    <partial name="_LoginPartial" />
+
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="language-switcher d-none d-md-flex">
+                            <span>BG</span>
+                            <span class="active">EN</span>
+                        </div>
+
+                        <partial name="_LoginPartial" />
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Danucite360 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="app-footer mt-5">
+        <div class="container py-5">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="brand-mark">D</span>
+                        <strong>Danucite360</strong>
+                    </div>
+                    <p class="footer-text">
+                        Civic budget transparency for a stronger Bulgaria.
+                    </p>
+                    <p class="footer-text mb-0">
+                        © 2026 Danucite360. All rights reserved.
+                    </p>
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <h6>Explore</h6>
+                    <a asp-area="" asp-controller="Budget" asp-action="National">National Budget</a>
+                    <a asp-area="" asp-controller="Map" asp-action="Index">Regions</a>
+                    <a asp-area="" asp-controller="Budget" asp-action="Categories">Categories</a>
+                    <a asp-area="" asp-controller="Sources" asp-action="Index">Sources</a>
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <h6>About</h6>
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy">About Danucite360</a>
+                    <a asp-area="" asp-controller="Sources" asp-action="Index">Methodology</a>
+                    <a asp-area="" asp-controller="Sources" asp-action="Index">Data Sources</a>
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <h6>Legal</h6>
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+                    <a asp-area="" asp-controller="Sources" asp-action="Index">Data Disclaimer</a>
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <h6>Data Status</h6>
+                    <span class="status-badge status-official mb-2">✓ Official Data</span>
+                    <span class="status-badge status-demo">⚠ Demo Data</span>
+                </div>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

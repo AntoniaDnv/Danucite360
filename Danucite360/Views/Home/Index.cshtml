@@ -4,95 +4,166 @@
     ViewData["Title"] = "Home";
 }
 
-<section class="py-5 bg-light border-bottom">
-    <div class="container">
-        <div class="row align-items-center g-4">
-            <div class="col-lg-7">
-                <span class="badge bg-primary mb-3">MVP Prototype</span>
-                <h1 class="display-5 fw-bold mb-3">Danucite360</h1>
-                <p class="lead text-muted">
-                    A simple public finance transparency dashboard for Bulgaria.
-                    Explore national budget values, demo regional spending, categories, and source references.
+<section class="home-hero">
+    <div class="page-shell">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5">
+                <span class="status-badge status-official mb-3">✓ Civic Transparency MVP</span>
+
+                <h1 class="hero-title">
+                    See where Bulgaria’s public money goes.
+                </h1>
+
+                <p class="hero-subtitle">
+                    Danucite360 turns public budget data into clear, citizen-friendly insights
+                    about revenue, spending, regions, categories, and sources.
                 </p>
 
-                <div class="d-flex gap-2 flex-wrap mt-4">
-                    <a class="btn btn-primary btn-lg" asp-controller="Budget" asp-action="National">
-                        View National Budget
+                <div class="d-flex gap-3 flex-wrap mt-4">
+                    <a class="btn btn-primary btn-lg"
+                       asp-controller="Budget"
+                       asp-action="National">
+                        Explore National Budget
                     </a>
-                    <a class="btn btn-outline-primary btn-lg" asp-controller="Map" asp-action="Index">
-                        Explore Regions
+
+                    <a class="btn btn-outline-primary btn-lg"
+                       asp-controller="Map"
+                       asp-action="Index">
+                        Compare Regions
                     </a>
-                    <a class="btn btn-outline-secondary btn-lg" asp-controller="Sources" asp-action="Index">
-                        View Sources
-                    </a>
+                </div>
+
+                <div class="mt-4">
+                    <partial name="_DemoNotice" />
                 </div>
             </div>
 
-            <div class="col-lg-5">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <h5 class="card-title">2026 Budget Snapshot</h5>
-                        <p class="text-muted mb-4">Values are shown in @Model.Unit.</p>
+            <div class="col-lg-7">
+                <div class="app-card dashboard-preview">
+                    <div class="app-card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <h5 class="mb-1">2026 National Budget Overview</h5>
+                                <p class="text-muted mb-0">Last updated: 28 May 2026</p>
+                            </div>
 
-                        <div class="mb-3">
-                            <div class="small text-muted">Revenue</div>
-                            <div class="h4 mb-0">@Model.Revenue.ToString("N1")</div>
+                            <span class="status-badge status-official">✓ Official Data</span>
                         </div>
 
-                        <div class="mb-3">
-                            <div class="small text-muted">Expenses</div>
-                            <div class="h4 mb-0">@Model.Expenses.ToString("N1")</div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="mini-kpi">
+                                    <div class="kpi-label">Total Revenue</div>
+                                    <div class="mini-kpi-value">@Model.Revenue.ToString("N1")</div>
+                                    <div class="kpi-meta">@Model.Unit</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mini-kpi">
+                                    <div class="kpi-label">Total Expenses</div>
+                                    <div class="mini-kpi-value">@Model.Expenses.ToString("N1")</div>
+                                    <div class="kpi-meta">@Model.Unit</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mini-kpi">
+                                    <div class="kpi-label">Budget Balance</div>
+                                    <div class="mini-kpi-value @(Model.Balance < 0 ? "text-danger" : "text-success")">
+                                        @Model.Balance.ToString("N1")
+                                    </div>
+                                    <div class="kpi-meta">@Model.Unit</div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div>
-                            <div class="small text-muted">Budget Balance</div>
-                            <div class="h4 mb-0 @(Model.Balance < 0 ? "text-danger" : "text-success")">
-                                @Model.Balance.ToString("N1")
+                        <div class="row g-4">
+                            <div class="col-md-5">
+                                <div class="fake-donut mx-auto">
+                                    <span>Budget<br />View</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-7">
+                                <h6 class="mb-3">Top public categories</h6>
+
+                                <div class="category-line">
+                                    <span>Healthcare</span>
+                                    <div><span style="width: 90%"></span></div>
+                                </div>
+
+                                <div class="category-line">
+                                    <span>Education</span>
+                                    <div><span style="width: 76%"></span></div>
+                                </div>
+
+                                <div class="category-line">
+                                    <span>Infrastructure</span>
+                                    <div><span style="width: 64%"></span></div>
+                                </div>
+
+                                <div class="category-line">
+                                    <span>Social Support</span>
+                                    <div><span style="width: 55%"></span></div>
+                                </div>
+
+                                <a class="small fw-semibold text-decoration-none"
+                                   asp-controller="Budget"
+                                   asp-action="Categories">
+                                    View all categories →
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <partial name="_DemoNotice" />
-    </div>
-</section>
 
-<section class="py-5">
-    <div class="container">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <h5>Simple dashboard</h5>
-                        <p class="text-muted mb-0">
-                            Turns complicated budget tables into readable cards, charts, and summaries.
-                        </p>
-                    </div>
+        <section class="mt-5">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <a class="text-decoration-none text-dark" asp-controller="Map" asp-action="Index">
+                        <div class="app-card h-100">
+                            <div class="app-card-body">
+                                <h5>Compare Regions</h5>
+                                <p class="text-muted">
+                                    See how demo public money is distributed across Bulgaria.
+                                </p>
+                                <span class="fw-semibold text-primary">Explore regions →</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
+                    <a class="text-decoration-none text-dark" asp-controller="Budget" asp-action="Categories">
+                        <div class="app-card h-100">
+                            <div class="app-card-body">
+                                <h5>Spending Categories</h5>
+                                <p class="text-muted">
+                                    Explore spending across healthcare, education, infrastructure, and more.
+                                </p>
+                                <span class="fw-semibold text-primary">View categories →</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
+                    <a class="text-decoration-none text-dark" asp-controller="Sources" asp-action="Index">
+                        <div class="app-card h-100">
+                            <div class="app-card-body">
+                                <h5>Trusted Sources</h5>
+                                <p class="text-muted">
+                                    Every official value should connect to a source, freshness date, and confidence label.
+                                </p>
+                                <span class="fw-semibold text-primary">View sources →</span>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
-
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <h5>Regional view</h5>
-                        <p class="text-muted mb-0">
-                            Compare demo regional spending across Sofia, Plovdiv, Varna, Burgas, Ruse, and Stara Zagora.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <h5>Source references</h5>
-                        <p class="text-muted mb-0">
-                            Shows where national values come from and clearly labels demo prototype data.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </section>
     </div>
 </section>

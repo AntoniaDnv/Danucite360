@@ -1,61 +1,229 @@
 ﻿@model Danucite360.Services.Models.NationalBudgetServiceModel
 
 @{
-    ViewData["Title"] = "National Budget";
+    ViewData["Title"] = "National Budget Overview";
 }
 
-<div class="container py-5">
-    <div class="mb-4">
-        <h1 class="fw-bold">National Budget Overview @Model.BudgetYear</h1>
-        <p class="text-muted">
-            Source-referenced national values from the 2026 draft budget document.
-        </p>
+<section class="page-shell">
+    <div class="page-header mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-official">✓ Official Data</span>
+                <span class="last-updated">Last updated: 28 May 2026</span>
+            </div>
+
+            <h1 class="section-title mb-2">National Budget Overview</h1>
+
+            <p class="section-subtitle mb-0">
+                See how much public money is collected, how much is spent,
+                and whether the budget shows a surplus or deficit.
+            </p>
+        </div>
+
+        <div class="page-actions">
+            <button class="btn btn-outline-secondary btn-sm" type="button">
+                Share
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" type="button">
+                Export
+            </button>
+        </div>
+    </div>
+
+    <div class="plain-summary mb-4">
+        <strong>What does this mean?</strong>
+        This overview compares national revenue, expenses, and budget balance for @Model.BudgetYear.
+        A negative balance means planned expenses and transfers are higher than revenue.
+    </div>
+
+    <div class="filter-bar app-card mb-4">
+        <div class="app-card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">Year</label>
+                    <select class="form-select">
+                        <option selected>@Model.BudgetYear</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">Data type</label>
+                    <select class="form-select">
+                        <option selected>All</option>
+                        <option>Official Data</option>
+                        <option>Demo Data</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 text-md-end">
+                    <span class="status-badge status-official">✓ Source referenced</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row g-4 mb-4">
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="small text-muted">Revenue</div>
-                    <div class="h4">@Model.Revenue.ToString("N1")</div>
-                    <div class="small text-muted">@Model.Unit</div>
-                </div>
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-blue">↗</div>
+                <div class="kpi-label">Total Revenue</div>
+                <div class="kpi-value">@Model.Revenue.ToString("N1")</div>
+                <div class="kpi-meta">@Model.Unit</div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="small text-muted">Expenses</div>
-                    <div class="h4">@Model.Expenses.ToString("N1")</div>
-                    <div class="small text-muted">@Model.Unit</div>
-                </div>
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-red">↘</div>
+                <div class="kpi-label">Total Expenses</div>
+                <div class="kpi-value">@Model.Expenses.ToString("N1")</div>
+                <div class="kpi-meta">@Model.Unit</div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="small text-muted">Budget Balance</div>
-                    <div class="h4 @(Model.Balance < 0 ? "text-danger" : "text-success")">
-                        @Model.Balance.ToString("N1")
+            <div class="kpi-card">
+                <div class="kpi-icon @(Model.Balance < 0 ? "kpi-icon-red" : "kpi-icon-green")">≈</div>
+                <div class="kpi-label">Budget Balance</div>
+                <div class="kpi-value @(Model.Balance < 0 ? "text-danger" : "text-success")">
+                    @Model.Balance.ToString("N1")
+                </div>
+                <div class="kpi-meta">@Model.Unit</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-heading">Revenue vs Expenses vs Balance</h5>
+                            <p class="text-muted small mb-0">
+                                Loaded from the API using JavaScript fetch and Chart.js.
+                            </p>
+                        </div>
+                        <span class="status-badge status-official">✓ Official Data</span>
                     </div>
-                    <div class="small text-muted">@Model.Unit</div>
+
+                    <canvas id="nationalBudgetChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Budget relationship</h5>
+                    <p class="text-muted">
+                        Revenue shows how much money is expected to be collected.
+                        Expenses show planned spending. The balance shows the difference.
+                    </p>
+
+                    <div class="budget-equation">
+                        <div>
+                            <span>Revenue</span>
+                            <strong>@Model.Revenue.ToString("N1")</strong>
+                        </div>
+
+                        <div>
+                            <span>Expenses</span>
+                            <strong>@Model.Expenses.ToString("N1")</strong>
+                        </div>
+
+                        <div>
+                            <span>Balance</span>
+                            <strong class="@(Model.Balance < 0 ? "text-danger" : "text-success")">
+                                @Model.Balance.ToString("N1")
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <a class="fw-semibold text-decoration-none"
+                           asp-controller="Sources"
+                           asp-action="Index">
+                            Learn more about sources and methodology →
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title">National Budget Chart</h5>
-            <p class="text-muted">Loaded through an API endpoint using JavaScript fetch.</p>
-            <canvas id="nationalBudgetChart"></canvas>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Data confidence overview</h5>
+                    <p class="text-muted small">
+                        This MVP separates official source-based values from demo prototype values.
+                    </p>
+
+                    <div class="confidence-row">
+                        <div class="confidence-label">
+                            <span class="confidence-dot official"></span>
+                            Official Data
+                        </div>
+                        <div class="confidence-bar">
+                            <span style="width: 70%" class="official"></span>
+                        </div>
+                        <strong>70%</strong>
+                    </div>
+
+                    <div class="confidence-row">
+                        <div class="confidence-label">
+                            <span class="confidence-dot demo"></span>
+                            Demo Data
+                        </div>
+                        <div class="confidence-bar">
+                            <span style="width: 25%" class="demo"></span>
+                        </div>
+                        <strong>25%</strong>
+                    </div>
+
+                    <div class="confidence-row">
+                        <div class="confidence-label">
+                            <span class="confidence-dot review"></span>
+                            Needs Review
+                        </div>
+                        <div class="confidence-bar">
+                            <span style="width: 5%" class="review"></span>
+                        </div>
+                        <strong>5%</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Related source</h5>
+
+                    <div class="source-mini-card">
+                        <div class="source-icon">📄</div>
+                        <div>
+                            <strong>@Model.SourceTitle</strong>
+                            <p class="text-muted small mb-0">
+                                Manually seeded national values from the 2026 draft budget source.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <a class="btn btn-outline-primary"
+                           asp-controller="Sources"
+                           asp-action="Index">
+                            View all sources
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-    <partial name="_SourceReference" model="Model" />
-</div>
+</section>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -1,49 +1,172 @@
 ﻿@model Danucite360.Services.Models.RegionDetailsServiceModel
 
 @{
-    ViewData["Title"] = Model.Name;
+    ViewData["Title"] = $"{Model.Name} Region";
 }
 
-<div class="container py-5">
+<section class="page-shell">
     <div class="mb-4">
-        <a class="text-decoration-none" asp-controller="Map" asp-action="Index">
-            ← Back to Region Selector
+        <a class="text-decoration-none fw-semibold"
+           asp-controller="Map"
+           asp-action="Index">
+            ← Back to region comparison
         </a>
     </div>
 
-    <div class="row g-4 align-items-start">
-        <div class="col-lg-5">
-            <h1 class="fw-bold">@Model.Name</h1>
-            <p class="text-muted">@Model.Description</p>
-
-            <div class="card border-0 shadow-sm mb-3">
-                <div class="card-body">
-                    <div class="small text-muted">Population</div>
-                    <div class="h4">@Model.Population.ToString("N0")</div>
-                </div>
+    <div class="page-header mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-demo">⚠ Demo Data</span>
+                <span class="last-updated">Budget year @Model.BudgetYear</span>
             </div>
 
-            <div class="card border-0 shadow-sm mb-3">
-                <div class="card-body">
-                    <div class="small text-muted">Total Demo Spending</div>
-                    <div class="h4">@Model.TotalDemoSpending.ToString("N1") @Model.Unit</div>
-                </div>
-            </div>
+            <h1 class="section-title mb-2">@Model.Name Region</h1>
 
-            <partial name="_DemoNotice" />
+            <p class="section-subtitle mb-0">
+                Explore demo public spending by category for @Model.Name.
+                This page shows how a citizen-friendly regional dashboard could work.
+            </p>
         </div>
 
-        <div class="col-lg-7">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Spending by Category</h5>
-                    <p class="text-muted">AJAX-loaded Chart.js visualization.</p>
+        <div class="page-actions">
+            <a class="btn btn-outline-secondary btn-sm"
+               asp-controller="Sources"
+               asp-action="Index">
+                View Sources
+            </a>
+        </div>
+    </div>
+
+    <partial name="_DemoNotice" />
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-blue">◎</div>
+                <div class="kpi-label">Population</div>
+                <div class="kpi-value">@Model.Population.ToString("N0")</div>
+                <div class="kpi-meta">Residents</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-green">Σ</div>
+                <div class="kpi-label">Total Demo Spending</div>
+                <div class="kpi-value">@Model.TotalDemoSpending.ToString("N1")</div>
+                <div class="kpi-meta">@Model.Unit</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-red">!</div>
+                <div class="kpi-label">Data Status</div>
+                <div class="kpi-value">Demo</div>
+                <div class="kpi-meta">Prototype regional dataset</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-heading">Spending by Category</h5>
+                            <p class="text-muted small mb-0">
+                                Demo spending categories loaded from the API using fetch and Chart.js.
+                            </p>
+                        </div>
+
+                        <span class="status-badge status-demo">⚠ Demo Data</span>
+                    </div>
+
                     <canvas id="regionChart" data-region-slug="@Model.Slug"></canvas>
                 </div>
             </div>
         </div>
+
+        <div class="col-lg-4">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">What does this mean?</h5>
+
+                    <p class="text-muted">
+                        This view shows how public spending could be explained to citizens by grouping
+                        values into understandable categories such as education, healthcare,
+                        infrastructure, and social support.
+                    </p>
+
+                    <div class="explanation-list">
+                        <div>
+                            <strong>Total spending</strong>
+                            <span>Sum of all demo category values for this region.</span>
+                        </div>
+
+                        <div>
+                            <strong>Category chart</strong>
+                            <span>Shows which areas receive the largest share.</span>
+                        </div>
+
+                        <div>
+                            <strong>Data status</strong>
+                            <span>Regional values are prototype data, not official municipal data.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Region profile</h5>
+
+                    <dl class="region-profile">
+                        <dt>Region</dt>
+                        <dd>@Model.Name</dd>
+
+                        <dt>Budget year</dt>
+                        <dd>@Model.BudgetYear</dd>
+
+                        <dt>Population</dt>
+                        <dd>@Model.Population.ToString("N0")</dd>
+
+                        <dt>Data confidence</dt>
+                        <dd><span class="status-badge status-demo">⚠ Demo Data</span></dd>
+
+                        <dt>Description</dt>
+                        <dd>@Model.Description</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Next steps for real product</h5>
+
+                    <p class="text-muted">
+                        In a sellable version, this page should include official municipal or regional
+                        sources, per-capita spending, year comparison, and source confidence labels.
+                    </p>
+
+                    <div class="product-roadmap-list">
+                        <span>Per-capita spending</span>
+                        <span>Year-over-year trend</span>
+                        <span>Official source references</span>
+                        <span>Compare with another region</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

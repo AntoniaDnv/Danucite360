@@ -1,65 +1,222 @@
 ﻿@model IEnumerable<Danucite360.Services.Models.CategorySpendingServiceModel>
 
 @{
-    ViewData["Title"] = "Categories";
+    ViewData["Title"] = "Spending Categories";
+
+    var categories = Model.ToList();
+    var topCategory = categories.OrderByDescending(c => c.Amount).FirstOrDefault();
+    var total = categories.Sum(c => c.Amount);
 }
 
-<div class="container py-5">
-    <div class="mb-4">
-        <h1 class="fw-bold">Spending Categories</h1>
-        <p class="text-muted">
-            Demo regional spending grouped by category.
-        </p>
+<section class="page-shell">
+    <div class="page-header mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-demo">⚠ Demo Data</span>
+                <span class="last-updated">Budget year 2026</span>
+            </div>
+
+            <h1 class="section-title mb-2">Spending Categories</h1>
+
+            <p class="section-subtitle mb-0">
+                See how public money is allocated across areas such as healthcare,
+                education, infrastructure, social support, administration, security, and environment.
+            </p>
+        </div>
+
+        <div class="page-actions">
+            <a class="btn btn-outline-secondary btn-sm"
+               asp-controller="Sources"
+               asp-action="Index">
+                View Sources
+            </a>
+        </div>
     </div>
 
     <partial name="_DemoNotice" />
 
-    <div class="row g-4">
+    <div class="plain-summary mb-4">
+        <strong>What does this mean?</strong>
+        Categories group spending into citizen-friendly areas.
+        In this MVP, category values are based on demo regional data, so they show the product concept rather than official totals.
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-blue">▦</div>
+                <div class="kpi-label">Categories</div>
+                <div class="kpi-value">@categories.Count</div>
+                <div class="kpi-meta">Spending areas shown</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-green">Σ</div>
+                <div class="kpi-label">Total Demo Spending</div>
+                <div class="kpi-value">@total.ToString("N1")</div>
+                <div class="kpi-meta">thousand EUR</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-red">★</div>
+                <div class="kpi-label">Largest Category</div>
+                <div class="kpi-value">@topCategory?.CategoryName</div>
+                <div class="kpi-meta">
+                    @(topCategory == null ? "No data" : $"{topCategory.Percentage:N2}% of demo spending")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-bar app-card mb-4">
+        <div class="app-card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label small text-muted">Search category</label>
+                    <input id="categorySearch" type="search" class="form-control" placeholder="Search category..." />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">Sort by</label>
+                    <select id="categorySort" class="form-select">
+                        <option value="amount" selected>Amount</option>
+                        <option value="name">Name</option>
+                        <option value="percentage">Percentage</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 text-md-end">
+                    <span class="status-badge status-demo">⚠ Demo regional values</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
         <div class="col-lg-7">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Category Chart</h5>
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-heading">Category Share</h5>
+                            <p class="text-muted small mb-0">
+                                Chart.js visualization loaded from the API.
+                            </p>
+                        </div>
+
+                        <span class="status-badge status-demo">⚠ Demo Data</span>
+                    </div>
+
                     <canvas id="categoriesChart"></canvas>
                 </div>
             </div>
         </div>
 
         <div class="col-lg-5">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Category Totals</h5>
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Top spending areas</h5>
+                    <p class="text-muted small">
+                        Sorted by total demo amount across all demo regions.
+                    </p>
 
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Category</th>
-                                    <th class="text-end">Amount</th>
-                                    <th class="text-end">%</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var category in Model)
-                                {
-                                    <tr>
-                                        <td>@category.CategoryName</td>
-                                        <td class="text-end">@category.Amount.ToString("N1")</td>
-                                        <td class="text-end">@category.Percentage.ToString("N2")%</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                     
+                    <div class="category-ranking">
+                        @foreach (var category in categories.OrderByDescending(c => c.Amount).Take(5))
+                        {
+                            <div class="category-rank-item"
+                                 data-category-name="@category.CategoryName.ToLowerInvariant()"
+                                 data-category-amount="@category.Amount"
+                                 data-category-percentage="@category.Percentage">
+                                <div>
+                                    <strong>@category.CategoryName</strong>
+                                    <span>@category.Percentage.ToString("N2")% of demo spending</span>
+                                </div>
+
+                                <div>
+                                    <strong>@category.Amount.ToString("N1")</strong>
+                                    <span>@category.Unit</span>
+                                </div>
+                            </div>
+                        }
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+    <div class="app-card">
+        <div class="app-card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h5 class="card-heading">All Categories</h5>
+                    <p class="text-muted small mb-0">
+                        Plain-language category table for citizens.
+                    </p>
+                </div>
+            </div>
+
+            <div class="category-card-grid" id="categoryGrid">
+                @foreach (var category in categories.OrderByDescending(c => c.Amount))
+                {
+                    <div class="category-info-card"
+                         data-category-name="@category.CategoryName.ToLowerInvariant()"
+                         data-category-amount="@category.Amount"
+                         data-category-percentage="@category.Percentage">
+                        <div class="category-icon">@GetCategoryIcon(category.CategorySlug)</div>
+
+                        <div>
+                            <h6>@category.CategoryName</h6>
+                            <p>@GetCategoryDescription(category.CategorySlug)</p>
+
+                            <div class="category-card-meta">
+                                <span>@category.Amount.ToString("N1") @category.Unit</span>
+                                <span>@category.Percentage.ToString("N2")%</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@functions {
+    private static string GetCategoryIcon(string slug)
+    {
+        return slug switch
+        {
+            "healthcare" => "✚",
+            "education" => "📘",
+            "infrastructure" => "▣",
+            "social-support" => "👥",
+            "public-administration" => "🏛",
+            "security" => "🛡",
+            "environment" => "🌿",
+            _ => "●"
+        };
+    }
+
+    private static string GetCategoryDescription(string slug)
+    {
+        return slug switch
+        {
+            "healthcare" => "Public spending related to healthcare services and medical support.",
+            "education" => "Funding related to schools, education services, and learning infrastructure.",
+            "infrastructure" => "Spending for roads, public works, and physical infrastructure.",
+            "social-support" => "Programs that support households, vulnerable groups, and social services.",
+            "public-administration" => "Administrative services and public-sector management.",
+            "security" => "Public safety, security services, and related systems.",
+            "environment" => "Environmental protection, sustainability, and green public services.",
+            _ => "Public spending category used in the prototype dataset."
+        };
+    }
+}
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="~/js/categories.js"></script>
 }
-

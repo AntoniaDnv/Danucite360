@@ -20,16 +20,19 @@
             labels: data.labels,
             datasets: [
                 {
-                    label: `National Budget ${data.year} (${data.unit})`,
-                    data: data.values
+                    label: `Amount (${data.unit})`,
+                    data: data.values,
+                    borderWidth: 1,
+                    borderRadius: 8
                 }
             ]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
             plugins: {
                 legend: {
-                    display: true
+                    display: false
                 },
                 tooltip: {
                     callbacks: {
@@ -40,8 +43,18 @@
                 }
             },
             scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return value.toLocaleString();
+                        }
+                    }
                 }
             }
         }

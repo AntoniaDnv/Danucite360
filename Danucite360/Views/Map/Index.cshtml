@@ -1,39 +1,208 @@
 ﻿@model IEnumerable<Danucite360.Services.Models.RegionListServiceModel>
 
 @{
-    ViewData["Title"] = "Map";
+    ViewData["Title"] = "Compare Regions";
+    var regions = Model.ToList();
+    var highestSpending = regions.OrderByDescending(r => r.TotalDemoSpending).FirstOrDefault();
 }
 
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-start mb-4">
+<section class="page-shell">
+    <div class="page-header mb-4">
         <div>
-            <h1 class="fw-bold">Bulgaria Region Selector</h1>
-            <p class="text-muted">
-                Select a demo district to view regional spending by category.
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-demo">⚠ Demo Data</span>
+                <span class="last-updated">Last updated: 28 May 2026</span>
+            </div>
+
+            <h1 class="section-title mb-2">Compare Regions</h1>
+
+            <p class="section-subtitle mb-0">
+                Explore how public money is distributed across Bulgaria and compare regions
+                by total demo spending and population.
             </p>
         </div>
     </div>
+
     <partial name="_DemoNotice" />
 
-    <div class="row g-4">
-        @foreach (var region in Model)
-        {
-            <div class="col-md-6 col-lg-4">
-                <a class="text-decoration-none text-dark" href="/regions/@region.Slug">
-                    <div class="card h-100 shadow-sm border-0 region-card">
-                        <div class="card-body">
-                            <h4 class="card-title">@region.Name</h4>
-                            <p class="text-muted mb-2">
-                                Population: @region.Population.ToString("N0")
-                            </p>
-                            <p class="mb-0">
-                                <strong>@region.TotalDemoSpending.ToString("N1")</strong>
-                                <span class="text-muted">@region.Unit</span>
+    <div class="filter-bar app-card mb-4">
+        <div class="app-card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label small text-muted">Search region</label>
+                    <input id="regionSearch" type="search" class="form-control" placeholder="Search region..." />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">Year</label>
+                    <select class="form-select">
+                        <option selected>2026</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label small text-muted">Data status</label>
+                    <select class="form-select">
+                        <option selected>Demo regional data</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div>
+                            <h5 class="card-heading">Region selector</h5>
+                            <p class="text-muted small mb-0">
+                                Select a region to open its spending dashboard.
                             </p>
                         </div>
+
+                        <span class="status-badge status-demo">⚠ Demo Data</span>
                     </div>
-                </a>
+
+                    <div class="region-grid" id="regionGrid">
+                        @foreach (var region in regions)
+                        {
+                            <a class="region-tile"
+                               data-region-name="@region.Name.ToLowerInvariant()"
+                               href="/regions/@region.Slug">
+                                <div>
+                                    <h6>@region.Name</h6>
+                                    <p>@region.Population.ToString("N0") people</p>
+                                </div>
+
+                                <div class="region-tile-value">
+                                    <strong>@region.TotalDemoSpending.ToString("N1")</strong>
+                                    <span>@region.Unit</span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
             </div>
-        }
+        </div>
+
+        <div class="col-lg-4">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Regional highlights</h5>
+
+                    @if (highestSpending != null)
+                    {
+                        <div class="highlight-card mb-3">
+                            <div class="kpi-label">Highest demo spending</div>
+                            <div class="highlight-value">@highestSpending.Name</div>
+                            <div class="kpi-meta">
+                                @highestSpending.TotalDemoSpending.ToString("N1") @highestSpending.Unit
+                            </div>
+                        </div>
+                    }
+
+                    <div class="highlight-card mb-3">
+                        <div class="kpi-label">Regions included</div>
+                        <div class="highlight-value">@regions.Count</div>
+                        <div class="kpi-meta">Prototype comparison set</div>
+                    </div>
+
+                    <div class="highlight-card">
+                        <div class="kpi-label">Data confidence</div>
+                        <div class="highlight-value">Demo</div>
+                        <div class="kpi-meta">Regional values are not official yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Top Regions by Total Demo Spending</h5>
+                    <p class="text-muted small">
+                        Total spending can be higher in larger regions. Later, the product should also support per-person comparison.
+                    </p>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Region</th>
+                                    <th class="text-end">Total Demo Spending</th>
+                                    <th class="text-end">Population</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var index = 1;
+                                }
+
+                                @foreach (var region in regions.OrderByDescending(r => r.TotalDemoSpending))
+                                {
+                                    <tr>
+                                        <td>@index</td>
+                                        <td>
+                                            <a class="fw-semibold text-decoration-none" href="/regions/@region.Slug">
+                                                @region.Name
+                                            </a>
+                                        </td>
+                                        <td class="text-end">@region.TotalDemoSpending.ToString("N1")</td>
+                                        <td class="text-end">@region.Population.ToString("N0")</td>
+                                    </tr>
+
+                                    index++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Visual comparison</h5>
+                    <p class="text-muted small">
+                        Simple bar comparison of total demo spending by region.
+                    </p>
+
+                    <div class="region-bars">
+                        @{
+                            var max = regions.Max(r => r.TotalDemoSpending);
+                        }
+
+                        @foreach (var region in regions.OrderByDescending(r => r.TotalDemoSpending))
+                        {
+                            var width = max == 0 ? 0 : (region.TotalDemoSpending / max) * 100;
+
+                            <div class="region-bar-row">
+                                <div class="region-bar-label">@region.Name</div>
+                                <div class="region-bar-track">
+                                    <span style="width:@width%"></span>
+                                </div>
+                                <div class="region-bar-value">@region.TotalDemoSpending.ToString("N0")</div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mt-4">
+                        <a class="fw-semibold text-decoration-none" asp-controller="Budget" asp-action="Categories">
+                            View category breakdown →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/map.js"></script>
+}
