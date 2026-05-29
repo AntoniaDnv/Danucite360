@@ -4,74 +4,215 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="container py-5">
-    <div class="mb-4">
-        <h1 class="fw-bold">Admin Dashboard</h1>
-        <p class="text-muted">
-            Manage Danucite360 MVP data for budget year @Model.BudgetYear.
-        </p>
-    </div>
-
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="small text-muted">Regions</div>
-                    <div class="h2">@Model.RegionsCount</div>
-                </div>
+<section class="admin-shell">
+    <div class="admin-page-header mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-official">✓ Admin</span>
+                <span class="last-updated">Budget year @Model.BudgetYear</span>
             </div>
+
+            <h1 class="section-title mb-2">Admin Dashboard</h1>
+
+            <p class="section-subtitle mb-0">
+                Manage budget records, review demo data, and keep the public dashboard accurate.
+            </p>
         </div>
 
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="small text-muted">Categories</div>
-                    <div class="h2">@Model.CategoriesCount</div>
-                </div>
-            </div>
-        </div>
+        <div class="page-actions">
+            <a class="btn btn-primary btn-sm"
+               asp-area="Admin"
+               asp-controller="BudgetRecords"
+               asp-action="Create">
+                Add Budget Record
+            </a>
 
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="small text-muted">Budget Records</div>
-                    <div class="h2">@Model.BudgetRecordsCount</div>
-                </div>
-            </div>
+            <a class="btn btn-outline-primary btn-sm"
+               asp-area=""
+               asp-controller="Home"
+               asp-action="Index">
+                View Public Site
+            </a>
         </div>
     </div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="small text-muted">Sources</div>
-                    <div class="h2">@Model.SourcesCount</div>
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-title">Admin</div>
+
+            <nav class="admin-nav">
+                <a class="active"
+                   asp-area="Admin"
+                   asp-controller="Dashboard"
+                   asp-action="Index">
+                    Dashboard
+                </a>
+
+                <a asp-area="Admin"
+                   asp-controller="Regions"
+                   asp-action="Index">
+                    Regions
+                </a>
+
+                <a asp-area="Admin"
+                   asp-controller="BudgetRecords"
+                   asp-action="Index">
+                    Budget Records
+                </a>
+
+                <a asp-area=""
+                   asp-controller="Sources"
+                   asp-action="Index">
+                    Sources
+                </a>
+            </nav>
+
+            <div class="admin-sidebar-note">
+                <strong>MVP mode</strong>
+                <span>Regional data is currently demo data for prototype purposes.</span>
+            </div>
+        </aside>
+
+        <div class="admin-content">
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="admin-metric-card">
+                        <div class="kpi-icon kpi-icon-blue">◎</div>
+                        <div class="kpi-label">Regions</div>
+                        <div class="kpi-value">@Model.RegionsCount</div>
+                        <div class="kpi-meta">Prototype regions</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="admin-metric-card">
+                        <div class="kpi-icon kpi-icon-green">▦</div>
+                        <div class="kpi-label">Categories</div>
+                        <div class="kpi-value">@Model.CategoriesCount</div>
+                        <div class="kpi-meta">Budget categories</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="admin-metric-card">
+                        <div class="kpi-icon kpi-icon-blue">Σ</div>
+                        <div class="kpi-label">Budget Records</div>
+                        <div class="kpi-value">@Model.BudgetRecordsCount</div>
+                        <div class="kpi-meta">Records in database</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="small text-muted">Demo Budget Records</div>
-                    <div class="h2">@Model.DemoRecordsCount</div>
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <div class="app-card h-100">
+                        <div class="app-card-body">
+                            <h5 class="card-heading">Data quality summary</h5>
+                            <p class="text-muted small">
+                                MVP dataset status overview.
+                            </p>
+
+                            <div class="confidence-row">
+                                <div class="confidence-label">
+                                    <span class="confidence-dot official"></span>
+                                    Source documents
+                                </div>
+                                <div class="confidence-bar">
+                                    <span style="width: 100%" class="official"></span>
+                                </div>
+                                <strong>@Model.SourcesCount</strong>
+                            </div>
+
+                            <div class="confidence-row">
+                                <div class="confidence-label">
+                                    <span class="confidence-dot demo"></span>
+                                    Demo records
+                                </div>
+                                <div class="confidence-bar">
+                                    @{
+                                        var demoPercent = Model.BudgetRecordsCount == 0
+                                            ? 0
+                                            : (Model.DemoRecordsCount * 100 / Model.BudgetRecordsCount);
+                                    }
+                                    <span style="width:@demoPercent%" class="demo"></span>
+                                </div>
+                                <strong>@Model.DemoRecordsCount</strong>
+                            </div>
+
+                            <div class="methodology-note mt-4">
+                                <strong>Admin note:</strong>
+                                Use budget records to control what appears in public charts.
+                                Editing a record updates the public dashboard immediately.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="app-card h-100">
+                        <div class="app-card-body">
+                            <h5 class="card-heading">Quick actions</h5>
+                            <p class="text-muted small">
+                                Common admin tasks for managing the MVP dataset.
+                            </p>
+
+                            <div class="quick-action-list">
+                                <a asp-area="Admin"
+                                   asp-controller="BudgetRecords"
+                                   asp-action="Create">
+                                    <strong>Add Budget Record</strong>
+                                    <span>Create a national or regional budget entry.</span>
+                                </a>
+
+                                <a asp-area="Admin"
+                                   asp-controller="BudgetRecords"
+                                   asp-action="Index">
+                                    <strong>Review Budget Records</strong>
+                                    <span>Edit chart data and source-linked values.</span>
+                                </a>
+
+                                <a asp-area="Admin"
+                                   asp-controller="Regions"
+                                   asp-action="Index">
+                                    <strong>Manage Regions</strong>
+                                    <span>Create, edit, or review region records.</span>
+                                </a>
+
+                                <a asp-area=""
+                                   asp-controller="Sources"
+                                   asp-action="Index">
+                                    <strong>Check Sources</strong>
+                                    <span>Review public source and methodology pages.</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="app-card-body">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+                        <div>
+                            <h5 class="card-heading">Recommended next product improvements</h5>
+                            <p class="text-muted small mb-0">
+                                These are not required for the MVP, but they prepare Danucite360 for a sellable version.
+                            </p>
+                        </div>
+
+                        <span class="status-badge status-review">! Roadmap</span>
+                    </div>
+
+                    <div class="product-roadmap-list">
+                        <span>Publish / unpublish records</span>
+                        <span>Source upload workflow</span>
+                        <span>Funded projects by category</span>
+                        <span>Audit history</span>
+                        <span>Multi-year comparison</span>
+                        <span>Bulgarian language mode</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-primary" asp-area="Admin" asp-controller="Regions" asp-action="Index">
-            Manage Regions
-        </a>
-
-        <a class="btn btn-outline-primary" asp-area="Admin" asp-controller="BudgetRecords" asp-action="Index">
-            Manage Budget Records
-        </a>
-
-        <a class="btn btn-outline-secondary" asp-area="" asp-controller="Home" asp-action="Index">
-            Back to Public Site
-        </a>
-    </div>
-</div>
+</section>

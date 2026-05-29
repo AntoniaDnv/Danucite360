@@ -997,3 +997,138 @@ canvas {
         gap: 6px;
     }
 }
+.admin-shell {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 48px 24px;
+}
+
+.admin-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.admin-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.admin-sidebar {
+    background: var(--civic-navy);
+    color: #ffffff;
+    border-radius: 20px;
+    padding: 20px;
+    position: sticky;
+    top: 96px;
+}
+
+.admin-sidebar-title {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #BFDBFE;
+    margin-bottom: 14px;
+}
+
+.admin-nav {
+    display: grid;
+    gap: 8px;
+}
+
+    .admin-nav a {
+        color: #CBD5E1;
+        text-decoration: none;
+        border-radius: 12px;
+        padding: 11px 12px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+        .admin-nav a:hover,
+        .admin-nav a.active {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+.admin-sidebar-note {
+    margin-top: 24px;
+    border-radius: 16px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+    .admin-sidebar-note strong {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    .admin-sidebar-note span {
+        color: #CBD5E1;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+.admin-content {
+    min-width: 0;
+}
+
+.admin-metric-card {
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    border-radius: 18px;
+    box-shadow: var(--shadow-card);
+    padding: 22px;
+    height: 100%;
+}
+
+.quick-action-list {
+    display: grid;
+    gap: 12px;
+}
+
+    .quick-action-list a {
+        display: block;
+        border: 1px solid var(--border-light);
+        border-radius: 16px;
+        padding: 16px;
+        background: #ffffff;
+        text-decoration: none;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+        .quick-action-list a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        }
+
+    .quick-action-list strong {
+        display: block;
+        color: var(--deep-ink);
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+
+    .quick-action-list span {
+        color: var(--text-secondary);
+        font-size: 13px;
+    }
+
+@media (max-width: 992px) {
+    .admin-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-sidebar {
+        position: static;
+    }
+
+    .admin-page-header {
+        flex-direction: column;
+    }
+}
