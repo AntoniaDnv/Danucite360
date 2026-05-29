@@ -4,35 +4,95 @@
     ViewData["Title"] = "Source Details";
 }
 
-<div class="container py-5">
+<section class="page-shell">
     <div class="mb-4">
-        <a class="text-decoration-none" asp-controller="Sources" asp-action="Index">
-            ← Back to Sources
+        <a class="text-decoration-none fw-semibold"
+           asp-controller="Sources"
+           asp-action="Index">
+            ← Back to sources
         </a>
     </div>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
-            <h1 class="h3 fw-bold">@Model.Title</h1>
+    <div class="page-header mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-official">✓ Official Source</span>
+                <span class="last-updated">Retrieved: @Model.RetrievedOn.ToString("yyyy-MM-dd")</span>
+            </div>
 
-            <dl class="row mt-4">
-                <dt class="col-sm-3">Publisher</dt>
-                <dd class="col-sm-9">@Model.Publisher</dd>
+            <h1 class="section-title mb-2">@Model.Title</h1>
 
-                <dt class="col-sm-3">URL / Reference</dt>
-                <dd class="col-sm-9">@Model.Url</dd>
-
-                <dt class="col-sm-3">Published On</dt>
-                <dd class="col-sm-9">
-                    @(Model.PublishedOn?.ToString("yyyy-MM-dd") ?? "Not specified")
-                </dd>
-
-                <dt class="col-sm-3">Retrieved On</dt>
-                <dd class="col-sm-9">@Model.RetrievedOn.ToString("yyyy-MM-dd")</dd>
-
-                <dt class="col-sm-3">Notes</dt>
-                <dd class="col-sm-9">@Model.Notes</dd>
-            </dl>
+            <p class="section-subtitle mb-0">
+                Detailed reference information for this budget source.
+            </p>
         </div>
     </div>
-</div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Source information</h5>
+
+                    <dl class="source-details-list">
+                        <dt>Title</dt>
+                        <dd>@Model.Title</dd>
+
+                        <dt>Publisher</dt>
+                        <dd>@Model.Publisher</dd>
+
+                        <dt>Reference</dt>
+                        <dd>@Model.Url</dd>
+
+                        <dt>Published on</dt>
+                        <dd>@(Model.PublishedOn?.ToString("yyyy-MM-dd") ?? "Not specified")</dd>
+
+                        <dt>Retrieved on</dt>
+                        <dd>@Model.RetrievedOn.ToString("yyyy-MM-dd")</dd>
+
+                        <dt>Notes</dt>
+                        <dd>@Model.Notes</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="app-card mb-4">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Confidence label</h5>
+
+                    <span class="status-badge status-official mb-3">✓ Official Source</span>
+
+                    <p class="text-muted mb-0">
+                        This source is used to support official national budget values.
+                        Regional values in the MVP remain demo data unless explicitly verified.
+                    </p>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="app-card-body">
+                    <h5 class="card-heading">How this source is used</h5>
+
+                    <div class="methodology-list">
+                        <div>
+                            <strong>National values</strong>
+                            <span>Manually seeded from the source document.</span>
+                        </div>
+
+                        <div>
+                            <strong>Regional values</strong>
+                            <span>Demo values only in the current prototype.</span>
+                        </div>
+
+                        <div>
+                            <strong>Future product</strong>
+                            <span>Source uploads, review workflow, and publish/unpublish controls.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

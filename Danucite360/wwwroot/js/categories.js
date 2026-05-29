@@ -1,6 +1,6 @@
 ﻿document.addEventListener("DOMContentLoaded", async () => {
     await loadCategoriesChart();
-    setupCategoryFilters();
+    setupCategorySearchAndSort();
 });
 
 async function loadCategoriesChart() {
@@ -49,43 +49,64 @@ async function loadCategoriesChart() {
     });
 }
 
-function setupCategoryFilters() {
+function setupCategorySearchAndSort() {
     const searchInput = document.getElementById("categorySearch");
     const sortSelect = document.getElementById("categorySort");
     const grid = document.getElementById("categoryGrid");
 
     if (!searchInput || !sortSelect || !grid) {
+        console.warn("Category search/sort elements were not found.");
         return;
     }
 
     const cards = Array.from(grid.querySelectorAll(".category-info-card"));
 
-    function applyFilters() {
-        const query = searchInput.value.trim().toLowerCase();
+    function normalize(value) {
+        return (value || "").toString().trim().toLowerCase();
+    }
+
+    function getAmount(card) {
+        return Number(card.dataset.categoryAmount?.replace(",", ".") || 0);
+    }
+
+    function getPercentage(card) {
+        return Number(card.dataset.categoryPercentage?.replace(",", ".") || 0);
+    }
+
+    function applySearchAndSort() {
+        const query = normalize(searchInput.value);
         const sortBy = sortSelect.value;
 
-        cards.forEach(card => {
-            const name = card.dataset.categoryName || "";
-            card.style.display = name.includes(query) ? "grid" : "none";
+        let filteredCards = cards.filter(card => {
+            const name = normalize(card.dataset.categoryName);
+            return name.includes(query);
         });
 
-        const visibleCards = cards.filter(card => card.style.display !== "none");
-
-        visibleCards.sort((a, b) => {
+        filteredCards.sort((a, b) => {
             if (sortBy === "name") {
-                return (a.dataset.categoryName || "").localeCompare(b.dataset.categoryName || "");
+                return normalize(a.dataset.categoryName)
+                    .localeCompare(normalize(b.dataset.categoryName));
             }
 
             if (sortBy === "percentage") {
-                return Number(b.dataset.categoryPercentage) - Number(a.dataset.categoryPercentage);
+                return getPercentage(b) - getPercentage(a);
             }
 
-            return Number(b.dataset.categoryAmount) - Number(a.dataset.categoryAmount);
+            return getAmount(b) - getAmount(a);
         });
 
-        visibleCards.forEach(card => grid.appendChild(card));
+        cards.forEach(card => {
+            card.style.display = "none";
+        });
+
+        filteredCards.forEach(card => {
+            card.style.display = "grid";
+            grid.appendChild(card);
+        });
     }
 
-    searchInput.addEventListener("input", applyFilters);
-    sortSelect.addEventListener("change", applyFilters);
+    searchInput.addEventListener("input", applySearchAndSort);
+    sortSelect.addEventListener("change", applySearchAndSort);
+
+    applySearchAndSort();
 }

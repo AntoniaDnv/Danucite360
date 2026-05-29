@@ -1,41 +1,227 @@
 ﻿@model IEnumerable<Danucite360.Services.Models.SourceServiceModel>
 
 @{
-    ViewData["Title"] = "Sources";
+    ViewData["Title"] = "Sources and Methodology";
+    var sources = Model.ToList();
 }
 
-<div class="container py-5">
-    <div class="mb-4">
-        <h1 class="fw-bold">Budget Sources</h1>
-        <p class="text-muted">
-            Documents and references used by Danucite360.
-        </p>
+<section class="page-shell">
+    <div class="page-header mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-official">✓ Official Data</span>
+                <span class="status-badge status-demo">⚠ Demo Data</span>
+            </div>
+
+            <h1 class="section-title mb-2">Sources and Methodology</h1>
+
+            <p class="section-subtitle mb-0">
+                Every number in Danucite360 should be connected to a source,
+                a freshness date, and a confidence label.
+            </p>
+        </div>
     </div>
 
-    <div class="alert alert-info">
-        National budget values are manually seeded from the source document.
-        Regional spending values are demo data for prototype purposes.
+    <div class="plain-summary mb-4">
+        <strong>Why this page matters.</strong>
+        Danucite360 separates official source-based national values from demo regional values.
+        This helps citizens understand which numbers come from public documents and which are prototype data.
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-green">✓</div>
+                <div class="kpi-label">Official Sources</div>
+                <div class="kpi-value">@sources.Count</div>
+                <div class="kpi-meta">Registered source documents</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-blue">↻</div>
+                <div class="kpi-label">Data Freshness</div>
+                <div class="kpi-value">Tracked</div>
+                <div class="kpi-meta">Retrieved date stored per source</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-red">!</div>
+                <div class="kpi-label">Demo Data</div>
+                <div class="kpi-value">Marked</div>
+                <div class="kpi-meta">Prototype regional values are labeled</div>
+            </div>
+        </div>
+    </div>
+
+    <partial name="_DemoNotice" />
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-heading">Official Sources List</h5>
+                            <p class="text-muted small mb-0">
+                                Source documents used to support official national budget values.
+                            </p>
+                        </div>
+
+                        <span class="status-badge status-official">✓ Source referenced</span>
+                    </div>
+
+                    <div class="source-list">
+                        @foreach (var source in sources)
+                        {
+                            <a class="source-list-item"
+                               asp-controller="Sources"
+                               asp-action="Details"
+                               asp-route-id="@source.Id">
+                                <div class="source-document-icon">📄</div>
+
+                                <div class="source-list-content">
+                                    <h6>@source.Title</h6>
+                                    <p>@source.Publisher</p>
+
+                                    <div class="source-meta-row">
+                                        <span>Retrieved: @source.RetrievedOn.ToString("yyyy-MM-dd")</span>
+                                        <span class="status-badge status-official">✓ Official Source</span>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Source confidence</h5>
+                    <p class="text-muted small">
+                        The MVP uses official source-backed national values and demo regional data.
+                    </p>
+
+                    <div class="confidence-row">
+                        <div class="confidence-label">
+                            <span class="confidence-dot official"></span>
+                            Official Data
+                        </div>
+                        <div class="confidence-bar">
+                            <span style="width: 65%" class="official"></span>
+                        </div>
+                        <strong>65%</strong>
+                    </div>
+
+                    <div class="confidence-row">
+                        <div class="confidence-label">
+                            <span class="confidence-dot demo"></span>
+                            Demo Data
+                        </div>
+                        <div class="confidence-bar">
+                            <span style="width: 35%" class="demo"></span>
+                        </div>
+                        <strong>35%</strong>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="methodology-note">
+                            <strong>Product principle:</strong>
+                            official values should always link to a public source, while demo values must be clearly labeled.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row g-4">
-        @foreach (var source in Model)
-        {
-            <div class="col-lg-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body">
-                        <h5>@source.Title</h5>
-                        <p class="text-muted mb-2">@source.Publisher</p>
-                        <p>@source.Notes</p>
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Methodology</h5>
+
+                    <div class="methodology-list">
+                        <div>
+                            <strong>1. Source collection</strong>
+                            <span>
+                                Budget source documents are registered with publisher, title, reference, and retrieval date.
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>2. Manual verification</strong>
+                            <span>
+                                For the MVP, national values are manually entered from the source document.
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>3. Demo labeling</strong>
+                            <span>
+                                Regional prototype values are labeled as demo data and should not be treated as official figures.
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>4. Public visualization</strong>
+                            <span>
+                                The public dashboard shows values through cards, charts, source labels, and plain-language explanations.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Data status labels</h5>
+
+                    <div class="status-explainer">
+                        <div>
+                            <span class="status-badge status-official">✓ Official Data</span>
+                            <p>
+                                Comes from a confirmed public institution or published public finance source.
+                            </p>
+                        </div>
+
+                        <div>
+                            <span class="status-badge status-demo">⚠ Demo Data</span>
+                            <p>
+                                Used for prototype and design testing. It should not be treated as official.
+                            </p>
+                        </div>
+
+                        <div>
+                            <span class="status-badge status-review">! Needs Review</span>
+                            <p>
+                                A future status for records that require verification before being published.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <a class="btn btn-primary"
+                           asp-controller="Budget"
+                           asp-action="National">
+                            View National Budget
+                        </a>
 
                         <a class="btn btn-outline-primary"
-                           asp-controller="Sources"
-                           asp-action="Details"
-                           asp-route-id="@source.Id">
-                            View Details
+                           asp-controller="Map"
+                           asp-action="Index">
+                            Compare Regions
                         </a>
                     </div>
                 </div>
             </div>
-        }
+        </div>
     </div>
-</div>
+</section>
