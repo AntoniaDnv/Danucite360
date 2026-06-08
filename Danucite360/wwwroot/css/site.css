@@ -1132,3 +1132,80 @@ canvas {
         flex-direction: column;
     }
 }
+.admin-data-table {
+    min-width: 980px;
+}
+
+.record-title {
+    color: var(--deep-ink);
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.record-subtitle {
+    color: var(--text-muted);
+    font-size: 12px;
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.record-amount {
+    color: var(--deep-ink);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.source-short {
+    color: var(--text-secondary);
+    font-size: 13px;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.table-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.empty-state {
+    border: 1px dashed var(--border-medium);
+    border-radius: 18px;
+    padding: 40px 24px;
+    text-align: center;
+    background: #ffffff;
+}
+
+.empty-state-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.empty-state h5 {
+    color: var(--deep-ink);
+    font-weight: 700;
+}
+
+.empty-state p {
+    color: var(--text-secondary);
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .table-actions {
+        justify-content: flex-start;
+    }
+}
+.admin-data-table code {
+    background: var(--soft-blue);
+    color: var(--civic-navy);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 700;
+}

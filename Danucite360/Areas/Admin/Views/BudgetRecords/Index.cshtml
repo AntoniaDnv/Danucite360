@@ -1,82 +1,278 @@
 ﻿@model IEnumerable<Danucite360.Data.Models.BudgetRecord>
 
 @{
-    ViewData["Title"] = "Manage Budget Records";
+    ViewData["Title"] = "Budget Records";
+    var records = Model.ToList();
+
+    var officialCount = records.Count(r => !r.IsDemo);
+    var demoCount = records.Count(r => r.IsDemo);
+    var nationalCount = records.Count(r => r.RegionId == null);
+    var regionalCount = records.Count(r => r.RegionId != null);
 }
 
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<section class="admin-shell">
+    <div class="admin-page-header mb-4">
         <div>
-            <h1 class="fw-bold">Manage Budget Records</h1>
-            <p class="text-muted">Edit national values and demo regional spending.</p>
-        </div>
-
-        <a class="btn btn-primary" asp-area="Admin" asp-controller="BudgetRecords" asp-action="Create">
-            Create Budget Record
-        </a>
-    </div>
-
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-sm align-middle">
-                    <thead>
-                        <tr>
-                            <th>Year</th>
-                            <th>Type</th>
-                            <th>Region</th>
-                            <th>Category</th>
-                            <th class="text-end">Amount</th>
-                            <th>Unit</th>
-                            <th>Demo</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var record in Model)
-                        {
-                            <tr>
-                                <td>@record.BudgetYear</td>
-                                <td>@record.RecordType</td>
-                                <td>@(record.Region?.Name ?? "National")</td>
-                                <td>@record.BudgetCategory.Name</td>
-                                <td class="text-end">@record.Amount.ToString("N1")</td>
-                                <td>@record.Unit</td>
-                                <td>@(record.IsDemo ? "Yes" : "No")</td>
-                                <td class="text-end">
-                                    <a class="btn btn-sm btn-outline-secondary"
-                                       asp-area="Admin"
-                                       asp-controller="BudgetRecords"
-                                       asp-action="Details"
-                                       asp-route-id="@record.Id">
-                                        Details
-                                    </a>
-
-                                    <a class="btn btn-sm btn-outline-primary"
-                                       asp-area="Admin"
-                                       asp-controller="BudgetRecords"
-                                       asp-action="Edit"
-                                       asp-route-id="@record.Id">
-                                        Edit
-                                    </a>
-
-                                    <a class="btn btn-sm btn-outline-danger"
-                                       asp-area="Admin"
-                                       asp-controller="BudgetRecords"
-                                       asp-action="Delete"
-                                       asp-route-id="@record.Id">
-                                        Delete
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-official">✓ Admin</span>
+                <span class="last-updated">Budget record management</span>
             </div>
 
-            <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                Back to Dashboard
+            <h1 class="section-title mb-2">Budget Records</h1>
+
+            <p class="section-subtitle mb-0">
+                Search, review, and manage all public finance records used across Danucite360.
+            </p>
+        </div>
+
+        <div class="page-actions">
+            <a class="btn btn-primary btn-sm"
+               asp-area="Admin"
+               asp-controller="BudgetRecords"
+               asp-action="Create">
+                Add Budget Record
+            </a>
+
+            <a class="btn btn-outline-primary btn-sm"
+               asp-area="Admin"
+               asp-controller="Dashboard"
+               asp-action="Index">
+                Dashboard
             </a>
         </div>
     </div>
-</div>
+
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-title">Admin</div>
+
+            <nav class="admin-nav">
+                <a asp-area="Admin"
+                   asp-controller="Dashboard"
+                   asp-action="Index">
+                    Dashboard
+                </a>
+
+                <a asp-area="Admin"
+                   asp-controller="Regions"
+                   asp-action="Index">
+                    Regions
+                </a>
+
+                <a class="active"
+                   asp-area="Admin"
+                   asp-controller="BudgetRecords"
+                   asp-action="Index">
+                    Budget Records
+                </a>
+
+                <a asp-area=""
+                   asp-controller="Sources"
+                   asp-action="Index">
+                    Sources
+                </a>
+            </nav>
+
+            <div class="admin-sidebar-note">
+                <strong>Data rule</strong>
+                <span>Regional MVP records should remain marked as demo data.</span>
+            </div>
+        </aside>
+
+        <div class="admin-content">
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="admin-metric-card">
+                        <div class="kpi-label">All Records</div>
+                        <div class="kpi-value">@records.Count</div>
+                        <div class="kpi-meta">Total entries</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="admin-metric-card">
+                        <div class="kpi-label">Official</div>
+                        <div class="kpi-value">@officialCount</div>
+                        <div class="kpi-meta">Source-backed records</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="admin-metric-card">
+                        <div class="kpi-label">Demo</div>
+                        <div class="kpi-value">@demoCount</div>
+                        <div class="kpi-meta">Prototype records</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="admin-metric-card">
+                        <div class="kpi-label">Regional</div>
+                        <div class="kpi-value">@regionalCount</div>
+                        <div class="kpi-meta">Region-linked records</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-bar app-card mb-4">
+                <div class="app-card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">Search records</label>
+                            <input id="recordSearch"
+                                   type="search"
+                                   class="form-control"
+                                   placeholder="Search by type, region, category..." />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Data status</label>
+                            <select id="recordStatusFilter" class="form-select">
+                                <option value="all" selected>All</option>
+                                <option value="official">Official</option>
+                                <option value="demo">Demo</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Scope</label>
+                            <select id="recordScopeFilter" class="form-select">
+                                <option value="all" selected>All</option>
+                                <option value="national">National</option>
+                                <option value="regional">Regional</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2 text-md-end">
+                            <button id="resetRecordFilters" type="button" class="btn btn-outline-secondary w-100">
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="app-card-body">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+                        <div>
+                            <h5 class="card-heading">Records table</h5>
+                            <p class="text-muted small mb-0">
+                                Table-first admin screen for reviewing and editing public finance values.
+                            </p>
+                        </div>
+
+                        <span class="status-badge status-review">! Review before publishing</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table admin-data-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Record</th>
+                                    <th>Year</th>
+                                    <th>Region</th>
+                                    <th>Category</th>
+                                    <th class="text-end">Amount</th>
+                                    <th>Status</th>
+                                    <th>Source</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="budgetRecordsTableBody">
+                                @foreach (var record in records)
+                                {
+                                    var status = record.IsDemo ? "demo" : "official";
+                                    var scope = record.RegionId == null ? "national" : "regional";
+
+                                    <tr data-record-row
+                                        data-search="@($"{record.RecordType} {record.Region?.Name ?? "National"} {record.BudgetCategory.Name} {record.BudgetSource.Title}".ToLowerInvariant())"
+                                        data-status="@status"
+                                        data-scope="@scope">
+                                        <td>
+                                            <div class="record-title">@record.RecordType</div>
+                                            <div class="record-subtitle">@record.Notes</div>
+                                        </td>
+
+                                        <td>@record.BudgetYear</td>
+
+                                        <td>@(record.Region?.Name ?? "National")</td>
+
+                                        <td>@record.BudgetCategory.Name</td>
+
+                                        <td class="text-end">
+                                            <div class="record-amount">@record.Amount.ToString("N1")</div>
+                                            <div class="record-subtitle">@record.Unit</div>
+                                        </td>
+
+                                        <td>
+                                            @if (record.IsDemo)
+                                            {
+                                                <span class="status-badge status-demo">⚠ Demo</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-badge status-official">✓ Official</span>
+                                            }
+                                        </td>
+
+                                        <td>
+                                            <div class="source-short">@record.BudgetSource.Title</div>
+                                        </td>
+
+                                        <td class="text-end">
+                                            <div class="table-actions">
+                                                <a class="btn btn-sm btn-outline-secondary"
+                                                   asp-area="Admin"
+                                                   asp-controller="BudgetRecords"
+                                                   asp-action="Details"
+                                                   asp-route-id="@record.Id">
+                                                    Details
+                                                </a>
+
+                                                <a class="btn btn-sm btn-outline-primary"
+                                                   asp-area="Admin"
+                                                   asp-controller="BudgetRecords"
+                                                   asp-action="Edit"
+                                                   asp-route-id="@record.Id">
+                                                    Edit
+                                                </a>
+
+                                                <a class="btn btn-sm btn-outline-danger"
+                                                   asp-area="Admin"
+                                                   asp-controller="BudgetRecords"
+                                                   asp-action="Delete"
+                                                   asp-route-id="@record.Id">
+                                                    Delete
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="recordsEmptyState" class="empty-state d-none">
+                        <div class="empty-state-icon">🔍</div>
+                        <h5>No budget records match your filters.</h5>
+                        <p>Try changing the search text, data status, or scope filter.</p>
+                    </div>
+
+                    <div class="mt-4">
+                        <a class="btn btn-outline-secondary"
+                           asp-area="Admin"
+                           asp-controller="Dashboard"
+                           asp-action="Index">
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/admin-budget-records.js" asp-append-version="true"></script>
+}

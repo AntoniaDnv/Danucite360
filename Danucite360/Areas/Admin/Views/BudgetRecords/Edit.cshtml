@@ -4,92 +4,188 @@
     ViewData["Title"] = "Edit Budget Record";
 }
 
-<div class="container py-5">
-    <h1 class="fw-bold mb-4">Edit Budget Record</h1>
+<section class="admin-shell">
+    <div class="admin-page-header mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-official">✓ Admin</span>
+                <span class="last-updated">Editing existing record</span>
+            </div>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
+            <h1 class="section-title mb-2">Edit Budget Record</h1>
+
+            <p class="section-subtitle mb-0">
+                Update a budget value used by public charts and dashboard summaries.
+            </p>
+        </div>
+
+        <div class="page-actions">
+            <a class="btn btn-outline-primary btn-sm"
+               asp-area="Admin"
+               asp-controller="BudgetRecords"
+               asp-action="Index">
+                Back to Records
+            </a>
+        </div>
+    </div>
+
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-title">Admin</div>
+
+            <nav class="admin-nav">
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                <a asp-area="Admin" asp-controller="Regions" asp-action="Index">Regions</a>
+                <a class="active" asp-area="Admin" asp-controller="BudgetRecords" asp-action="Index">Budget Records</a>
+                <a asp-area="" asp-controller="Sources" asp-action="Index">Sources</a>
+            </nav>
+
+            <div class="admin-sidebar-note">
+                <strong>Careful</strong>
+                <span>Changes here update the public dashboard after saving.</span>
+            </div>
+        </aside>
+
+        <div class="admin-content">
             <form method="post">
                 @Html.AntiForgeryToken()
 
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="app-card mb-4">
+                            <div class="app-card-body">
+                                <h5 class="card-heading">Record details</h5>
+                                <p class="text-muted small">
+                                    Edit the amount, classification, source, and data status for this record.
+                                </p>
 
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label asp-for="BudgetYear" class="form-label"></label>
-                        <input asp-for="BudgetYear" class="form-control" />
-                        <span asp-validation-for="BudgetYear" class="text-danger"></span>
-                    </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                    <div class="col-md-4">
-                        <label asp-for="RecordType" class="form-label"></label>
-                        <select asp-for="RecordType" asp-items="Model.RecordTypes" class="form-select"></select>
-                        <span asp-validation-for="RecordType" class="text-danger"></span>
-                    </div>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label asp-for="BudgetYear" class="form-label"></label>
+                                        <input asp-for="BudgetYear" class="form-control" />
+                                        <span asp-validation-for="BudgetYear" class="text-danger"></span>
+                                    </div>
 
-                    <div class="col-md-4">
-                        <label asp-for="Amount" class="form-label"></label>
-                        <input asp-for="Amount" class="form-control" />
-                        <span asp-validation-for="Amount" class="text-danger"></span>
-                    </div>
+                                    <div class="col-md-4">
+                                        <label asp-for="RecordType" class="form-label"></label>
+                                        <select asp-for="RecordType" asp-items="Model.RecordTypes" class="form-select"></select>
+                                        <span asp-validation-for="RecordType" class="text-danger"></span>
+                                    </div>
 
-                    <div class="col-md-4">
-                        <label asp-for="Currency" class="form-label"></label>
-                        <input asp-for="Currency" class="form-control" />
-                        <span asp-validation-for="Currency" class="text-danger"></span>
-                    </div>
+                                    <div class="col-md-4">
+                                        <label asp-for="Amount" class="form-label"></label>
+                                        <input asp-for="Amount" class="form-control" />
+                                        <span asp-validation-for="Amount" class="text-danger"></span>
+                                    </div>
 
-                    <div class="col-md-4">
-                        <label asp-for="Unit" class="form-label"></label>
-                        <input asp-for="Unit" class="form-control" />
-                        <span asp-validation-for="Unit" class="text-danger"></span>
-                    </div>
+                                    <div class="col-md-4">
+                                        <label asp-for="Currency" class="form-label"></label>
+                                        <input asp-for="Currency" class="form-control" />
+                                        <span asp-validation-for="Currency" class="text-danger"></span>
+                                    </div>
 
-                    <div class="col-md-4">
-                        <label asp-for="RegionId" class="form-label">Region</label>
-                        <select asp-for="RegionId" asp-items="Model.Regions" class="form-select">
-                            <option value="">National / No region</option>
-                        </select>
-                        <span asp-validation-for="RegionId" class="text-danger"></span>
-                    </div>
+                                    <div class="col-md-4">
+                                        <label asp-for="Unit" class="form-label"></label>
+                                        <input asp-for="Unit" class="form-control" />
+                                        <span asp-validation-for="Unit" class="text-danger"></span>
+                                    </div>
 
-                    <div class="col-md-6">
-                        <label asp-for="BudgetCategoryId" class="form-label">Category</label>
-                        <select asp-for="BudgetCategoryId" asp-items="Model.Categories" class="form-select"></select>
-                        <span asp-validation-for="BudgetCategoryId" class="text-danger"></span>
-                    </div>
+                                    <div class="col-md-4">
+                                        <label asp-for="RegionId" class="form-label">Region</label>
+                                        <select asp-for="RegionId" asp-items="Model.Regions" class="form-select">
+                                            <option value="">National / No region</option>
+                                        </select>
+                                        <span asp-validation-for="RegionId" class="text-danger"></span>
+                                    </div>
 
-                    <div class="col-md-6">
-                        <label asp-for="BudgetSourceId" class="form-label">Source</label>
-                        <select asp-for="BudgetSourceId" asp-items="Model.Sources" class="form-select"></select>
-                        <span asp-validation-for="BudgetSourceId" class="text-danger"></span>
-                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="BudgetCategoryId" class="form-label">Category</label>
+                                        <select asp-for="BudgetCategoryId" asp-items="Model.Categories" class="form-select"></select>
+                                        <span asp-validation-for="BudgetCategoryId" class="text-danger"></span>
+                                    </div>
 
-                    <div class="col-12">
-                        <label asp-for="Notes" class="form-label"></label>
-                        <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
-                        <span asp-validation-for="Notes" class="text-danger"></span>
-                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="BudgetSourceId" class="form-label">Source</label>
+                                        <select asp-for="BudgetSourceId" asp-items="Model.Sources" class="form-select"></select>
+                                        <span asp-validation-for="BudgetSourceId" class="text-danger"></span>
+                                    </div>
 
-                    <div class="col-12">
-                        <div class="form-check">
-                            <input asp-for="IsDemo" class="form-check-input" />
-                            <label asp-for="IsDemo" class="form-check-label"></label>
+                                    <div class="col-12">
+                                        <label asp-for="Notes" class="form-label"></label>
+                                        <textarea asp-for="Notes" class="form-control" rows="4"></textarea>
+                                        <span asp-validation-for="Notes" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <span asp-validation-for="IsDemo" class="text-danger"></span>
-                    </div>
-                </div>
 
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                    <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="BudgetRecords" asp-action="Index">
-                        Cancel
-                    </a>
+                        <div class="app-card">
+                            <div class="app-card-body">
+                                <h5 class="card-heading">Data status</h5>
+
+                                <div class="form-check form-switch">
+                                    <input asp-for="IsDemo" class="form-check-input" />
+                                    <label asp-for="IsDemo" class="form-check-label">
+                                        Mark as demo data
+                                    </label>
+                                </div>
+
+                                <span asp-validation-for="IsDemo" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="app-card mb-4">
+                            <div class="app-card-body">
+                                <h5 class="card-heading">Editing guidance</h5>
+
+                                <div class="methodology-list">
+                                    <div>
+                                        <strong>Public impact</strong>
+                                        <span>Changing this value may update public charts immediately.</span>
+                                    </div>
+
+                                    <div>
+                                        <strong>Regional data</strong>
+                                        <span>Regional MVP values should remain marked as demo data.</span>
+                                    </div>
+
+                                    <div>
+                                        <strong>Source</strong>
+                                        <span>Keep the source reference connected to the value.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sticky-action-card app-card">
+                            <div class="app-card-body">
+                                <h5 class="card-heading">Save changes</h5>
+                                <p class="text-muted small">
+                                    Review before saving because public pages read from these records.
+                                </p>
+
+                                <button type="submit" class="btn btn-primary w-100 mb-2">
+                                    Save Changes
+                                </button>
+
+                                <a class="btn btn-outline-secondary w-100"
+                                   asp-area="Admin"
+                                   asp-controller="BudgetRecords"
+                                   asp-action="Index">
+                                    Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
-</div>
+</section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
