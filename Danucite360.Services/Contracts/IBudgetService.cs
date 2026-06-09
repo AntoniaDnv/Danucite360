@@ -8,6 +8,8 @@ public interface IBudgetService
 
     Task<IEnumerable<CategorySpendingServiceModel>> GetCategoryOverviewAsync(int year);
 
+    Task<CategoryDetailServiceModel?> GetCategoryDetailAsync(string categorySlug, int year);
+
     Task<ChartDataServiceModel> GetNationalChartDataAsync(int year);
 
     Task<ChartDataServiceModel> GetCategoryChartDataAsync(int year);

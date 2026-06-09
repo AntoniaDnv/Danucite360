@@ -101,6 +101,79 @@ public class BudgetService : IBudgetService
             .ToList();
     }
 
+    public async Task<CategoryDetailServiceModel?> GetCategoryDetailAsync(string categorySlug, int year)
+    {
+        var category = await context.BudgetCategories
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Slug == categorySlug);
+
+        if (category == null)
+        {
+            return null;
+        }
+
+        var records = await context.BudgetRecords
+            .AsNoTracking()
+            .Include(r => r.Region)
+            .Where(r => r.BudgetYear == year &&
+                        r.RecordType == BudgetRecordTypes.RegionalExpense &&
+                        r.BudgetCategoryId == category.Id)
+            .ToListAsync();
+
+        // Only regional spending categories have detail pages.
+        if (records.Count == 0)
+        {
+            return null;
+        }
+
+        var totalAmount = records.Sum(r => r.Amount);
+
+        var allRegionalTotal = await context.BudgetRecords
+            .AsNoTracking()
+            .Where(r => r.BudgetYear == year &&
+                        r.RecordType == BudgetRecordTypes.RegionalExpense)
+            .SumAsync(r => r.Amount);
+
+        var totalPopulation = records
+            .Where(r => r.Region != null)
+            .Sum(r => (long)r.Region!.Population);
+
+        var perCapita = totalPopulation > 0 ? totalAmount * 1000m / totalPopulation : 0m;
+
+        var regions = records
+            .Where(r => r.Region != null)
+            .Select(r => new RegionCategoryAmountServiceModel
+            {
+                RegionName = r.Region!.Name,
+                RegionSlug = r.Region.Slug,
+                Population = r.Region.Population,
+                Amount = r.Amount,
+                PerCapita = r.Region.Population > 0 ? r.Amount * 1000m / r.Region.Population : 0m
+            })
+            .OrderByDescending(r => r.PerCapita)
+            .ToList();
+
+        foreach (var region in regions)
+        {
+            region.VsAveragePercent = perCapita == 0
+                ? 0
+                : Math.Round((region.PerCapita - perCapita) / perCapita * 100, 1);
+        }
+
+        return new CategoryDetailServiceModel
+        {
+            CategorySlug = category.Slug,
+            CategoryName = category.Name,
+            Description = category.Description,
+            BudgetYear = year,
+            TotalAmount = totalAmount,
+            Percentage = allRegionalTotal == 0 ? 0 : Math.Round(totalAmount / allRegionalTotal * 100, 2),
+            PerCapita = perCapita,
+            Unit = records.First().Unit,
+            Regions = regions
+        };
+    }
+
     public async Task<ChartDataServiceModel> GetNationalChartDataAsync(int year)
     {
         var overview = await GetNationalOverviewAsync(year);

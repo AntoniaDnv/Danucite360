@@ -26,4 +26,17 @@ public class BudgetController : Controller
         var model = await budgetService.GetCategoryOverviewAsync(DataConstants.BudgetYear);
         return View(model);
     }
+
+    [HttpGet("/budget/categories/{slug}")]
+    public async Task<IActionResult> Category(string slug)
+    {
+        var model = await budgetService.GetCategoryDetailAsync(slug, DataConstants.BudgetYear);
+
+        if (model == null)
+        {
+            return NotFound();
+        }
+
+        return View(model);
+    }
 }

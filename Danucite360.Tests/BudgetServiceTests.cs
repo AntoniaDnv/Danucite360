@@ -77,6 +77,31 @@ public class BudgetServiceTests
     }
 
     [Fact]
+    public async Task GetCategoryDetailAsync_AggregatesRegionalDataForCategory()
+    {
+        using var context = TestDbContextFactory.CreateDbContext();
+        var service = new BudgetService(context);
+
+        var result = await service.GetCategoryDetailAsync("education", DataConstants.BudgetYear);
+
+        Assert.NotNull(result);
+        Assert.Equal(190000m, result!.TotalAmount); // Sofia 120000 + Plovdiv 70000
+        Assert.Equal(2, result.Regions.Count);
+    }
+
+    [Fact]
+    public async Task GetCategoryDetailAsync_ReturnsNullForNonRegionalCategory()
+    {
+        using var context = TestDbContextFactory.CreateDbContext();
+        var service = new BudgetService(context);
+
+        // "revenue" only has a national record, so it has no category detail page.
+        var result = await service.GetCategoryDetailAsync("revenue", DataConstants.BudgetYear);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
     public async Task GetCategoryOverviewAsync_GroupsRegionalExpensesByCategory()
     {
         using var context = TestDbContextFactory.CreateDbContext();

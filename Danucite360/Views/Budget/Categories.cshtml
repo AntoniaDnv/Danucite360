@@ -164,10 +164,11 @@
             <div class="category-card-grid" id="categoryGrid">
                 @foreach (var category in categories.OrderByDescending(c => c.Amount))
                 {
-                    <div class="category-info-card"
-                         data-category-name="@category.CategoryName.ToLowerInvariant()"
-                         data-category-amount="@category.Amount"
-                         data-category-percentage="@category.Percentage">
+                    <a class="category-info-card"
+                       href="/budget/categories/@category.CategorySlug"
+                       data-category-name="@category.CategoryName.ToLowerInvariant()"
+                       data-category-amount="@category.Amount"
+                       data-category-percentage="@category.Percentage">
                         <div class="category-icon">@GetCategoryIcon(category.CategorySlug)</div>
 
                         <div>
@@ -177,9 +178,10 @@
                             <div class="category-card-meta">
                                 <span>@category.Amount.ToString("N1") @category.Unit</span>
                                 <span>@category.Percentage.ToString("N2")%</span>
+                                <span class="view-detail">View details →</span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 }
             </div>
         </div>

@@ -1,0 +1,167 @@
+@model Danucite360.Services.Models.CategoryDetailServiceModel
+
+@{
+    ViewData["Title"] = Model.CategoryName + " Spending";
+
+    var maxAmount = Model.Regions.Any() ? Model.Regions.Max(r => r.Amount) : 1m;
+}
+
+<section class="page-shell">
+    <div class="page-header mb-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-demo">⚠ Demo Data</span>
+                <span class="last-updated">Budget year @Model.BudgetYear</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="category-icon category-icon-lg">@GetCategoryIcon(Model.CategorySlug)</span>
+                <div>
+                    <h1 class="section-title mb-1">@Model.CategoryName Spending</h1>
+                    <p class="section-subtitle mb-0">Category analysis and regional distribution.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-actions">
+            <a class="btn btn-outline-secondary btn-sm" asp-controller="Budget" asp-action="Categories">
+                ← All Categories
+            </a>
+        </div>
+    </div>
+
+    <partial name="_DemoNotice" />
+
+    <div class="row g-4 my-1">
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Spending</div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.TotalAmount)</div>
+                <div class="kpi-meta">Across @Model.Regions.Count regions</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">% of Demo Spending</div>
+                <div class="kpi-value">@Model.Percentage.ToString("N1")%</div>
+                <div class="kpi-meta">Share of all regional demo spend</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Spending per Capita</div>
+                <div class="kpi-value">€@Model.PerCapita.ToString("N0")</div>
+                <div class="kpi-meta">Per resident</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Regions Covered</div>
+                <div class="kpi-value">@Model.Regions.Count</div>
+                <div class="kpi-meta">Demo comparison set</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+        <div class="col-lg-7">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Regional Breakdown</h5>
+                    <p class="text-muted small">Demo @Model.CategoryName.ToLower() spending by region (thousand EUR).</p>
+
+                    <div class="revenue-bars mt-3">
+                        @foreach (var r in Model.Regions.OrderByDescending(r => r.Amount))
+                        {
+                            var pct = Model.TotalAmount == 0 ? 0 : (double)(r.Amount / Model.TotalAmount) * 100;
+                            <div class="revenue-bar-row">
+                                <span class="revenue-bar-label">
+                                    <a class="text-decoration-none" href="/regions/@r.RegionSlug">@r.RegionName</a>
+                                </span>
+                                <div class="revenue-bar-track">
+                                    <span style="width:@(((double)(r.Amount / maxAmount) * 100).ToString("F1"))%"></span>
+                                </div>
+                                <span class="revenue-bar-value mono">@MoneyFormatter.FormatThousandEur(r.Amount) · @pct.ToString("F1")%</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="source-ref">Source: Danucite360 demo distribution</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Regional Disparity</h5>
+                    <p class="text-muted small">Per-capita spending vs the category average (€@Model.PerCapita.ToString("N0")).</p>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Region</th>
+                                    <th class="num">Per Capita (EUR)</th>
+                                    <th class="num">vs avg</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var r in Model.Regions)
+                                {
+                                    <tr>
+                                        <td><a class="text-decoration-none" href="/regions/@r.RegionSlug">@r.RegionName</a></td>
+                                        <td class="num">€@r.PerCapita.ToString("N0")</td>
+                                        <td class="num">
+                                            <span class="vs-avg @(r.VsAveragePercent >= 0 ? "vs-up" : "vs-down")">
+                                                @(r.VsAveragePercent >= 0 ? "▲ +" : "▼ ")@r.VsAveragePercent.ToString("N1")%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-card mt-4">
+        <div class="app-card-body">
+            <h5 class="card-heading">What this category includes</h5>
+            <p class="mb-0 text-secondary">@GetCategoryDescription(Model.CategorySlug)</p>
+        </div>
+    </div>
+</section>
+
+@functions {
+    private static string GetCategoryIcon(string slug)
+    {
+        return slug switch
+        {
+            "healthcare" => "✚",
+            "education" => "📘",
+            "infrastructure" => "▣",
+            "social-support" => "👥",
+            "public-administration" => "🏛",
+            "security" => "🛡",
+            "environment" => "🌿",
+            _ => "●"
+        };
+    }
+
+    private static string GetCategoryDescription(string slug)
+    {
+        return slug switch
+        {
+            "healthcare" => "Healthcare encompasses public spending designed to improve health outcomes: funding for state and municipal hospitals, clinical care, medical programs, health administration, and related services.",
+            "education" => "Education covers funding for schools, universities, teaching staff, learning materials, and the public education infrastructure that supports students across the country.",
+            "infrastructure" => "Infrastructure includes spending on roads, bridges, public works, utilities, and the physical assets that keep regions connected and functioning.",
+            "social-support" => "Social support funds programs for households, pensions, vulnerable groups, family assistance, and the social safety net.",
+            "public-administration" => "Public administration covers the cost of running public institutions: administrative services, public-sector management, and government operations.",
+            "security" => "Security includes public safety, policing, emergency services, and the systems that protect citizens and public order.",
+            "environment" => "Environment covers environmental protection, sustainability programs, waste management, and green public services.",
+            _ => "Public spending category used in the Danucite360 prototype dataset."
+        };
+    }
+}
