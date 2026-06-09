@@ -39,17 +39,30 @@
     <div class="filter-bar app-card mb-4">
         <div class="app-card-body">
             <div class="row g-3 align-items-end">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <label class="form-label small text-muted">Search region</label>
                     <input id="regionSearch" type="search" class="form-control" placeholder="Search region..." />
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label small text-muted">Year</label>
-                    <select class="form-select"><option selected>2026</option></select>
+                    <select id="regionYear" class="form-select"><option selected>2026</option></select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label small text-muted">Data status</label>
-                    <select class="form-select"><option selected>Demo regional data</option></select>
+                    <select id="regionStatus" class="form-select">
+                        <option value="all" selected>All</option>
+                        <option value="demo">Demo</option>
+                        <option value="official">Official</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">Sort by</label>
+                    <select id="regionSort" class="form-select">
+                        <option value="percapita" selected>Per Capita</option>
+                        <option value="spending">Total Spending</option>
+                        <option value="population">Population</option>
+                        <option value="name">Name</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -108,17 +121,27 @@
                     <tbody>
                         @foreach (var r in byPerCapita)
                         {
-                            <tr data-region-name="@r.Name.ToLowerInvariant()">
+                            <tr data-region-name="@r.Name.ToLowerInvariant()"
+                                data-status="demo"
+                                data-percapita="@Math.Round(r.PerCapita, 0)"
+                                data-spending="@Math.Round(SpendMillions(r.TotalDemoSpending), 1)"
+                                data-population="@r.Population">
                                 <td>
                                     <a class="fw-semibold text-decoration-none" href="/regions/@r.Slug">@r.Name</a>
                                 </td>
                                 <td class="num">@r.Population.ToString("N0")</td>
                                 <td class="num">@SpendMillions(r.TotalDemoSpending).ToString("N1")</td>
-                                <td class="num">€@PerCapitaEur(regions.First(x => x.Slug == r.Slug)).ToString("N0")</td>
+                                <td class="num">€@r.PerCapita.ToString("N0")</td>
                             </tr>
                         }
                     </tbody>
                 </table>
+            </div>
+
+            <div id="regionsEmptyState" class="empty-state d-none">
+                <div class="empty-state-icon">🔍</div>
+                <h5>No regions match your filters.</h5>
+                <p>Try changing the search text or data status.</p>
             </div>
         </div>
     </div>

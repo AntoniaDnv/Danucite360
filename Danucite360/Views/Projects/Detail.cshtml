@@ -1,0 +1,134 @@
+@model Danucite360.Services.Models.ProjectDetailServiceModel
+
+@{
+    ViewData["Title"] = Model.Title;
+
+    string StatusClass(string s) => s switch
+    {
+        "Completed" => "status-official",
+        "Ongoing" => "status-ongoing",
+        _ => "status-draft"
+    };
+
+    // Derive a milestone timeline from completion %.
+    var c = Model.CompletionPercent;
+    var currentStage = c >= 100 ? 3 : c >= 40 ? 2 : c >= 10 ? 1 : 0;
+    var milestones = new[] { "Planning", "Tendering", "Construction", "Handover" };
+    string StageState(int i) => i < currentStage || c >= 100 ? "done" : i == currentStage ? "current" : "upcoming";
+
+    var maxShare = Model.FundingShares.Any() ? Model.FundingShares.Max(f => f.Amount) : 1m;
+}
+
+<section class="page-shell">
+    <nav class="breadcrumbs mb-2">
+        <a asp-controller="Projects" asp-action="Explorer">Projects</a>
+        <span>›</span>
+        @if (Model.RegionSlug != null)
+        {
+            <a asp-controller="Projects" asp-action="Region" asp-route-slug="@Model.RegionSlug">@Model.RegionName</a>
+        }
+        else
+        {
+            <span>National</span>
+        }
+    </nav>
+
+    <div class="page-header mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge @StatusClass(Model.Status)">@Model.Status</span>
+                <span class="project-type-tag">@Model.ProjectType</span>
+                <span class="status-badge status-demo">⚠ Demo</span>
+            </div>
+            <h1 class="section-title mb-1">@Model.Title</h1>
+            <p class="section-subtitle mb-0">@Model.RegionName · Budget year @Model.BudgetYear</p>
+        </div>
+        <div class="page-actions">
+            <div class="text-md-end">
+                <div class="kpi-label">Total Budget</div>
+                <div class="kpi-value mono">@MoneyFormatter.FormatThousandEur(Model.Budget)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="app-card mb-4">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Current Status</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small">Overall progress</span>
+                        <strong class="mono">@Model.CompletionPercent%</strong>
+                    </div>
+                    <div class="project-progress lg"><span style="width:@Model.CompletionPercent%"></span></div>
+                    <div class="kpi-meta mt-2">@Model.Status</div>
+                </div>
+            </div>
+
+            <div class="app-card mb-4">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Project Milestones</h5>
+                    <div class="milestones">
+                        @for (var i = 0; i < milestones.Length; i++)
+                        {
+                            var state = StageState(i);
+                            <div class="milestone milestone-@state">
+                                <div class="milestone-dot">@(state == "done" ? "✓" : (i + 1).ToString())</div>
+                                <div class="milestone-label">@milestones[i]</div>
+                                <div class="milestone-state">@(state == "done" ? "Complete" : state == "current" ? "In Progress" : "Upcoming")</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Why this project matters</h5>
+                    <p class="text-secondary mb-3">@Model.Description</p>
+                    <div class="source-ref text-start">Source: @Model.SourceTitle</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="app-card">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Funding Breakdown</h5>
+                    <div class="revenue-bars mt-3">
+                        @foreach (var f in Model.FundingShares)
+                        {
+                            <div class="revenue-bar-row">
+                                <span class="revenue-bar-label">@f.SourceName</span>
+                                <div class="revenue-bar-track">
+                                    <span style="width:@(((double)(f.Amount / maxShare) * 100).ToString("F1"))%"></span>
+                                </div>
+                                <span class="revenue-bar-value mono">@MoneyFormatter.FormatThousandEur(f.Amount) · @f.Percent.ToString("F0")%</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="source-ref">Source: Danucite360 demo distribution</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.RelatedProjects.Any())
+    {
+        <h5 class="card-heading mt-5 mb-3">Related Projects</h5>
+        <div class="project-grid">
+            @foreach (var p in Model.RelatedProjects)
+            {
+                <a class="project-card" href="/projects/@p.Slug">
+                    <div class="project-card-top">
+                        <span class="project-type-tag">@p.ProjectType</span>
+                        <span class="status-badge @StatusClass(p.Status)">@p.Status</span>
+                    </div>
+                    <h6 class="project-title">@p.Title</h6>
+                    <div class="project-region">@p.RegionName</div>
+                    <div class="project-budget mono">@MoneyFormatter.FormatThousandEur(p.Budget)</div>
+                </a>
+            }
+        </div>
+    }
+</section>

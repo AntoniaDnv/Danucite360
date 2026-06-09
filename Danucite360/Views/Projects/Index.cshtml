@@ -1,0 +1,66 @@
+@model Danucite360.Services.Models.ProjectsOverviewServiceModel
+
+@{
+    ViewData["Title"] = "Projects";
+}
+
+<section class="page-shell">
+    <div class="mb-4">
+        <span class="status-badge status-demo">⚠ Demo Prototype Data (@Model.BudgetYear)</span>
+    </div>
+
+    <div class="overview-hero">
+        <div class="overview-hero-copy">
+            <h1 class="hero-title">Where Your Taxes Go</h1>
+            <p class="hero-subtitle">
+                Tracking public projects funded by tax revenue and EU structural funds — a transparent view
+                into the infrastructure, education, and development initiatives shaping Bulgaria.
+            </p>
+            <div class="d-flex gap-3 flex-wrap mt-4">
+                <a class="btn btn-primary btn-lg" asp-controller="Projects" asp-action="Explorer">Explore All Projects →</a>
+                <a class="btn btn-outline-secondary btn-lg" asp-controller="Funding" asp-action="Index">View Funding</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Tracked Projects</div>
+                <div class="kpi-value">@Model.TotalProjects.ToString("N0")</div>
+                <div class="kpi-meta">Across all regions</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Value</div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.TotalValue)</div>
+                <div class="kpi-meta">Combined project budgets</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Active Regions</div>
+                <div class="kpi-value">@Model.ActiveRegions</div>
+                <div class="kpi-meta">Regions with funded projects</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">In Progress</div>
+                <div class="kpi-value">@Model.InProgress</div>
+                <div class="kpi-meta">Ongoing projects</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="deep-dive mt-4">
+        <div>
+            <h4 class="mb-1">Explore the full project portfolio</h4>
+            <p class="mb-0">
+                Filter by region, sector, status, and funding source to see exactly where public money is invested.
+            </p>
+        </div>
+        <a class="btn btn-primary" asp-controller="Projects" asp-action="Explorer">Explore All Projects →</a>
+    </div>
+</section>

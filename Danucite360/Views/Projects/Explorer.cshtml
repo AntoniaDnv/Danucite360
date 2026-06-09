@@ -1,0 +1,108 @@
+@model IEnumerable<Danucite360.Services.Models.ProjectListItemServiceModel>
+
+@{
+    ViewData["Title"] = "Projects Explorer";
+    var projects = Model.ToList();
+    var types = projects.Select(p => p.ProjectType).Distinct().OrderBy(t => t).ToList();
+    var statuses = projects.Select(p => p.Status).Distinct().ToList();
+    var regions = projects.Select(p => p.RegionName).Distinct().OrderBy(r => r).ToList();
+
+    string StatusClass(string s) => s switch
+    {
+        "Completed" => "status-official",
+        "Ongoing" => "status-ongoing",
+        _ => "status-draft"
+    };
+}
+
+<section class="page-shell">
+    <div class="page-header mb-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-demo">⚠ Demo Data</span>
+                <span class="last-updated">Budget year 2026</span>
+            </div>
+            <h1 class="section-title mb-2">Projects Explorer</h1>
+            <p class="section-subtitle mb-0">Directory of public municipal and state projects.</p>
+        </div>
+        <div class="page-actions">
+            <a class="btn btn-outline-secondary btn-sm" asp-controller="Projects" asp-action="Index">← Overview</a>
+        </div>
+    </div>
+
+    <div class="filter-bar app-card mb-4">
+        <div class="app-card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label small text-muted">Search projects</label>
+                    <input id="projectSearch" type="search" class="form-control" placeholder="Search by title..." />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">Sector</label>
+                    <select id="projectType" class="form-select">
+                        <option value="all" selected>All sectors</option>
+                        @foreach (var t in types)
+                        {
+                            <option value="@t">@t</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">Status</label>
+                    <select id="projectStatus" class="form-select">
+                        <option value="all" selected>All statuses</option>
+                        @foreach (var s in statuses)
+                        {
+                            <option value="@s">@s</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted">Region</label>
+                    <select id="projectRegion" class="form-select">
+                        <option value="all" selected>All</option>
+                        @foreach (var r in regions)
+                        {
+                            <option value="@r">@r</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="project-grid" id="projectGrid">
+        @foreach (var p in projects)
+        {
+            <a class="project-card"
+               href="/projects/@p.Slug"
+               data-title="@p.Title.ToLowerInvariant()"
+               data-type="@p.ProjectType"
+               data-status="@p.Status"
+               data-region="@p.RegionName">
+                <div class="project-card-top">
+                    <span class="project-type-tag">@p.ProjectType</span>
+                    <span class="status-badge @StatusClass(p.Status)">@p.Status</span>
+                </div>
+                <h6 class="project-title">@p.Title</h6>
+                <div class="project-region">@p.RegionName</div>
+                <div class="project-budget mono">@MoneyFormatter.FormatThousandEur(p.Budget)</div>
+                <div class="project-progress"><span style="width:@p.CompletionPercent%"></span></div>
+                <div class="project-card-foot">
+                    <span>@p.CompletionPercent% complete</span>
+                    <span class="source-chip">@p.PrimaryFundingSource</span>
+                </div>
+            </a>
+        }
+    </div>
+
+    <div id="projectsEmptyState" class="empty-state d-none mt-3">
+        <div class="empty-state-icon">🔍</div>
+        <h5>No projects match your filters.</h5>
+        <p>Try changing the search text, sector, status, or region.</p>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/projects-explorer.js" asp-append-version="true"></script>
+}
