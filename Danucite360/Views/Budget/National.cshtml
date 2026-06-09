@@ -65,30 +65,27 @@
     <div class="row g-4 mb-4">
         <div class="col-md-4">
             <div class="kpi-card">
-                <div class="kpi-icon kpi-icon-blue">↗</div>
                 <div class="kpi-label">Total Revenue</div>
-                <div class="kpi-value">@Model.Revenue.ToString("N1")</div>
-                <div class="kpi-meta">@Model.Unit</div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.Revenue)</div>
+                <div class="kpi-meta text-success">▲ Revenue, aid &amp; donations</div>
             </div>
         </div>
 
         <div class="col-md-4">
             <div class="kpi-card">
-                <div class="kpi-icon kpi-icon-red">↘</div>
                 <div class="kpi-label">Total Expenses</div>
-                <div class="kpi-value">@Model.Expenses.ToString("N1")</div>
-                <div class="kpi-meta">@Model.Unit</div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.Expenses)</div>
+                <div class="kpi-meta">Planned expenditure &amp; transfers</div>
             </div>
         </div>
 
         <div class="col-md-4">
             <div class="kpi-card">
-                <div class="kpi-icon @(Model.Balance < 0 ? "kpi-icon-red" : "kpi-icon-green")">≈</div>
                 <div class="kpi-label">Budget Balance</div>
                 <div class="kpi-value @(Model.Balance < 0 ? "text-danger" : "text-success")">
-                    @Model.Balance.ToString("N1")
+                    @MoneyFormatter.FormatThousandEur(Model.Balance)
                 </div>
-                <div class="kpi-meta">@Model.Unit</div>
+                <div class="kpi-meta">@(Model.Balance < 0 ? "Planned deficit" : "Planned surplus")</div>
             </div>
         </div>
     </div>
@@ -124,18 +121,18 @@
                     <div class="budget-equation">
                         <div>
                             <span>Revenue</span>
-                            <strong>@Model.Revenue.ToString("N1")</strong>
+                            <strong>@MoneyFormatter.FormatThousandEur(Model.Revenue)</strong>
                         </div>
 
                         <div>
                             <span>Expenses</span>
-                            <strong>@Model.Expenses.ToString("N1")</strong>
+                            <strong>@MoneyFormatter.FormatThousandEur(Model.Expenses)</strong>
                         </div>
 
                         <div>
                             <span>Balance</span>
                             <strong class="@(Model.Balance < 0 ? "text-danger" : "text-success")">
-                                @Model.Balance.ToString("N1")
+                                @MoneyFormatter.FormatThousandEur(Model.Balance)
                             </strong>
                         </div>
                     </div>
@@ -156,43 +153,30 @@
         <div class="col-lg-7">
             <div class="app-card h-100">
                 <div class="app-card-body">
-                    <h5 class="card-heading">Data confidence overview</h5>
+                    <h5 class="card-heading">Where does the money come from?</h5>
                     <p class="text-muted small">
-                        This MVP separates official source-based values from demo prototype values.
+                        Primary revenue streams in the @Model.BudgetYear draft budget, by share of total revenue.
                     </p>
 
-                    <div class="confidence-row">
-                        <div class="confidence-label">
-                            <span class="confidence-dot official"></span>
-                            Official Data
-                        </div>
-                        <div class="confidence-bar">
-                            <span style="width: 70%" class="official"></span>
-                        </div>
-                        <strong>70%</strong>
+                    @{
+                        var streams = Model.RevenueBreakdown;
+                        var maxStream = streams.Any() ? streams.Max(s => s.Amount) : 1m;
+                    }
+
+                    <div class="revenue-bars mt-3">
+                        @foreach (var s in streams)
+                        {
+                            <div class="revenue-bar-row">
+                                <span class="revenue-bar-label">@s.CategoryName</span>
+                                <div class="revenue-bar-track">
+                                    <span style="width:@(((double)(s.Amount / maxStream) * 100).ToString("F1"))%"></span>
+                                </div>
+                                <span class="revenue-bar-value mono">@MoneyFormatter.FormatThousandEur(s.Amount)</span>
+                            </div>
+                        }
                     </div>
 
-                    <div class="confidence-row">
-                        <div class="confidence-label">
-                            <span class="confidence-dot demo"></span>
-                            Demo Data
-                        </div>
-                        <div class="confidence-bar">
-                            <span style="width: 25%" class="demo"></span>
-                        </div>
-                        <strong>25%</strong>
-                    </div>
-
-                    <div class="confidence-row">
-                        <div class="confidence-label">
-                            <span class="confidence-dot review"></span>
-                            Needs Review
-                        </div>
-                        <div class="confidence-bar">
-                            <span style="width: 5%" class="review"></span>
-                        </div>
-                        <strong>5%</strong>
-                    </div>
+                    <div class="source-ref">Source: @Model.SourceTitle</div>
                 </div>
             </div>
         </div>
@@ -227,5 +211,6 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="~/js/national-budget.js"></script>
+    <script src="~/js/chart-theme.js" asp-append-version="true"></script>
+    <script src="~/js/national-budget.js" asp-append-version="true"></script>
 }

@@ -90,17 +90,48 @@ public static class SeedData
 
         var categories = new[]
         {
+            // National revenue streams (from the 2026 draft State Budget).
             new BudgetCategory
             {
-                Name = "Revenue",
-                Slug = "revenue",
-                Description = "National budget revenue, aid and donations."
+                Name = "Value Added Tax (VAT)",
+                Slug = "vat",
+                Description = "Revenue from value added tax."
             },
             new BudgetCategory
             {
-                Name = "Expenses",
-                Slug = "expenses",
-                Description = "National budget expenses."
+                Name = "Personal Income Tax",
+                Slug = "personal-income-tax",
+                Description = "Revenue from personal income tax."
+            },
+            new BudgetCategory
+            {
+                Name = "Corporate Tax",
+                Slug = "corporate-tax",
+                Description = "Revenue from corporate income tax."
+            },
+            new BudgetCategory
+            {
+                Name = "Excise Duties",
+                Slug = "excise-duties",
+                Description = "Revenue from excise duties."
+            },
+            new BudgetCategory
+            {
+                Name = "Other Tax Revenue",
+                Slug = "other-tax-revenue",
+                Description = "Remaining tax revenue streams."
+            },
+            new BudgetCategory
+            {
+                Name = "Non-tax Revenue, Aid & Donations",
+                Slug = "non-tax-revenue",
+                Description = "Non-tax revenue, aid and donations."
+            },
+            new BudgetCategory
+            {
+                Name = "National Expenditure",
+                Slug = "national-expenditure",
+                Description = "Total national budget expenditure and transfers."
             },
             new BudgetCategory
             {
@@ -231,45 +262,61 @@ public static class SeedData
         var categories = await context.BudgetCategories.ToDictionaryAsync(c => c.Slug);
         var regions = await context.Regions.ToDictionaryAsync(r => r.Slug);
 
-        var records = new List<BudgetRecord>
+        // National revenue streams — sum to total revenue of 30,369,776.7 thousand EUR.
+        var revenueStreams = new (string Slug, decimal Amount, string Notes)[]
         {
-            new BudgetRecord
+            ("vat", 14_385_215.2m, "Value Added Tax (VAT)"),
+            ("personal-income-tax", 4_731_244.3m, "Personal income tax"),
+            ("corporate-tax", 3_653_304.7m, "Corporate income tax"),
+            ("excise-duties", 4_242_028.8m, "Excise duties"),
+            ("other-tax-revenue", 501_058.6m, "Other tax revenue"),
+            ("non-tax-revenue", 2_856_925.1m, "Non-tax revenue, aid and donations")
+        };
+
+        var records = new List<BudgetRecord>();
+
+        foreach (var stream in revenueStreams)
+        {
+            records.Add(new BudgetRecord
             {
                 BudgetYear = DataConstants.BudgetYear,
-                Amount = 30369776.7m,
+                Amount = stream.Amount,
                 Currency = DataConstants.DefaultCurrency,
                 Unit = DataConstants.DefaultUnit,
                 RecordType = BudgetRecordTypes.NationalRevenue,
                 IsDemo = false,
-                BudgetCategoryId = categories["revenue"].Id,
+                BudgetCategoryId = categories[stream.Slug].Id,
                 BudgetSourceId = source.Id,
-                Notes = "I. ПРИХОДИ, ПОМОЩИ И ДАРЕНИЯ"
-            },
-            new BudgetRecord
-            {
-                BudgetYear = DataConstants.BudgetYear,
-                Amount = 17256463.0m,
-                Currency = DataConstants.DefaultCurrency,
-                Unit = DataConstants.DefaultUnit,
-                RecordType = BudgetRecordTypes.NationalExpense,
-                IsDemo = false,
-                BudgetCategoryId = categories["expenses"].Id,
-                BudgetSourceId = source.Id,
-                Notes = "II. РАЗХОДИ"
-            },
-            new BudgetRecord
-            {
-                BudgetYear = DataConstants.BudgetYear,
-                Amount = -4578509.4m,
-                Currency = DataConstants.DefaultCurrency,
-                Unit = DataConstants.DefaultUnit,
-                RecordType = BudgetRecordTypes.BudgetBalance,
-                IsDemo = false,
-                BudgetCategoryId = categories["budget-balance"].Id,
-                BudgetSourceId = source.Id,
-                Notes = "V. БЮДЖЕТНО САЛДО"
-            }
-        };
+                Notes = stream.Notes
+            });
+        }
+
+        // Total national expenditure (= revenue - balance), so the figures reconcile.
+        records.Add(new BudgetRecord
+        {
+            BudgetYear = DataConstants.BudgetYear,
+            Amount = 34_948_286.1m,
+            Currency = DataConstants.DefaultCurrency,
+            Unit = DataConstants.DefaultUnit,
+            RecordType = BudgetRecordTypes.NationalExpense,
+            IsDemo = false,
+            BudgetCategoryId = categories["national-expenditure"].Id,
+            BudgetSourceId = source.Id,
+            Notes = "Total expenditure and transfers"
+        });
+
+        records.Add(new BudgetRecord
+        {
+            BudgetYear = DataConstants.BudgetYear,
+            Amount = -4_578_509.4m,
+            Currency = DataConstants.DefaultCurrency,
+            Unit = DataConstants.DefaultUnit,
+            RecordType = BudgetRecordTypes.BudgetBalance,
+            IsDemo = false,
+            BudgetCategoryId = categories["budget-balance"].Id,
+            BudgetSourceId = source.Id,
+            Notes = "Budget balance (deficit)"
+        });
 
         AddRegionalDemoRecords(records, regions["sofia"], categories, source.Id,
             120000, 95000, 150000, 70000, 50000, 40000, 30000);

@@ -20,12 +20,27 @@ public class BudgetService : IBudgetService
         var records = await context.BudgetRecords
             .AsNoTracking()
             .Include(r => r.BudgetSource)
+            .Include(r => r.BudgetCategory)
             .Where(r => r.BudgetYear == year && r.RegionId == null)
             .ToListAsync();
 
-        var revenue = records
+        var revenueRecords = records
             .Where(r => r.RecordType == BudgetRecordTypes.NationalRevenue)
-            .Sum(r => r.Amount);
+            .ToList();
+
+        var revenue = revenueRecords.Sum(r => r.Amount);
+
+        var revenueBreakdown = revenueRecords
+            .OrderByDescending(r => r.Amount)
+            .Select(r => new CategorySpendingServiceModel
+            {
+                CategoryName = r.BudgetCategory.Name,
+                CategorySlug = r.BudgetCategory.Slug,
+                Amount = r.Amount,
+                Percentage = revenue == 0 ? 0 : Math.Round(r.Amount / revenue * 100, 2),
+                Unit = r.Unit
+            })
+            .ToList();
 
         var expenses = records
             .Where(r => r.RecordType == BudgetRecordTypes.NationalExpense)
@@ -47,7 +62,8 @@ public class BudgetService : IBudgetService
             Balance = balance != 0 ? balance : revenue - expenses,
             Unit = firstRecord?.Unit ?? DataConstants.DefaultUnit,
             SourceTitle = source?.Title ?? "No source available",
-            SourceUrl = source?.Url ?? "#"
+            SourceUrl = source?.Url ?? "#",
+            RevenueBreakdown = revenueBreakdown
         };
     }
 

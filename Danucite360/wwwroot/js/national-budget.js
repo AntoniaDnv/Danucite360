@@ -13,6 +13,7 @@
     }
 
     const data = await response.json();
+    const C = window.DanuciteCharts;
 
     new Chart(canvas, {
         type: "bar",
@@ -22,8 +23,9 @@
                 {
                     label: `Amount (${data.unit})`,
                     data: data.values,
-                    borderWidth: 1,
-                    borderRadius: 8
+                    backgroundColor: C ? [C.palette.teal, C.palette.navy, C.palette.amber] : undefined,
+                    borderWidth: 0,
+                    borderRadius: 4
                 }
             ]
         },
@@ -37,7 +39,8 @@
                 tooltip: {
                     callbacks: {
                         label: function (context) {
-                            return `${context.parsed.y.toLocaleString()} ${data.unit}`;
+                            return C ? C.formatBillionsEur(context.parsed.y)
+                                     : `${context.parsed.y.toLocaleString()} ${data.unit}`;
                         }
                     }
                 }
@@ -52,7 +55,7 @@
                     beginAtZero: true,
                     ticks: {
                         callback: function (value) {
-                            return value.toLocaleString();
+                            return C ? C.formatBillionsEur(value) : value.toLocaleString();
                         }
                     }
                 }

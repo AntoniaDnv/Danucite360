@@ -1,169 +1,150 @@
-﻿@model Danucite360.Services.Models.NationalBudgetServiceModel
+@model Danucite360.Services.Models.NationalBudgetServiceModel
 
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Overview";
+
+    // Values are stored in "thousand EUR"; present citizen-friendly billions of EUR.
+    string Bn(decimal v) => "€" + (v / 1_000_000m).ToString("N2") + "B";
+
+    // Revenue streams come from the seeded national revenue records (data-driven).
+    var revenueStreams = Model.RevenueBreakdown;
+    var maxStream = revenueStreams.Any() ? revenueStreams.Max(s => s.Amount) : 1m;
 }
 
-<section class="home-hero">
-    <div class="page-shell">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-5">
-                <span class="status-badge status-official mb-3">✓ Civic Transparency MVP</span>
+<section class="page-shell overview-page">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+        <span class="status-badge status-demo">⚠ Demo Prototype</span>
+        <span class="last-updated">Last updated: 28 May @Model.BudgetYear</span>
+    </div>
 
-                <h1 class="hero-title">
-                    See where Bulgaria’s public money goes.
-                </h1>
+    <div class="overview-hero">
+        <div class="overview-hero-copy">
+            <span class="hero-eyebrow">Public Finance Transparency Initiative</span>
+            <h1 class="hero-title">
+                Understand Bulgaria’s <span class="hero-accent">public money</span>.
+            </h1>
+            <p class="hero-subtitle">
+                Danucite360 turns the public budget into clear dashboards. Explore how taxes are
+                collected and where public funds are invested — with objective, analytical precision.
+            </p>
+            <div class="d-flex gap-3 flex-wrap mt-4">
+                <a class="btn btn-primary btn-lg" asp-controller="Budget" asp-action="National">Explore</a>
+                <a class="btn btn-outline-secondary btn-lg" asp-controller="Map" asp-action="Index">Compare Regions</a>
+            </div>
+        </div>
 
-                <p class="hero-subtitle">
-                    Danucite360 turns public budget data into clear, citizen-friendly insights
-                    about revenue, spending, regions, categories, and sources.
-                </p>
-
-                <div class="d-flex gap-3 flex-wrap mt-4">
-                    <a class="btn btn-primary btn-lg"
-                       asp-controller="Budget"
-                       asp-action="National">
-                        Explore National Budget
-                    </a>
-
-                    <a class="btn btn-outline-primary btn-lg"
-                       asp-controller="Map"
-                       asp-action="Index">
-                        Compare Regions
-                    </a>
+        <div class="app-card overview-snapshot">
+            <div class="app-card-body">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                    <h6 class="card-heading mb-0">@Model.BudgetYear Budget Snapshot</h6>
+                    <span class="chip-muted">Official data</span>
                 </div>
-
-                <div class="mt-4">
-                    <partial name="_DemoNotice" />
+                <div class="snapshot-headline mono @(Model.Balance < 0 ? "text-danger" : "text-success")">
+                    @Bn(Model.Balance)
+                </div>
+                <div class="kpi-meta mb-2">Projected budget balance</div>
+                <div class="snapshot-chart">
+                    <canvas id="budgetSnapshotChart"></canvas>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="col-lg-7">
-                <div class="app-card dashboard-preview">
-                    <div class="app-card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-4">
-                            <div>
-                                <h5 class="mb-1">2026 National Budget Overview</h5>
-                                <p class="text-muted mb-0">Last updated: 28 May 2026</p>
+    <div class="row g-4 my-1">
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Revenue</div>
+                <div class="kpi-value">@Bn(Model.Revenue)</div>
+                <div class="kpi-meta text-success">▲ Revenue, aid &amp; donations</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Spending</div>
+                <div class="kpi-value">@Bn(Model.Expenses)</div>
+                <div class="kpi-meta">Planned expenditure</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Budget Balance</div>
+                <div class="kpi-value @(Model.Balance < 0 ? "text-danger" : "text-success")">@Bn(Model.Balance)</div>
+                <div class="kpi-meta">@(Model.Balance < 0 ? "Planned deficit" : "Planned surplus")</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Fiscal Year</div>
+                <div class="kpi-value">@Model.BudgetYear</div>
+                <div class="kpi-meta">Draft state budget</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Where does the money come from?</h5>
+                    <p class="text-muted small">
+                        A breakdown of primary revenue streams, highlighting tax collection across the
+                        @Model.BudgetYear draft budget.
+                    </p>
+
+                    <div class="revenue-bars mt-3">
+                        @foreach (var s in revenueStreams)
+                        {
+                            <div class="revenue-bar-row">
+                                <span class="revenue-bar-label">@s.CategoryName</span>
+                                <div class="revenue-bar-track">
+                                    <span style="width:@(((double)(s.Amount / maxStream) * 100).ToString("F1"))%"></span>
+                                </div>
+                                <span class="revenue-bar-value mono">@Bn(s.Amount)</span>
                             </div>
-
-                            <span class="status-badge status-official">✓ Official Data</span>
-                        </div>
-
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-4">
-                                <div class="mini-kpi">
-                                    <div class="kpi-label">Total Revenue</div>
-                                    <div class="mini-kpi-value">@Model.Revenue.ToString("N1")</div>
-                                    <div class="kpi-meta">@Model.Unit</div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="mini-kpi">
-                                    <div class="kpi-label">Total Expenses</div>
-                                    <div class="mini-kpi-value">@Model.Expenses.ToString("N1")</div>
-                                    <div class="kpi-meta">@Model.Unit</div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="mini-kpi">
-                                    <div class="kpi-label">Budget Balance</div>
-                                    <div class="mini-kpi-value @(Model.Balance < 0 ? "text-danger" : "text-success")">
-                                        @Model.Balance.ToString("N1")
-                                    </div>
-                                    <div class="kpi-meta">@Model.Unit</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row g-4">
-                            <div class="col-md-5">
-                                <div class="fake-donut mx-auto">
-                                    <span>Budget<br />View</span>
-                                </div>
-                            </div>
-
-                            <div class="col-md-7">
-                                <h6 class="mb-3">Top public categories</h6>
-
-                                <div class="category-line">
-                                    <span>Healthcare</span>
-                                    <div><span style="width: 90%"></span></div>
-                                </div>
-
-                                <div class="category-line">
-                                    <span>Education</span>
-                                    <div><span style="width: 76%"></span></div>
-                                </div>
-
-                                <div class="category-line">
-                                    <span>Infrastructure</span>
-                                    <div><span style="width: 64%"></span></div>
-                                </div>
-
-                                <div class="category-line">
-                                    <span>Social Support</span>
-                                    <div><span style="width: 55%"></span></div>
-                                </div>
-
-                                <a class="small fw-semibold text-decoration-none"
-                                   asp-controller="Budget"
-                                   asp-action="Categories">
-                                    View all categories →
-                                </a>
-                            </div>
-                        </div>
+                        }
                     </div>
+
+                    <div class="source-ref">Source: @Model.SourceTitle</div>
                 </div>
             </div>
         </div>
 
-        <section class="mt-5">
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <a class="text-decoration-none text-dark" asp-controller="Map" asp-action="Index">
-                        <div class="app-card h-100">
-                            <div class="app-card-body">
-                                <h5>Compare Regions</h5>
-                                <p class="text-muted">
-                                    See how demo public money is distributed across Bulgaria.
-                                </p>
-                                <span class="fw-semibold text-primary">Explore regions →</span>
-                            </div>
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-heading">Where does it go?</h5>
+                            <p class="text-muted small mb-0">
+                                Categorized public spending across social services, administration and infrastructure.
+                            </p>
                         </div>
-                    </a>
-                </div>
+                        <span class="status-badge status-demo">⚠ Demo</span>
+                    </div>
 
-                <div class="col-md-4">
-                    <a class="text-decoration-none text-dark" asp-controller="Budget" asp-action="Categories">
-                        <div class="app-card h-100">
-                            <div class="app-card-body">
-                                <h5>Spending Categories</h5>
-                                <p class="text-muted">
-                                    Explore spending across healthcare, education, infrastructure, and more.
-                                </p>
-                                <span class="fw-semibold text-primary">View categories →</span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+                    <div class="donut-wrap flex-grow-1">
+                        <canvas id="spendingDonut"></canvas>
+                    </div>
 
-                <div class="col-md-4">
-                    <a class="text-decoration-none text-dark" asp-controller="Sources" asp-action="Index">
-                        <div class="app-card h-100">
-                            <div class="app-card-body">
-                                <h5>Trusted Sources</h5>
-                                <p class="text-muted">
-                                    Every official value should connect to a source, freshness date, and confidence label.
-                                </p>
-                                <span class="fw-semibold text-primary">View sources →</span>
-                            </div>
-                        </div>
-                    </a>
+                    <div class="source-ref">Source: Danucite360 demo distribution</div>
                 </div>
             </div>
-        </section>
+        </div>
+    </div>
+
+    <div class="deep-dive mt-4">
+        <div>
+            <h4 class="mb-1">Deep dive into the data</h4>
+            <p class="mb-0">
+                Access the source documents, methodology notes, and regional breakdowns behind every figure.
+            </p>
+        </div>
+        <a class="btn btn-primary" asp-controller="Sources" asp-action="Index">View Sources</a>
     </div>
 </section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/chart-theme.js" asp-append-version="true"></script>
+    <script src="~/js/home-overview.js" asp-append-version="true"></script>
+}

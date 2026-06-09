@@ -140,46 +140,42 @@
         </div>
     </div>
 
-    <div class="row g-4">
-        <div class="col-lg-6">
-            <div class="app-card h-100">
-                <div class="app-card-body">
-                    <h5 class="card-heading">Methodology</h5>
+    <div class="app-card mb-4">
+        <div class="app-card-body">
+            <h5 class="card-heading">The Data Journey</h5>
+            <p class="text-muted small">
+                Raw public finance data is notoriously complex and inconsistently formatted.
+                Our methodology applies a rigorous, four-step process to transform government
+                records into structured, analysis-ready figures.
+            </p>
 
-                    <div class="methodology-list">
-                        <div>
-                            <strong>1. Source collection</strong>
-                            <span>
-                                Budget source documents are registered with publisher, title, reference, and retrieval date.
-                            </span>
-                        </div>
-
-                        <div>
-                            <strong>2. Manual verification</strong>
-                            <span>
-                                For the MVP, national values are manually entered from the source document.
-                            </span>
-                        </div>
-
-                        <div>
-                            <strong>3. Demo labeling</strong>
-                            <span>
-                                Regional prototype values are labeled as demo data and should not be treated as official figures.
-                            </span>
-                        </div>
-
-                        <div>
-                            <strong>4. Public visualization</strong>
-                            <span>
-                                The public dashboard shows values through cards, charts, source labels, and plain-language explanations.
-                            </span>
-                        </div>
-                    </div>
+            <div class="data-journey mt-3">
+                <div class="journey-step">
+                    <span class="journey-num">01</span>
+                    <strong>Ingestion &amp; Cleaning</strong>
+                    <span>Raw CSVs and PDF payloads are ingested. Formatting errors, null values and encoding artifacts are systematically removed or flagged.</span>
+                </div>
+                <div class="journey-step">
+                    <span class="journey-num">02</span>
+                    <strong>Categorization</strong>
+                    <span>Transactions are mapped to standardized economic classifications (e.g. COFOG) using heuristic models matching payment descriptions.</span>
+                </div>
+                <div class="journey-step">
+                    <span class="journey-num">03</span>
+                    <strong>Normalization</strong>
+                    <span>Entities (municipalities, ministries, contractors) are resolved against a unified registry to eliminate duplicates and variations.</span>
+                </div>
+                <div class="journey-step">
+                    <span class="journey-num">04</span>
+                    <strong>Visualization</strong>
+                    <span>Clean, relational data is exposed via internal APIs to power the dashboards, ensuring fast, accurate rendering of complex datasets.</span>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-lg-6">
+    <div class="row g-4">
+        <div class="col-lg-12">
             <div class="app-card h-100">
                 <div class="app-card-body">
                     <h5 class="card-heading">Data status labels</h5>

@@ -1,14 +1,21 @@
 :root {
+    /* Institutional Modernism palette (Stitch mock) */
+    --brand-navy: #131B2E; /* nav, footer, admin sidebar, primary branding */
     --civic-navy: #1E3A5F;
     --institution-blue: #2563EB;
+    --accent-teal: #0D9488; /* CTAs, active states, data highlights */
+    --accent-teal-strong: #0F766E;
+    --accent-teal-soft: #CCFBF1;
+    --slate: #515F74; /* secondary UI, icons, supporting text */
+    --slate-soft: #E2E8F0;
     --soft-blue: #EFF6FF;
     --deep-ink: #0F172A;
     --page-bg: #F8FAFC;
     --card-bg: #FFFFFF;
-    --border-light: #E5E7EB;
+    --border-light: #E2E8F0; /* hairline "blueprint" borders */
     --border-medium: #CBD5E1;
-    --text-primary: #111827;
-    --text-secondary: #475569;
+    --text-primary: #1B1B1D;
+    --text-secondary: #45464D;
     --text-muted: #6B7280;
     --official-green: #16A34A;
     --official-soft: #DCFCE7;
@@ -16,8 +23,13 @@
     --demo-soft: #FEF3C7;
     --review-red: #DC2626;
     --review-soft: #FEE2E2;
-    --shadow-card: 0 8px 24px rgba(15, 23, 42, 0.06);
-    --radius-card: 16px;
+    /* Tonal layering + low-contrast outlines instead of heavy shadows */
+    --shadow-card: none;
+    --shadow-float: 0 4px 12px rgba(15, 23, 42, 0.08);
+    --radius-card: 8px; /* large containers */
+    --radius-sm: 4px; /* buttons, inputs, small cards */
+    --font-sans: "Public Sans", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
 html {
@@ -27,11 +39,27 @@ html {
 body {
     background: var(--page-bg);
     color: var(--text-primary);
-    font-family: Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-sans);
 }
 
 a {
-    color: var(--institution-blue);
+    color: var(--accent-teal-strong);
+}
+
+/* Monospaced, perfectly-aligned financial figures */
+.mono,
+.kpi-value,
+.record-amount,
+.region-tile-value strong,
+.mini-kpi-value,
+.highlight-value,
+.budget-equation strong,
+.category-card-meta span,
+.region-bar-value,
+.admin-metric-card .kpi-value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
 }
 
 .page-shell {
@@ -84,10 +112,12 @@ a {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    border-radius: 999px;
-    padding: 6px 10px;
-    font-size: 13px;
+    border-radius: var(--radius-sm);
+    padding: 4px 8px;
+    font-size: 12px;
     font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
 }
 
 .status-official {
@@ -98,6 +128,11 @@ a {
 .status-demo {
     background: var(--demo-soft);
     color: #92400E;
+}
+
+.status-draft {
+    background: var(--slate-soft);
+    color: #334155;
 }
 
 .status-review {
@@ -125,14 +160,20 @@ a {
     max-width: 720px;
 }
 
-.btn-primary {
-    background-color: var(--institution-blue);
-    border-color: var(--institution-blue);
+.btn {
+    border-radius: var(--radius-sm);
+    font-weight: 600;
 }
 
-    .btn-primary:hover {
-        background-color: #1D4ED8;
-        border-color: #1D4ED8;
+.btn-primary {
+    background-color: var(--accent-teal);
+    border-color: var(--accent-teal);
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+        background-color: var(--accent-teal-strong);
+        border-color: var(--accent-teal-strong);
     }
 
 .table {
@@ -140,11 +181,33 @@ a {
 }
 
     .table thead th {
-        color: var(--text-secondary);
+        background: var(--brand-navy);
+        color: #E2E8F0;
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 600;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
+        border-bottom: none;
+        padding: 12px 14px;
+    }
+
+    .table tbody tr:nth-child(even) > * {
+        background: var(--page-bg); /* zebra striping */
+    }
+
+    .table td {
+        padding: 12px 14px;
+        vertical-align: middle;
         border-bottom-color: var(--border-light);
+    }
+
+    /* Financial figures are always right-aligned in mono */
+    .table .num,
+    .table td.num,
+    .table th.num {
+        text-align: right;
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
     }
 
 .region-card {
@@ -191,15 +254,14 @@ canvas {
 .brand-mark {
     width: 34px;
     height: 34px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--civic-navy), var(--institution-blue));
+    border-radius: var(--radius-sm);
+    background: var(--brand-navy);
     color: #ffffff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-weight: 800;
     font-size: 16px;
-    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
 }
 
 .brand-subtitle {
@@ -213,13 +275,74 @@ canvas {
     color: var(--text-secondary);
     font-size: 14px;
     font-weight: 600;
-    padding: 10px 12px;
-    border-radius: 10px;
+    padding: 10px 4px;
+    margin: 0 8px;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
 }
 
     .navbar .nav-link:hover {
-        color: var(--institution-blue);
-        background: var(--soft-blue);
+        color: var(--brand-navy);
+    }
+
+    .navbar .nav-link.active {
+        color: var(--brand-navy);
+        border-bottom-color: var(--accent-teal);
+    }
+
+.nav-search {
+    position: relative;
+}
+
+    .nav-search input {
+        height: 36px;
+        width: 200px;
+        max-width: 40vw;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        background: var(--page-bg);
+        padding: 0 12px 0 32px;
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+
+    .nav-search input:focus {
+        outline: none;
+        border-color: var(--accent-teal);
+        background: #fff;
+    }
+
+    .nav-search::before {
+        content: "⌕";
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 15px;
+    }
+
+.live-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--slate);
+    background: #fff;
+    white-space: nowrap;
+}
+
+    .live-status::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--accent-teal);
+        box-shadow: 0 0 0 3px var(--accent-teal-soft);
     }
 
 .language-switcher {
@@ -241,7 +364,7 @@ canvas {
     }
 
 .app-footer {
-    background: var(--civic-navy);
+    background: var(--brand-navy);
     color: #ffffff;
 }
 
@@ -1018,9 +1141,9 @@ canvas {
 }
 
 .admin-sidebar {
-    background: var(--civic-navy);
+    background: var(--brand-navy);
     color: #ffffff;
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 20px;
     position: sticky;
     top: 96px;
@@ -1208,4 +1331,256 @@ canvas {
     padding: 4px 8px;
     font-size: 12px;
     font-weight: 700;
+}
+
+/* ===== Home / National Overview (Institutional Modernism) ===== */
+.overview-hero {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 32px;
+    align-items: stretch;
+    margin-bottom: 8px;
+}
+
+.hero-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 12px;
+}
+
+.overview-hero .hero-title {
+    font-size: 44px;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+}
+
+.hero-accent {
+    color: var(--accent-teal);
+}
+
+.overview-snapshot {
+    align-self: stretch;
+}
+
+.snapshot-headline {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-top: 4px;
+}
+
+.snapshot-chart {
+    height: 200px;
+    margin-top: 8px;
+}
+
+.chip-muted {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--slate);
+    background: var(--page-bg);
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    padding: 3px 9px;
+}
+
+.overview-page .kpi-value {
+    font-size: 28px;
+}
+
+/* Revenue breakdown horizontal bars */
+.revenue-bars {
+    display: grid;
+    gap: 16px;
+}
+
+.revenue-bar-row {
+    display: grid;
+    grid-template-columns: 180px 1fr 92px;
+    align-items: center;
+    gap: 14px;
+    font-size: 14px;
+}
+
+.revenue-bar-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.revenue-bar-track {
+    height: 10px;
+    background: var(--page-bg);
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+    .revenue-bar-track span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: var(--accent-teal);
+    }
+
+    .revenue-bar-track span.alt {
+        background: var(--slate);
+    }
+
+.revenue-bar-value {
+    text-align: right;
+    color: var(--deep-ink);
+    font-weight: 600;
+}
+
+.donut-wrap {
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 0;
+}
+
+/* Source reference badge, bottom-right of chart containers */
+.source-ref {
+    margin-top: auto;
+    padding-top: 14px;
+    text-align: right;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.deep-dive {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    background: var(--brand-navy);
+    color: #ffffff;
+    border-radius: var(--radius-card);
+    padding: 28px 32px;
+}
+
+    .deep-dive h4 {
+        font-weight: 700;
+    }
+
+    .deep-dive p {
+        color: #CBD5E1;
+        font-size: 14px;
+        max-width: 640px;
+    }
+
+/* Regional Comparison */
+.map-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--page-bg);
+    border: 1px dashed var(--border-medium);
+    border-radius: var(--radius-card);
+    min-height: 260px;
+    margin-top: 8px;
+}
+
+.map-placeholder-inner {
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.map-pin {
+    font-size: 34px;
+    color: var(--slate-light, #94A3B8);
+    margin-bottom: 8px;
+}
+
+.map-placeholder-inner p {
+    font-size: 13px;
+    margin-bottom: 0;
+}
+
+.region-chart {
+    min-height: 280px;
+    margin-top: 8px;
+}
+
+.category-chart {
+    height: 320px;
+}
+
+/* Sources: The Data Journey */
+.data-journey {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.journey-step {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-card);
+    padding: 18px;
+    background: #ffffff;
+    border-top: 3px solid var(--accent-teal);
+}
+
+    .journey-step .journey-num {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--accent-teal);
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .journey-step strong {
+        display: block;
+        color: var(--deep-ink);
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+
+    .journey-step > span:last-child {
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+@media (max-width: 992px) {
+    .data-journey {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .data-journey {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 992px) {
+    .overview-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .overview-hero .hero-title {
+        font-size: 36px;
+    }
+
+    .revenue-bar-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .revenue-bar-value {
+        text-align: left;
+    }
 }

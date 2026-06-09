@@ -25,7 +25,18 @@ public class BudgetServiceTests
 
         var result = await service.GetNationalOverviewAsync(DataConstants.BudgetYear);
 
-        Assert.Equal(17256463.0m, result.Expenses);
+        Assert.Equal(34948286.1m, result.Expenses);
+    }
+
+    [Fact]
+    public async Task GetNationalOverviewAsync_RevenueMinusExpensesReconcilesWithBalance()
+    {
+        using var context = TestDbContextFactory.CreateDbContext();
+        var service = new BudgetService(context);
+
+        var result = await service.GetNationalOverviewAsync(DataConstants.BudgetYear);
+
+        Assert.Equal(result.Balance, result.Revenue - result.Expenses);
     }
 
     [Fact]

@@ -15,4 +15,8 @@ public class NationalBudgetServiceModel
     public string SourceTitle { get; set; } = null!;
 
     public string SourceUrl { get; set; } = null!;
+
+    // Revenue streams (VAT, income taxes, etc.) ordered by amount, descending.
+    public IReadOnlyList<CategorySpendingServiceModel> RevenueBreakdown { get; set; }
+        = new List<CategorySpendingServiceModel>();
 }

@@ -18,32 +18,44 @@ async function loadCategoriesChart() {
     }
 
     const data = await response.json();
+    const C = window.DanuciteCharts;
+    const total = data.values.reduce((a, b) => a + Number(b), 0);
 
     new Chart(canvas, {
-        type: "doughnut",
+        type: "bar",
         data: {
             labels: data.labels,
             datasets: [
                 {
                     label: `Spending Categories ${data.year}`,
                     data: data.values,
-                    borderWidth: 2
+                    backgroundColor: C ? C.palette.teal : "#0D9488",
+                    borderRadius: 4,
+                    maxBarThickness: 26
                 }
             ]
         },
         options: {
+            indexAxis: "y",
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    position: "bottom"
-                },
+                legend: { display: false },
                 tooltip: {
                     callbacks: {
                         label: function (context) {
-                            return `${context.label}: ${context.parsed.toLocaleString()} ${data.unit}`;
+                            const pct = total ? ((context.parsed.x / total) * 100).toFixed(1) : 0;
+                            return `${context.parsed.x.toLocaleString()} ${data.unit} (${pct}%)`;
                         }
                     }
                 }
+            },
+            scales: {
+                x: {
+                    grid: { color: C ? C.palette.border : "#E2E8F0" },
+                    ticks: { callback: v => Number(v).toLocaleString() }
+                },
+                y: { grid: { display: false } }
             }
         }
     });

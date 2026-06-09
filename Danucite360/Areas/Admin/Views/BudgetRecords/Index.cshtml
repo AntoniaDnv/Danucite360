@@ -200,9 +200,9 @@
 
                                         <td>@record.BudgetCategory.Name</td>
 
-                                        <td class="text-end">
-                                            <div class="record-amount">@record.Amount.ToString("N1")</div>
-                                            <div class="record-subtitle">@record.Unit</div>
+                                        <td class="num">
+                                            <div class="record-amount">@MoneyFormatter.FormatThousandEur(record.Amount)</div>
+                                            <div class="record-subtitle">@record.Amount.ToString("N1") thsd EUR</div>
                                         </td>
 
                                         <td>

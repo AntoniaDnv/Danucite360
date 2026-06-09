@@ -111,7 +111,9 @@
                         <span class="status-badge status-demo">⚠ Demo Data</span>
                     </div>
 
-                    <canvas id="categoriesChart"></canvas>
+                    <div class="category-chart">
+                        <canvas id="categoriesChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -218,5 +220,6 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/chart-theme.js" asp-append-version="true"></script>
     <script src="~/js/categories.js" asp-append-version="true"></script>
 }

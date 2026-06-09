@@ -1,4 +1,13 @@
 ﻿@using Danucite360.Common.Constants
+@{
+    var routeController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var routeAction = ViewContext.RouteData.Values["action"]?.ToString();
+    string NavActive(bool isActive) => isActive ? "nav-link active" : "nav-link";
+    var overviewActive = routeController == "Home" && routeAction == "Index";
+    var regionsActive = routeController == "Map" || routeController == "Regions";
+    var categoriesActive = routeController == "Budget" && routeAction == "Categories";
+    var sourcesActive = routeController == "Sources";
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,6 +15,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Danucite360</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800&family=JetBrains+Mono:wght@400;500;600&display=swap" />
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -30,27 +44,19 @@
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <ul class="navbar-nav mx-auto gap-lg-2">
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="@NavActive(overviewActive)" asp-area="" asp-controller="Home" asp-action="Index">Overview</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Budget" asp-action="National">National Budget</a>
+                            <a class="@NavActive(regionsActive)" asp-area="" asp-controller="Map" asp-action="Index">Regions</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Map" asp-action="Index">Regions</a>
+                            <a class="@NavActive(categoriesActive)" asp-area="" asp-controller="Budget" asp-action="Categories">Categories</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Budget" asp-action="Categories">Categories</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Sources" asp-action="Index">Sources</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">About</a>
+                            <a class="@NavActive(sourcesActive)" asp-area="" asp-controller="Sources" asp-action="Index">Sources</a>
                         </li>
 
                         @if (User.IsInRole(RoleConstants.Admin))
@@ -62,6 +68,12 @@
                     </ul>
 
                     <div class="d-flex align-items-center gap-3">
+                        <div class="nav-search d-none d-lg-block">
+                            <input type="search" aria-label="Search" placeholder="Search data…" disabled />
+                        </div>
+
+                        <span class="live-status d-none d-md-inline-flex" title="Prototype data feed">Live Status</span>
+
                         <div class="language-switcher d-none d-md-flex">
                             <span>BG</span>
                             <span class="active">EN</span>

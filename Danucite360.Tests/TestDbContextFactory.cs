@@ -120,7 +120,7 @@ public static class TestDbContextFactory
             {
                 Id = 2,
                 BudgetYear = DataConstants.BudgetYear,
-                Amount = 17256463.0m,
+                Amount = 34948286.1m,
                 Currency = "EUR",
                 Unit = "thousand EUR",
                 RecordType = BudgetRecordTypes.NationalExpense,
