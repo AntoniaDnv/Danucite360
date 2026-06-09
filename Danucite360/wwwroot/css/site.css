@@ -942,6 +942,225 @@ canvas {
     border-radius: var(--radius-card);
 }
 
+/* ===== Projects / Investments ===== */
+.status-ongoing {
+    background: var(--accent-teal-soft);
+    color: var(--accent-teal-strong);
+}
+
+.project-type-tag {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--slate);
+    background: var(--page-bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 3px 8px;
+}
+
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.project-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-card);
+    padding: 18px;
+    background: #fff;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+    .project-card:hover {
+        border-color: var(--accent-teal);
+        transform: translateY(-2px);
+        color: var(--text-primary);
+    }
+
+.project-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.project-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--deep-ink);
+    margin: 2px 0 0;
+    line-height: 1.35;
+}
+
+.project-region {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.project-budget {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--deep-ink);
+}
+
+.project-progress {
+    height: 8px;
+    background: var(--page-bg);
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+    .project-progress.lg {
+        height: 12px;
+    }
+
+    .project-progress span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: var(--accent-teal);
+    }
+
+.project-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.source-chip {
+    background: var(--page-bg);
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--slate);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 55%;
+}
+
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+    .breadcrumbs a {
+        color: var(--slate);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .breadcrumbs a:hover {
+        color: var(--accent-teal-strong);
+    }
+
+/* Milestone timeline */
+.milestones {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.milestone {
+    text-align: center;
+    border-top: 3px solid var(--border-light);
+    padding-top: 12px;
+}
+
+    .milestone-dot {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        border: 1px solid var(--border-light);
+        background: #fff;
+        color: var(--text-muted);
+    }
+
+    .milestone-label {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--deep-ink);
+        margin-top: 8px;
+    }
+
+    .milestone-state {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .milestone-done {
+        border-top-color: var(--accent-teal);
+    }
+
+        .milestone-done .milestone-dot {
+            background: var(--accent-teal);
+            border-color: var(--accent-teal);
+            color: #fff;
+        }
+
+    .milestone-current {
+        border-top-color: var(--demo-amber);
+    }
+
+        .milestone-current .milestone-dot {
+            border-color: var(--demo-amber);
+            color: var(--demo-amber);
+        }
+
+.program-card {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-card);
+    padding: 18px;
+    height: 100%;
+}
+
+    .program-card h6 {
+        font-weight: 700;
+        color: var(--deep-ink);
+        margin-bottom: 2px;
+    }
+
+@media (max-width: 992px) {
+    .project-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .milestones {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .project-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Regional disparity: per-capita vs average */
 .vs-avg {
     font-family: var(--font-mono);

@@ -22,6 +22,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<BudgetRecord> BudgetRecords { get; set; } = null!;
 
+    public DbSet<FundedProject> FundedProjects { get; set; } = null!;
+
+    public DbSet<ProjectFunding> ProjectFundings { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -55,5 +59,35 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany(s => s.BudgetRecords)
             .HasForeignKey(r => r.BudgetSourceId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<FundedProject>()
+            .HasIndex(p => p.Slug)
+            .IsUnique();
+
+        builder.Entity<FundedProject>()
+            .Property(p => p.Budget)
+            .HasPrecision(18, 2);
+
+        builder.Entity<FundedProject>()
+            .HasOne(p => p.Region)
+            .WithMany()
+            .HasForeignKey(p => p.RegionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<FundedProject>()
+            .HasOne(p => p.BudgetSource)
+            .WithMany()
+            .HasForeignKey(p => p.BudgetSourceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<ProjectFunding>()
+            .Property(f => f.Amount)
+            .HasPrecision(18, 2);
+
+        builder.Entity<ProjectFunding>()
+            .HasOne(f => f.FundedProject)
+            .WithMany(p => p.FundingShares)
+            .HasForeignKey(f => f.FundedProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

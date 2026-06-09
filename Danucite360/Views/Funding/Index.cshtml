@@ -1,0 +1,135 @@
+@model Danucite360.Services.Models.FundingOverviewServiceModel
+
+@{
+    ViewData["Title"] = "Funding Sources & Programs";
+    var topSource = Model.AllocationBySource.FirstOrDefault();
+    var labels = System.Text.Json.JsonSerializer.Serialize(Model.AllocationBySource.Select(a => a.Name));
+    var values = System.Text.Json.JsonSerializer.Serialize(Model.AllocationBySource.Select(a => a.Amount));
+
+    // Lean scope: operational programs / procedures are a small demo list.
+    var programs = new (string Name, string Period, decimal Allocation, int Spent, string Status)[]
+    {
+        ("Regions in Growth 2021–27", "Operational Programme", 1_380_000m, 38, "Active"),
+        ("Low-Carbon Economy Transition", "Recovery & Resilience", 1_290_000m, 21, "Active"),
+        ("Hemus Highway Extension", "National Programme", 1_140_000m, 64, "Active")
+    };
+
+    var procedures = new (string Code, string Fund, decimal Budget, string Deadline)[]
+    {
+        ("BG16RFOP002-2.089", "EU Cohesion Fund", 230_000m, "15 Oct 2026"),
+        ("BG-RRP-4.025", "EU Recovery Plan", 180_000m, "30 Nov 2026"),
+        ("BG05SFPR002-2.003", "National Budget", 95_000m, "20 Dec 2026")
+    };
+}
+
+<section class="page-shell">
+    <div class="page-header mb-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-demo">⚠ Demo Data</span>
+                <span class="last-updated">Budget year @Model.BudgetYear</span>
+            </div>
+            <h1 class="section-title mb-2">Funding Sources &amp; Programs</h1>
+            <p class="section-subtitle mb-0">
+                Comprehensive analysis of capital allocation for public infrastructure projects, aggregating
+                national budgets, municipal co-financing, and European Union mechanisms.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="app-card h-100">
+                <div class="app-card-body d-flex flex-column">
+                    <h5 class="card-heading">National Capital Allocation Share (@Model.BudgetYear)</h5>
+                    <div class="donut-wrap flex-grow-1">
+                        <canvas id="fundingDonut" data-labels='@Html.Raw(labels)' data-values='@Html.Raw(values)'></canvas>
+                    </div>
+                    <div class="source-ref">Source: Danucite360 demo distribution</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Key Allocation Share</div>
+                        <div class="kpi-value">@(topSource?.Percent.ToString("F1") ?? "0")%</div>
+                        <div class="kpi-meta">@(topSource?.Name ?? "—") leads funding</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Allocated</div>
+                        <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.TotalAllocated)</div>
+                        <div class="kpi-meta">Across all project funding shares</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Active Open Procedures</div>
+                        <div class="kpi-value">@Model.OpenProcedures</div>
+                        <div class="kpi-meta">Projects in planning</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-card mb-4">
+        <div class="app-card-body">
+            <h5 class="card-heading">Major Operational Programs</h5>
+            <div class="row g-4 mt-1">
+                @foreach (var prog in programs)
+                {
+                    <div class="col-md-4">
+                        <div class="program-card">
+                            <span class="status-badge status-ongoing mb-2">@prog.Status</span>
+                            <h6>@prog.Name</h6>
+                            <p class="text-muted small">@prog.Period</p>
+                            <div class="kpi-meta mb-1">Allocation</div>
+                            <div class="mono fw-bold mb-2">@MoneyFormatter.FormatThousandEur(prog.Allocation)</div>
+                            <div class="project-progress"><span style="width:@prog.Spent%"></span></div>
+                            <div class="kpi-meta mt-1">@prog.Spent% committed</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="app-card">
+        <div class="app-card-body">
+            <h5 class="card-heading">Open Application Procedures</h5>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Procedure</th>
+                            <th>Fund</th>
+                            <th class="num">Available Budget</th>
+                            <th class="num">Deadline</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pr in procedures)
+                        {
+                            <tr>
+                                <td class="mono">@pr.Code</td>
+                                <td>@pr.Fund</td>
+                                <td class="num">@MoneyFormatter.FormatThousandEur(pr.Budget)</td>
+                                <td class="num">@pr.Deadline</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/chart-theme.js" asp-append-version="true"></script>
+    <script src="~/js/funding.js" asp-append-version="true"></script>
+}

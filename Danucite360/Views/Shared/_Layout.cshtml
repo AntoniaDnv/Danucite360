@@ -4,8 +4,10 @@
     var routeAction = ViewContext.RouteData.Values["action"]?.ToString();
     string NavActive(bool isActive) => isActive ? "nav-link active" : "nav-link";
     var overviewActive = routeController == "Home" && routeAction == "Index";
+    var projectsActive = routeController == "Projects";
     var regionsActive = routeController == "Map" || routeController == "Regions";
     var categoriesActive = routeController == "Budget" && routeAction == "Categories";
+    var fundingActive = routeController == "Funding";
     var sourcesActive = routeController == "Sources";
 }
 
@@ -48,11 +50,19 @@
                         </li>
 
                         <li class="nav-item">
+                            <a class="@NavActive(projectsActive)" asp-area="" asp-controller="Projects" asp-action="Index">Projects</a>
+                        </li>
+
+                        <li class="nav-item">
                             <a class="@NavActive(regionsActive)" asp-area="" asp-controller="Map" asp-action="Index">Regions</a>
                         </li>
 
                         <li class="nav-item">
                             <a class="@NavActive(categoriesActive)" asp-area="" asp-controller="Budget" asp-action="Categories">Categories</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="@NavActive(fundingActive)" asp-area="" asp-controller="Funding" asp-action="Index">Funding</a>
                         </li>
 
                         <li class="nav-item">
