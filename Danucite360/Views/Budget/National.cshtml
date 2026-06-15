@@ -207,6 +207,71 @@
             </div>
         </div>
     </div>
+
+    @{
+        var exec = ViewBag.Execution as Danucite360.Services.Models.BudgetExecutionServiceModel;
+    }
+    @if (exec != null)
+    {
+        var execLabels = System.Text.Json.JsonSerializer.Serialize(exec.Months.Select(m => m.Month));
+        var execValues = System.Text.Json.JsonSerializer.Serialize(exec.Months.Select(m => m.CumulativeRevenue));
+
+        <div class="app-card mt-4">
+            <div class="app-card-body">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-1">
+                    <div>
+                        <h5 class="card-heading mb-1">@exec.BudgetYear Budget Execution</h5>
+                        <p class="text-muted small mb-0">
+                            Actual cumulative execution under the <strong>Consolidated Fiscal Programme</strong> —
+                            broader in scope than the State Budget Law plan above (it also covers municipalities,
+                            social funds and EU funds).
+                        </p>
+                    </div>
+                    <span class="status-badge status-draft">Actuals · @exec.LatestMonth</span>
+                </div>
+
+                <div class="row g-4 my-1">
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Revenue (YTD)</div>
+                            <div class="kpi-value">@MoneyFormatter.FormatThousandEur(exec.LatestRevenue)</div>
+                            <div class="kpi-meta">Collected to @exec.LatestMonth</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Spending (YTD)</div>
+                            <div class="kpi-value">@MoneyFormatter.FormatThousandEur(exec.LatestExpenditure)</div>
+                            <div class="kpi-meta">Spent to @exec.LatestMonth</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Balance (YTD)</div>
+                            <div class="kpi-value text-danger">@MoneyFormatter.FormatThousandEur(exec.LatestBalance)</div>
+                            <div class="kpi-meta">
+                                @(exec.LatestBalancePercentGdp.HasValue ? exec.LatestBalancePercentGdp.Value.ToString("N1") + "% of GDP" : "Deficit")
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Context</div>
+                            <div class="kpi-value" style="font-size:18px;line-height:1.3;">Highest April deficit in 15 years</div>
+                            <div class="kpi-meta">Per the Fiscal Council</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="region-chart">
+                    <canvas id="executionChart"
+                            data-labels='@Html.Raw(execLabels)'
+                            data-values='@Html.Raw(execValues)'></canvas>
+                </div>
+                <div class="source-ref">Source: @exec.SourceTitle</div>
+            </div>
+        </div>
+    }
 </section>
 
 @section Scripts {

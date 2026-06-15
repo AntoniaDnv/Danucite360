@@ -6,6 +6,8 @@ public interface IBudgetService
 {
     Task<NationalBudgetServiceModel> GetNationalOverviewAsync(int year);
 
+    BudgetExecutionServiceModel GetBudgetExecution(int year);
+
     Task<IEnumerable<CategorySpendingServiceModel>> GetCategoryOverviewAsync(int year);
 
     Task<CategoryDetailServiceModel?> GetCategoryDetailAsync(string categorySlug, int year);

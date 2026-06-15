@@ -77,6 +77,25 @@ public class BudgetServiceTests
     }
 
     [Fact]
+    public void GetBudgetExecution_LatestBalanceReconcilesAndRevenueIsMonotonic()
+    {
+        using var context = TestDbContextFactory.CreateDbContext();
+        var service = new BudgetService(context);
+
+        var result = service.GetBudgetExecution(DataConstants.BudgetYear);
+
+        // Balance = revenue - expenditure.
+        Assert.Equal(result.LatestBalance, result.LatestRevenue - result.LatestExpenditure);
+
+        // Cumulative revenue must be strictly increasing month over month.
+        var revenues = result.Months.Select(m => m.CumulativeRevenue).ToList();
+        for (var i = 1; i < revenues.Count; i++)
+        {
+            Assert.True(revenues[i] > revenues[i - 1]);
+        }
+    }
+
+    [Fact]
     public async Task GetCategoryDetailAsync_AggregatesRegionalDataForCategory()
     {
         using var context = TestDbContextFactory.CreateDbContext();

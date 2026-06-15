@@ -67,6 +67,33 @@ public class BudgetService : IBudgetService
         };
     }
 
+    public BudgetExecutionServiceModel GetBudgetExecution(int year)
+    {
+        // Actual cumulative execution from the Ministry of Finance monthly CFP
+        // bulletins (Jan–Apr 2026). Figures reported in EUR million; stored here
+        // in thousand EUR (× 1000) to reuse the standard money formatter.
+        var months = new List<MonthlyExecutionPointServiceModel>
+        {
+            new() { Month = "Jan", CumulativeRevenue = 3_606_800m },
+            new() { Month = "Feb", CumulativeRevenue = 6_845_000m },
+            new() { Month = "Mar", CumulativeRevenue = 10_038_400m },
+            new() { Month = "Apr", CumulativeRevenue = 14_071_100m }
+        };
+
+        return new BudgetExecutionServiceModel
+        {
+            BudgetYear = year,
+            Unit = DataConstants.DefaultUnit,
+            SourceTitle = "Ministry of Finance — monthly bulletins on the Consolidated Fiscal Programme (2026)",
+            Months = months,
+            LatestMonth = "end-April",
+            LatestRevenue = 14_071_100m,
+            LatestExpenditure = 15_832_300m,
+            LatestBalance = -1_761_200m,
+            LatestBalancePercentGdp = -1.4m
+        };
+    }
+
     public async Task<IEnumerable<CategorySpendingServiceModel>> GetCategoryOverviewAsync(int year)
     {
         var records = await context.BudgetRecords
