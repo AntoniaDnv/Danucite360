@@ -8,6 +8,7 @@
     var regionsActive = routeController == "Map" || routeController == "Regions";
     var categoriesActive = routeController == "Budget" && routeAction == "Categories";
     var fundingActive = routeController == "Funding";
+    var debtActive = routeController == "Debt";
     var sourcesActive = routeController == "Sources";
 }
 
@@ -63,6 +64,10 @@
 
                         <li class="nav-item">
                             <a class="@NavActive(fundingActive)" asp-area="" asp-controller="Funding" asp-action="Index">Funding</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="@NavActive(debtActive)" asp-area="" asp-controller="Debt" asp-action="Index">Debt</a>
                         </li>
 
                         <li class="nav-item">

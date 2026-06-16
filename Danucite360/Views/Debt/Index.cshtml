@@ -1,0 +1,260 @@
+@model Danucite360.Services.Models.DebtOverviewServiceModel
+
+@{
+    ViewData["Title"] = "Debt & Guarantees";
+
+    var trendLabels = System.Text.Json.JsonSerializer.Serialize(Model.Trend.Select(t => t.Month));
+    var trendDomestic = System.Text.Json.JsonSerializer.Serialize(Model.Trend.Select(t => t.Domestic));
+    var trendExternal = System.Text.Json.JsonSerializer.Serialize(Model.Trend.Select(t => t.External));
+    var instLabels = System.Text.Json.JsonSerializer.Serialize(Model.InstrumentStructure.Select(i => i.Name));
+    var instValues = System.Text.Json.JsonSerializer.Serialize(Model.InstrumentStructure.Select(i => i.Percent));
+    var yieldPoints = System.Text.Json.JsonSerializer.Serialize(Model.YieldCurve.Select(y => new { x = y.Years, y = y.YieldPercent }));
+}
+
+<section class="page-shell">
+    <div class="page-header mb-3">
+        <div>
+            <h1 class="section-title mb-2">Debt &amp; Guarantees Overview</h1>
+            <p class="section-subtitle mb-2">
+                Understand how much Bulgaria owes, how the debt is structured, and what guarantees
+                and securities are connected to public finance.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="status-badge status-official">✓ Official Data</span>
+                <span class="status-badge status-draft">Monthly Bulletin</span>
+                <span class="status-badge status-draft">@Model.Period</span>
+                <span class="status-badge status-ongoing">Source: Ministry of Finance</span>
+            </div>
+        </div>
+        <div class="page-actions">
+            <a class="btn btn-outline-secondary btn-sm" asp-controller="Sources" asp-action="Index">View Source</a>
+        </div>
+    </div>
+
+    <div class="plain-summary mb-4">
+        <strong>What does this mean?</strong>
+        Public debt is the total financial obligations of the government. <strong>Central Government Debt</strong>
+        is money owed directly to creditors, while <strong>Guaranteed Debt</strong> is debt the government only
+        repays if the original borrower (e.g. a state company) cannot. At <strong>@Model.DebtToGdpPercent.ToString("N1")% of GDP</strong>,
+        Bulgaria's ratio is among the lowest in the EU — a sign of strong fiscal stability.
+    </div>
+
+    <!-- KPI row 1 -->
+    <div class="row g-4 mb-1">
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="kpi-label">Total Central Govt Debt</div>
+                    <span class="status-badge status-official">Official</span>
+                </div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.TotalDebt)</div>
+                <div class="kpi-meta">@Model.DebtToGdpPercent.ToString("N1")% of GDP</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Domestic Debt</div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.DomesticDebt)</div>
+                <div class="kpi-meta">@Model.DomesticSharePercent.ToString("N1")% total share</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">External Debt</div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.ExternalDebt)</div>
+                <div class="kpi-meta">@Model.ExternalSharePercent.ToString("N1")% total share</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Guaranteed Debt</div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.GuaranteedDebt)</div>
+                <div class="kpi-meta">@Model.GuaranteedToGdpPercent.ToString("N1")% of GDP</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI row 2: composition stats -->
+    <div class="row g-3 mb-4 mt-1">
+        <div class="col-6 col-lg-3">
+            <div class="stat-chip"><div class="stat-chip-icon">🏛</div><div><div class="kpi-label">State Debt</div><div class="stat-chip-value mono">@MoneyFormatter.FormatThousandEur(Model.StateDebt)</div></div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-chip"><div class="stat-chip-icon">€</div><div><div class="kpi-label">EUR-Denominated</div><div class="stat-chip-value mono">@Model.EurDenominatedPercent.ToString("N1")%</div></div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-chip"><div class="stat-chip-icon">📈</div><div><div class="kpi-label">Fixed-Rate Debt</div><div class="stat-chip-value mono">@Model.FixedRatePercent.ToString("N1")%</div></div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-chip"><div class="stat-chip-icon">%</div><div><div class="kpi-label">Avg. Interest</div><div class="stat-chip-value mono">@Model.AvgInterestPercent.ToString("N1")%</div></div></div>
+        </div>
+    </div>
+
+    <!-- Charts row: trend + instrument donut -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body d-flex flex-column">
+                    <h5 class="card-heading">Domestic vs External Debt Trend</h5>
+                    <p class="text-muted small">Central government debt by source, last 6 reported months.</p>
+                    <div class="region-chart flex-grow-1">
+                        <canvas id="debtTrendChart"
+                                data-labels='@Html.Raw(trendLabels)'
+                                data-domestic='@Html.Raw(trendDomestic)'
+                                data-external='@Html.Raw(trendExternal)'></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body d-flex flex-column">
+                    <h5 class="card-heading">Debt Structure by Instrument</h5>
+                    <div class="donut-wrap flex-grow-1">
+                        <canvas id="debtInstrumentChart"
+                                data-labels='@Html.Raw(instLabels)'
+                                data-values='@Html.Raw(instValues)'></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Currency + Interest structure -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Currency Structure</h5>
+                    <div class="revenue-bars mt-3">
+                        @foreach (var c in Model.CurrencyStructure)
+                        {
+                            <div class="revenue-bar-row">
+                                <span class="revenue-bar-label">@c.Name</span>
+                                <div class="revenue-bar-track"><span style="width:@c.Percent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span></div>
+                                <span class="revenue-bar-value mono">@c.Percent.ToString("N1")%</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h5 class="card-heading">Interest Structure</h5>
+                    <div class="revenue-bars mt-3">
+                        @foreach (var i in Model.InterestStructure)
+                        {
+                            <div class="revenue-bar-row">
+                                <span class="revenue-bar-label">@i.Name</span>
+                                <div class="revenue-bar-track"><span style="width:@i.Percent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span></div>
+                                <span class="revenue-bar-value mono">@i.Percent.ToString("N1")%</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guaranteed breakdown + maturity -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <div>
+                            <h5 class="card-heading mb-0">Guaranteed Debt</h5>
+                            <p class="text-muted small mb-0">Total: @MoneyFormatter.FormatThousandEur(Model.GuaranteedDebt)</p>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-1">
+                        @foreach (var g in Model.GuaranteedBreakdown)
+                        {
+                            <div class="col-6">
+                                <div class="mini-stat">
+                                    <div class="kpi-label">@g.Name</div>
+                                    <div class="mini-stat-value mono">@g.Percent.ToString("N1")%</div>
+                                    <div class="project-progress"><span style="width:@g.Percent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body d-flex flex-column justify-content-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-heading mb-0">State Debt Maturity</h5>
+                        <div class="text-end">
+                            <div class="kpi-label">Avg. Remaining</div>
+                            <div class="kpi-value" style="font-size:24px;">@Model.AvgMaturity</div>
+                        </div>
+                    </div>
+                    <p class="text-muted small mt-3 mb-0">
+                        A long average maturity (over 8 years) means debt is repaid gradually over a long horizon,
+                        reducing near-term refinancing pressure.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auctions -->
+    <div class="app-card">
+        <div class="app-card-body">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                <div>
+                    <h5 class="card-heading mb-0">Government Securities Auctions</h5>
+                    <p class="text-muted small mb-0">Yields achieved at primary market auctions.</p>
+                </div>
+                <span class="status-badge status-draft">@Model.Period</span>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="region-chart" style="min-height:220px;">
+                        <canvas id="yieldCurveChart" data-points='@Html.Raw(yieldPoints)'></canvas>
+                    </div>
+                    <p class="text-muted small mt-2 mb-0">
+                        Market demand remains robust, with bid-to-cover ratios averaging ~2.4× for 10-year benchmark bonds.
+                    </p>
+                </div>
+                <div class="col-lg-7">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Maturity</th>
+                                    <th class="num">Avg. Yield</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var a in Model.Auctions)
+                                {
+                                    <tr>
+                                        <td class="mono">@a.Date</td>
+                                        <td>@a.Type</td>
+                                        <td>@a.Maturity</td>
+                                        <td class="num">@a.YieldPercent.ToString("N2")%</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="source-ref">Source: @Model.SourceTitle. BGN→EUR at the fixed rate 1.95583.</div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/chart-theme.js" asp-append-version="true"></script>
+    <script src="~/js/debt.js" asp-append-version="true"></script>
+}

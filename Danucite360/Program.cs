@@ -32,6 +32,7 @@ public partial class Program
         builder.Services.AddScoped<IBudgetService, BudgetService>();
         builder.Services.AddScoped<ISourceService, SourceService>();
         builder.Services.AddScoped<IProjectService, ProjectService>();
+        builder.Services.AddScoped<IDebtService, DebtService>();
        
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
