@@ -272,6 +272,83 @@
             </div>
         </div>
     }
+    @{
+        var stateExec = ViewBag.StateExecution as Danucite360.Services.Models.StateBudgetExecutionServiceModel;
+    }
+    @if (stateExec != null)
+    {
+        var maxRev = stateExec.RevenueBreakdown.Any() ? stateExec.RevenueBreakdown.Max(x => x.Amount) : 1m;
+        var maxExp = stateExec.ExpenditureBreakdown.Any() ? stateExec.ExpenditureBreakdown.Max(x => x.Amount) : 1m;
+
+        <div class="app-card mt-4">
+            <div class="app-card-body">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-1">
+                    <div>
+                        <h5 class="card-heading mb-1">State Budget — Where the Money Goes</h5>
+                        <p class="text-muted small mb-0">
+                            Actual state budget execution to <strong>@stateExec.Period</strong>, by economic type.
+                        </p>
+                    </div>
+                    <span class="status-badge status-draft">Actuals · @stateExec.Period</span>
+                </div>
+
+                <div class="row g-4 my-1">
+                    <div class="col-6 col-lg-4">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Revenue (YTD)</div>
+                            <div class="kpi-value">@MoneyFormatter.FormatThousandEur(stateExec.Revenue)</div>
+                            <div class="kpi-meta">Collected to @stateExec.Period</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-4">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Expenditure (YTD)</div>
+                            <div class="kpi-value">@MoneyFormatter.FormatThousandEur(stateExec.Expenditure)</div>
+                            <div class="kpi-meta">Spent &amp; transferred</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Balance (YTD)</div>
+                            <div class="kpi-value text-danger">@MoneyFormatter.FormatThousandEur(stateExec.Balance)</div>
+                            <div class="kpi-meta">Deficit, financed by debt issuance</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mt-1">
+                    <div class="col-lg-6">
+                        <h6 class="card-heading" style="font-size:15px;">Revenue by source</h6>
+                        <div class="revenue-bars mt-2">
+                            @foreach (var r in stateExec.RevenueBreakdown)
+                            {
+                                <div class="revenue-bar-row">
+                                    <span class="revenue-bar-label">@r.CategoryName</span>
+                                    <div class="revenue-bar-track"><span style="width:@(((double)(r.Amount / maxRev) * 100).ToString("F1"))%"></span></div>
+                                    <span class="revenue-bar-value mono">@MoneyFormatter.FormatThousandEur(r.Amount) · @r.Percentage.ToString("F1")%</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <h6 class="card-heading" style="font-size:15px;">Expenditure by economic type</h6>
+                        <div class="revenue-bars mt-2">
+                            @foreach (var e in stateExec.ExpenditureBreakdown)
+                            {
+                                <div class="revenue-bar-row">
+                                    <span class="revenue-bar-label">@e.CategoryName</span>
+                                    <div class="revenue-bar-track"><span class="alt" style="width:@(((double)(e.Amount / maxExp) * 100).ToString("F1"))%"></span></div>
+                                    <span class="revenue-bar-value mono">@MoneyFormatter.FormatThousandEur(e.Amount) · @e.Percentage.ToString("F1")%</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="source-ref">Source: @stateExec.SourceTitle</div>
+            </div>
+        </div>
+    }
 </section>
 
 @section Scripts {

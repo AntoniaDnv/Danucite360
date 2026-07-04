@@ -8,6 +8,8 @@ public interface IBudgetService
 
     BudgetExecutionServiceModel GetBudgetExecution(int year);
 
+    StateBudgetExecutionServiceModel GetStateBudgetExecution(int year);
+
     Task<IEnumerable<CategorySpendingServiceModel>> GetCategoryOverviewAsync(int year);
 
     Task<CategoryDetailServiceModel?> GetCategoryDetailAsync(string categorySlug, int year);

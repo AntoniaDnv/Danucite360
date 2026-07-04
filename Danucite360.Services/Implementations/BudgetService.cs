@@ -94,6 +94,62 @@ public class BudgetService : IBudgetService
         };
     }
 
+    public StateBudgetExecutionServiceModel GetStateBudgetExecution(int year)
+    {
+        // Actual state budget execution to end-April 2026 (MoF monthly reports),
+        // reported in EUR million; stored in thousand EUR (× 1000). All component
+        // lists sum exactly to the corresponding total.
+        const decimal revenue = 7_917_200m;
+        const decimal expenditure = 9_882_300m; // expenses & transfers + EU contribution
+
+        var revenueParts = new (string Name, decimal Amount)[]
+        {
+            ("VAT", 3_848_100m),
+            ("Personal Income Tax", 1_517_800m),
+            ("Excise Duties", 1_084_600m),
+            ("Corporate Tax", 538_200m),
+            ("Other Tax Revenue", 186_500m),
+            ("Non-tax Revenue", 708_500m),
+            ("Grants & Aid", 33_500m)
+        };
+
+        var expenditureParts = new (string Name, decimal Amount)[]
+        {
+            ("Transfers to Social Insurance Funds", 2_798_600m),
+            ("Transfers to Municipalities", 2_239_500m),
+            ("Personnel", 2_202_000m),
+            ("Maintenance", 640_000m),
+            ("EU Budget Contribution", 351_800m),
+            ("Social Spending & Scholarships", 341_700m),
+            ("Subsidies", 303_200m),
+            ("Capital Expenses", 267_700m),
+            ("Interest", 229_600m),
+            ("Other Transfers & Reserves", 508_200m)
+        };
+
+        List<CategorySpendingServiceModel> Build(IEnumerable<(string Name, decimal Amount)> parts, decimal total) =>
+            parts.Select(p => new CategorySpendingServiceModel
+            {
+                CategoryName = p.Name,
+                Amount = p.Amount,
+                Percentage = total == 0 ? 0 : Math.Round(p.Amount / total * 100, 1),
+                Unit = DataConstants.DefaultUnit
+            }).ToList();
+
+        return new StateBudgetExecutionServiceModel
+        {
+            BudgetYear = year,
+            Period = "end-April 2026",
+            Unit = DataConstants.DefaultUnit,
+            SourceTitle = "Ministry of Finance — monthly State Budget execution reports (Apr 2026)",
+            Revenue = revenue,
+            Expenditure = expenditure,
+            Balance = revenue - expenditure,
+            RevenueBreakdown = Build(revenueParts, revenue),
+            ExpenditureBreakdown = Build(expenditureParts, expenditure)
+        };
+    }
+
     public async Task<IEnumerable<CategorySpendingServiceModel>> GetCategoryOverviewAsync(int year)
     {
         var records = await context.BudgetRecords

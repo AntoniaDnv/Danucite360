@@ -34,3 +34,25 @@ public class MonthlyExecutionPointServiceModel
     // Cumulative year-to-date revenue, in thousand EUR.
     public decimal CumulativeRevenue { get; set; }
 }
+
+/// <summary>
+/// State budget actual execution with the full economic breakdown of revenue
+/// and expenditure, from the Ministry of Finance monthly state-budget reports.
+/// Narrower scope than the Consolidated Fiscal Programme. Amounts in thousand EUR.
+/// </summary>
+public class StateBudgetExecutionServiceModel
+{
+    public int BudgetYear { get; set; }
+    public string Period { get; set; } = "end-April 2026";
+    public string Unit { get; set; } = "thousand EUR";
+    public string SourceTitle { get; set; } = string.Empty;
+
+    public decimal Revenue { get; set; }
+    public decimal Expenditure { get; set; }
+    public decimal Balance { get; set; }
+
+    public IReadOnlyList<CategorySpendingServiceModel> RevenueBreakdown { get; set; }
+        = new List<CategorySpendingServiceModel>();
+    public IReadOnlyList<CategorySpendingServiceModel> ExpenditureBreakdown { get; set; }
+        = new List<CategorySpendingServiceModel>();
+}

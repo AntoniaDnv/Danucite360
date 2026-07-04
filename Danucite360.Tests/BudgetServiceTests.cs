@@ -96,6 +96,19 @@ public class BudgetServiceTests
     }
 
     [Fact]
+    public void GetStateBudgetExecution_BreakdownsSumToTotalsAndBalanceReconciles()
+    {
+        using var context = TestDbContextFactory.CreateDbContext();
+        var service = new BudgetService(context);
+
+        var result = service.GetStateBudgetExecution(DataConstants.BudgetYear);
+
+        Assert.Equal(result.Revenue, result.RevenueBreakdown.Sum(r => r.Amount));
+        Assert.Equal(result.Expenditure, result.ExpenditureBreakdown.Sum(e => e.Amount));
+        Assert.Equal(result.Balance, result.Revenue - result.Expenditure);
+    }
+
+    [Fact]
     public async Task GetCategoryDetailAsync_AggregatesRegionalDataForCategory()
     {
         using var context = TestDbContextFactory.CreateDbContext();
