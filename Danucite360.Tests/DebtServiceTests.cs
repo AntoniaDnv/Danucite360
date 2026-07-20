@@ -7,38 +7,58 @@ namespace Danucite360.Tests;
 public class DebtServiceTests
 {
     [Fact]
-    public void GetOverview_DomesticPlusExternalEqualsTotal()
+    public async Task GetOverviewAsync_DomesticPlusExternalEqualsTotal()
     {
-        var service = new DebtService();
+        using var context = TestDbContextFactory.CreateDbContext();
+        var service = new DebtService(context);
 
-        var result = service.GetOverview(DataConstants.BudgetYear);
+        var result = await service.GetOverviewAsync(DataConstants.BudgetYear);
 
-        Assert.Equal(result.TotalDebt, result.DomesticDebt + result.ExternalDebt);
+        Assert.NotNull(result);
+        Assert.Equal(result!.TotalDebt, result.DomesticDebt + result.ExternalDebt);
     }
 
     [Fact]
-    public void GetOverview_TrendReconcilesToTotalsAndEndsAtApril()
+    public async Task GetOverviewAsync_TrendReconcilesToTotalsAndEndsAtApril()
     {
-        var service = new DebtService();
+        using var context = TestDbContextFactory.CreateDbContext();
+        var service = new DebtService(context);
 
-        var result = service.GetOverview(DataConstants.BudgetYear);
+        var result = await service.GetOverviewAsync(DataConstants.BudgetYear);
 
-        var last = result.Trend[^1];
+        Assert.NotNull(result);
+        var last = result!.Trend[^1];
         Assert.Equal(result.DomesticDebt, last.Domestic);
         Assert.Equal(result.ExternalDebt, last.External);
         Assert.Equal(result.TotalDebt, last.Domestic + last.External);
     }
 
     [Fact]
-    public void GetOverview_StructureBreakdownsSumToHundred()
+    public async Task GetOverviewAsync_StructureBreakdownsSumToHundred()
     {
-        var service = new DebtService();
+        using var context = TestDbContextFactory.CreateDbContext();
+        var service = new DebtService(context);
 
-        var result = service.GetOverview(DataConstants.BudgetYear);
+        var result = await service.GetOverviewAsync(DataConstants.BudgetYear);
 
-        Assert.Equal(100m, result.InstrumentStructure.Sum(i => i.Percent));
+        Assert.NotNull(result);
+        Assert.Equal(100m, result!.InstrumentStructure.Sum(i => i.Percent));
         Assert.Equal(100m, result.CurrencyStructure.Sum(c => c.Percent));
         Assert.Equal(100m, result.InterestStructure.Sum(i => i.Percent));
         Assert.Equal(100m, result.GuaranteedBreakdown.Sum(g => g.Percent));
+    }
+
+    [Fact]
+    public async Task GetOverviewAsync_DerivesYieldCurveFromAuctions()
+    {
+        using var context = TestDbContextFactory.CreateDbContext();
+        var service = new DebtService(context);
+
+        var result = await service.GetOverviewAsync(DataConstants.BudgetYear);
+
+        Assert.NotNull(result);
+        Assert.Equal(2, result!.YieldCurve.Count);
+        Assert.Contains(result.YieldCurve, y => y.Years == 10 && y.YieldPercent == 4.18m);
+        Assert.True(result.YieldCurve[0].Years < result.YieldCurve[1].Years);
     }
 }

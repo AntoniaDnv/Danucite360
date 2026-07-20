@@ -14,9 +14,15 @@ public class DebtController : Controller
     }
 
     [HttpGet("/debt")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var model = debtService.GetOverview(DataConstants.BudgetYear);
+        var model = await debtService.GetOverviewAsync(DataConstants.BudgetYear);
+
+        if (model == null)
+        {
+            return NotFound();
+        }
+
         return View(model);
     }
 }

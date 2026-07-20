@@ -103,6 +103,8 @@ public static class TestDbContextFactory
 
         context.Regions.AddRange(sofia, plovdiv);
 
+        context.DebtSnapshots.Add(SeedData.CreateDebtSnapshot());
+
         context.BudgetRecords.AddRange(
             new BudgetRecord
             {

@@ -4,5 +4,5 @@ namespace Danucite360.Services.Contracts;
 
 public interface IDebtService
 {
-    DebtOverviewServiceModel GetOverview(int year);
+    Task<DebtOverviewServiceModel?> GetOverviewAsync(int year);
 }

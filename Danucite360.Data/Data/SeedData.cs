@@ -21,6 +21,80 @@ public static class SeedData
         await SeedRegionsAsync(context);
         await SeedBudgetRecordsAsync(context);
         await SeedProjectsAsync(context);
+        await SeedDebtAsync(context);
+    }
+
+    private static async Task SeedDebtAsync(ApplicationDbContext context)
+    {
+        if (await context.DebtSnapshots.AnyAsync())
+        {
+            return;
+        }
+
+        context.DebtSnapshots.Add(CreateDebtSnapshot());
+        await context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Builds the April 2026 government debt snapshot from the Ministry of Finance
+    /// Government Debt monthly bulletin. Shared by production seeding and tests.
+    /// </summary>
+    public static DebtSnapshot CreateDebtSnapshot()
+    {
+        return new DebtSnapshot
+        {
+            Period = "April 2026",
+            BudgetYear = DataConstants.BudgetYear,
+            AsOf = new DateTime(2026, 4, 30),
+            SourceTitle = "Ministry of Finance — Government Debt monthly bulletin (April 2026)",
+            Unit = DataConstants.DefaultUnit,
+
+            TotalDebt = 33_752_300m,
+            DebtToGdpPercent = 26.9m,
+            DomesticDebt = 8_477_800m,
+            DomesticSharePercent = 25.1m,
+            ExternalDebt = 25_274_500m,
+            ExternalSharePercent = 74.9m,
+            GuaranteedDebt = 637_400m,
+            GuaranteedToGdpPercent = 0.5m,
+            StateDebt = 31_750_000m,
+            StateDebtSharePercent = 94.1m,
+            EurDenominatedPercent = 96.2m,
+            FixedRatePercent = 99.8m,
+            AvgInterestPercent = 3.2m,
+            AvgMaturity = "8y 5m",
+
+            Breakdowns = new List<DebtBreakdownItem>
+            {
+                new() { Section = "Instrument", Name = "Securities (International)", Percent = 67.1m, SortOrder = 0 },
+                new() { Section = "Instrument", Name = "Securities (Domestic)", Percent = 18.6m, SortOrder = 1 },
+                new() { Section = "Instrument", Name = "Loans", Percent = 8.8m, SortOrder = 2 },
+                new() { Section = "Instrument", Name = "Deposits", Percent = 5.5m, SortOrder = 3 },
+                new() { Section = "Currency", Name = "EUR (Euro)", Percent = 96.2m, SortOrder = 0 },
+                new() { Section = "Currency", Name = "USD (Dollar)", Percent = 3.8m, SortOrder = 1 },
+                new() { Section = "Interest", Name = "Fixed Rate (Predictable)", Percent = 99.8m, SortOrder = 0 },
+                new() { Section = "Interest", Name = "Floating Rate", Percent = 0.2m, SortOrder = 1 },
+                new() { Section = "Guaranteed", Name = "Energy Sector", Percent = 51.8m, SortOrder = 0 },
+                new() { Section = "Guaranteed", Name = "EU Programs", Percent = 24.5m, SortOrder = 1 },
+                new() { Section = "Guaranteed", Name = "Financial", Percent = 19.6m, SortOrder = 2 },
+                new() { Section = "Guaranteed", Name = "Other", Percent = 4.1m, SortOrder = 3 }
+            },
+
+            TrendPoints = new List<DebtTrendPoint>
+            {
+                new() { Month = "Dec 25", Domestic = 8_747_400m, External = 24_061_700m, SortOrder = 0 },
+                new() { Month = "Jan 26", Domestic = 8_440_400m, External = 24_711_800m, SortOrder = 1 },
+                new() { Month = "Feb 26", Domestic = 7_877_100m, External = 25_599_900m, SortOrder = 2 },
+                new() { Month = "Mar 26", Domestic = 8_177_400m, External = 25_538_400m, SortOrder = 3 },
+                new() { Month = "Apr 26", Domestic = 8_477_800m, External = 25_274_500m, SortOrder = 4 }
+            },
+
+            Auctions = new List<DebtAuction>
+            {
+                new() { Date = "06.04.2026", Type = "GS (Bonds)", Maturity = "10 Year", YieldPercent = 4.18m, SortOrder = 0 },
+                new() { Date = "20.04.2026", Type = "GS (Bonds)", Maturity = "5 Year", YieldPercent = 3.33m, SortOrder = 1 }
+            }
+        };
     }
 
     private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)

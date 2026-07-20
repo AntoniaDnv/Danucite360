@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Danucite360.Data.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -25,6 +26,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<FundedProject> FundedProjects { get; set; } = null!;
 
     public DbSet<ProjectFunding> ProjectFundings { get; set; } = null!;
+
+    public DbSet<DebtSnapshot> DebtSnapshots { get; set; } = null!;
+
+    public DbSet<DebtBreakdownItem> DebtBreakdownItems { get; set; } = null!;
+
+    public DbSet<DebtTrendPoint> DebtTrendPoints { get; set; } = null!;
+
+    public DbSet<DebtAuction> DebtAuctions { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -89,5 +98,22 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany(p => p.FundingShares)
             .HasForeignKey(f => f.FundedProjectId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Debt snapshot: give all monetary/percentage decimals explicit precision,
+        // and cascade-delete the child rows with their parent snapshot.
+        foreach (var clr in new[]
+        {
+            typeof(DebtSnapshot), typeof(DebtBreakdownItem), typeof(DebtTrendPoint), typeof(DebtAuction)
+        })
+        {
+            foreach (var prop in clr.GetProperties().Where(p => p.PropertyType == typeof(decimal)))
+            {
+                builder.Entity(clr).Property(prop.Name).HasPrecision(18, 2);
+            }
+        }
+
+        builder.Entity<DebtSnapshot>()
+            .HasIndex(s => new { s.BudgetYear, s.Period })
+            .IsUnique();
     }
 }
