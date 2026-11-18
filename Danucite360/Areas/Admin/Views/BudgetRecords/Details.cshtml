@@ -1,40 +1,40 @@
 ﻿@model Danucite360.Data.Models.BudgetRecord
 
 @{
-    ViewData["Title"] = "Budget Record Details";
+    ViewData["Title"] = "Бюджетен запис";
 }
 
 <div class="container py-5">
-    <h1 class="fw-bold mb-4">Budget Record Details</h1>
+    <h1 class="fw-bold mb-4">Бюджетен запис</h1>
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
             <dl class="row">
-                <dt class="col-sm-3">Year</dt>
+                <dt class="col-sm-3">Година</dt>
                 <dd class="col-sm-9">@Model.BudgetYear</dd>
 
-                <dt class="col-sm-3">Type</dt>
+                <dt class="col-sm-3">Вид</dt>
                 <dd class="col-sm-9">@Model.RecordType</dd>
 
-                <dt class="col-sm-3">Region</dt>
+                <dt class="col-sm-3">Област</dt>
                 <dd class="col-sm-9">@(Model.Region?.Name ?? "National")</dd>
 
-                <dt class="col-sm-3">Category</dt>
+                <dt class="col-sm-3">Категория</dt>
                 <dd class="col-sm-9">@Model.BudgetCategory.Name</dd>
 
-                <dt class="col-sm-3">Amount</dt>
+                <dt class="col-sm-3">Сума</dt>
                 <dd class="col-sm-9">@Model.Amount.ToString("N1") @Model.Unit</dd>
 
-                <dt class="col-sm-3">Currency</dt>
+                <dt class="col-sm-3">Валута</dt>
                 <dd class="col-sm-9">@Model.Currency</dd>
 
-                <dt class="col-sm-3">Demo</dt>
+                <dt class="col-sm-3">Демо</dt>
                 <dd class="col-sm-9">@(Model.IsDemo ? "Yes" : "No")</dd>
 
-                <dt class="col-sm-3">Source</dt>
+                <dt class="col-sm-3">Източник</dt>
                 <dd class="col-sm-9">@Model.BudgetSource.Title</dd>
 
-                <dt class="col-sm-3">Notes</dt>
+                <dt class="col-sm-3">Бележки</dt>
                 <dd class="col-sm-9">@Model.Notes</dd>
             </dl>
 
@@ -43,14 +43,14 @@
                asp-controller="BudgetRecords"
                asp-action="Edit"
                asp-route-id="@Model.Id">
-                Edit
+                Редактирай
             </a>
 
             <a class="btn btn-outline-secondary"
                asp-area="Admin"
                asp-controller="BudgetRecords"
                asp-action="Index">
-                Back
+                Назад
             </a>
         </div>
     </div>

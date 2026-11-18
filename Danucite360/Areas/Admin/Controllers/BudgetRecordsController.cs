@@ -247,12 +247,12 @@ public class BudgetRecordsController : Controller
     {
         if (model.RecordType == BudgetRecordTypes.RegionalExpense && model.RegionId == null)
         {
-            ModelState.AddModelError(nameof(model.RegionId), "Region is required for regional expense records.");
+            ModelState.AddModelError(nameof(model.RegionId), "Регионалните записи изискват област.");
         }
 
         if (model.RecordType != BudgetRecordTypes.RegionalExpense && model.RegionId != null)
         {
-            ModelState.AddModelError(nameof(model.RegionId), "National records should not have a region.");
+            ModelState.AddModelError(nameof(model.RegionId), "Националните записи не трябва да имат област.");
         }
 
         if (model.RecordType == BudgetRecordTypes.RegionalExpense && !model.IsDemo)

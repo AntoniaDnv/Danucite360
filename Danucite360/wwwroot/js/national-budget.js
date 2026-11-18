@@ -1,4 +1,6 @@
 ﻿document.addEventListener("DOMContentLoaded", async () => {
+    renderExecutionTrajectory();
+
     const canvas = document.getElementById("nationalBudgetChart");
 
     if (!canvas) {
@@ -21,7 +23,7 @@
             labels: data.labels,
             datasets: [
                 {
-                    label: `Amount (${data.unit})`,
+                    label: "Сума",
                     data: data.values,
                     backgroundColor: C ? [C.palette.teal, C.palette.navy, C.palette.amber] : undefined,
                     borderWidth: 0,
@@ -63,3 +65,51 @@
         }
     });
 });
+
+// Cumulative revenue execution trajectory (Consolidated Fiscal Programme).
+function renderExecutionTrajectory() {
+    const C = window.DanuciteCharts;
+    const canvas = document.getElementById("executionChart");
+    if (!canvas || !window.Chart) return;
+
+    const labels = JSON.parse(canvas.dataset.labels || "[]");
+    const values = JSON.parse(canvas.dataset.values || "[]");
+
+    new Chart(canvas, {
+        type: "line",
+        data: {
+            labels,
+            datasets: [{
+                label: "Натрупани приходи от началото на годината",
+                data: values,
+                borderColor: C ? C.palette.teal : "#0D9488",
+                backgroundColor: "rgba(13, 148, 136, 0.12)",
+                borderWidth: 2,
+                pointRadius: 4,
+                pointBackgroundColor: C ? C.palette.teal : "#0D9488",
+                fill: true,
+                tension: 0.25
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => C ? C.formatBillionsEur(ctx.parsed.y) : ctx.parsed.y.toLocaleString()
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: C ? C.palette.border : "#E2E8F0" },
+                    ticks: { callback: v => C ? C.formatBillionsEur(v) : v.toLocaleString() }
+                }
+            }
+        }
+    });
+}

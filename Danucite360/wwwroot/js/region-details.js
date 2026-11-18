@@ -27,7 +27,7 @@
             labels: data.labels,
             datasets: [
                 {
-                    label: `Regional Spending ${data.year} (${data.unit})`,
+                    label: `Разходи в областта ${data.year}`,
                     data: data.values
                 }
             ]

@@ -67,6 +67,89 @@ public class BudgetService : IBudgetService
         };
     }
 
+    public BudgetExecutionServiceModel GetBudgetExecution(int year)
+    {
+        // Actual cumulative execution from the Ministry of Finance monthly CFP
+        // bulletins (Jan–Apr 2026). Figures reported in EUR million; stored here
+        // in thousand EUR (× 1000) to reuse the standard money formatter.
+        var months = new List<MonthlyExecutionPointServiceModel>
+        {
+            new() { Month = "Яну", CumulativeRevenue = 3_606_800m },
+            new() { Month = "Фев", CumulativeRevenue = 6_845_000m },
+            new() { Month = "Мар", CumulativeRevenue = 10_038_400m },
+            new() { Month = "Апр", CumulativeRevenue = 14_071_100m }
+        };
+
+        return new BudgetExecutionServiceModel
+        {
+            BudgetYear = year,
+            Unit = DataConstants.DefaultUnit,
+            SourceTitle = "Министерство на финансите — месечни бюлетини за изпълнението на КФП (2026)",
+            Months = months,
+            LatestMonth = "края на април",
+            LatestRevenue = 14_071_100m,
+            LatestExpenditure = 15_832_300m,
+            LatestBalance = -1_761_200m,
+            LatestBalancePercentGdp = -1.4m
+        };
+    }
+
+    public StateBudgetExecutionServiceModel GetStateBudgetExecution(int year)
+    {
+        // Actual state budget execution to end-April 2026 (MoF monthly reports),
+        // reported in EUR million; stored in thousand EUR (× 1000). All component
+        // lists sum exactly to the corresponding total.
+        const decimal revenue = 7_917_200m;
+        const decimal expenditure = 9_882_300m; // expenses & transfers + EU contribution
+
+        var revenueParts = new (string Name, decimal Amount)[]
+        {
+            ("ДДС", 3_848_100m),
+            ("Данък върху доходите на физ. лица", 1_517_800m),
+            ("Акцизи", 1_084_600m),
+            ("Корпоративен данък", 538_200m),
+            ("Други данъчни приходи", 186_500m),
+            ("Неданъчни приходи", 708_500m),
+            ("Помощи и дарения", 33_500m)
+        };
+
+        var expenditureParts = new (string Name, decimal Amount)[]
+        {
+            ("Трансфери към осигурителните фондове", 2_798_600m),
+            ("Трансфери към общините", 2_239_500m),
+            ("Персонал (заплати и осигуровки)", 2_202_000m),
+            ("Издръжка", 640_000m),
+            ("Вноска в бюджета на ЕС", 351_800m),
+            ("Социални разходи и стипендии", 341_700m),
+            ("Субсидии", 303_200m),
+            ("Капиталови разходи", 267_700m),
+            ("Лихви", 229_600m),
+            ("Други трансфери и резерви", 508_200m)
+        };
+
+        List<CategorySpendingServiceModel> Build(IEnumerable<(string Name, decimal Amount)> parts, decimal total) =>
+            parts.Select(p => new CategorySpendingServiceModel
+            {
+                CategoryName = p.Name,
+                Amount = p.Amount,
+                Percentage = total == 0 ? 0 : Math.Round(p.Amount / total * 100, 1),
+                Unit = DataConstants.DefaultUnit
+            }).ToList();
+
+        return new StateBudgetExecutionServiceModel
+        {
+            BudgetYear = year,
+            Period = "януари – април 2026",
+            Unit = DataConstants.DefaultUnit,
+            SourceTitle = "Министерство на финансите — месечни отчети за изпълнението на държавния бюджет (април 2026)",
+            Revenue = revenue,
+            Expenditure = expenditure,
+            Balance = revenue - expenditure,
+            RevenueBreakdown = Build(revenueParts, revenue),
+            ExpenditureBreakdown = Build(expenditureParts, expenditure)
+        };
+    }
+
     public async Task<IEnumerable<CategorySpendingServiceModel>> GetCategoryOverviewAsync(int year)
     {
         var records = await context.BudgetRecords
@@ -181,7 +264,7 @@ public class BudgetService : IBudgetService
         return new ChartDataServiceModel
         {
             Year = year,
-            Labels = new[] { "Revenue", "Expenses", "Budget Balance" },
+            Labels = new[] { "Приходи", "Разходи", "Салдо" },
             Values = new[]
             {
             overview.Revenue,
@@ -251,6 +334,29 @@ public class BudgetService : IBudgetService
                                  br.RecordType == BudgetRecordTypes.RegionalExpense)
                     .Sum(br => br.Amount),
                 Unit = DataConstants.DefaultUnit
+            })
+            .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<BudgetRecordExportServiceModel>> GetRecordsForExportAsync(int year)
+    {
+        return await context.BudgetRecords
+            .AsNoTracking()
+            .Where(r => r.BudgetYear == year)
+            .OrderBy(r => r.RecordType).ThenBy(r => r.Region!.Name).ThenBy(r => r.BudgetCategory.Name)
+            .Select(r => new BudgetRecordExportServiceModel
+            {
+                BudgetYear = r.BudgetYear,
+                RecordType = r.RecordType,
+                Category = r.BudgetCategory.Name,
+                Region = r.Region != null ? r.Region.Name : null,
+                Amount = r.Amount,
+                Currency = r.Currency,
+                Unit = r.Unit,
+                DataStatus = r.IsDemo ? "demo" : "official",
+                Source = r.BudgetSource.Title,
+                SourceUrl = r.BudgetSource.Url,
+                Notes = r.Notes
             })
             .ToListAsync();
     }

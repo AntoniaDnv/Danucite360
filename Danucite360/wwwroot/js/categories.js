@@ -27,7 +27,7 @@ async function loadCategoriesChart() {
             labels: data.labels,
             datasets: [
                 {
-                    label: `Spending Categories ${data.year}`,
+                    label: `Разходи по области ${data.year}`,
                     data: data.values,
                     backgroundColor: C ? C.palette.teal : "#0D9488",
                     borderRadius: 4,

@@ -1,0 +1,55 @@
+@{
+    ViewData["Title"] = "Отворени данни";
+    var datasets = new[]
+    {
+        (Title: "Бюджетни записи 2026", Desc: "Приходи, разходи, салдо и регионални разходи — с категория, регион, източник и статус (официални / демо).", Csv: "/open-data/budget-records.csv", Api: "/api/budget-records"),
+        (Title: "Капиталови проекти", Desc: "Проекти с бюджет, изплатена сума, физически напредък, град и координати. Демонстрационни данни.", Csv: "/open-data/projects.csv", Api: "/api/projects"),
+        (Title: "Регистър на мерките", Desc: "Мерки с целеви групи, възрасти, ефект за бюджета и дата на влизане в сила. Демонстрационни данни.", Csv: "/open-data/measures.csv", Api: "/api/measures"),
+    };
+}
+
+<section class="page-shell">
+    <div class="page-header mb-4">
+        <div>
+            <span class="hero-eyebrow">Машиночетими данни</span>
+            <h1 class="section-title mb-2">Не снимки на таблици. Отворени данни.</h1>
+            <p class="section-subtitle mb-0">
+                Всичко, което виждате в графиките, може да се изтегли като CSV (за Excel и анализ) или да се ползва през JSON API
+                (за журналисти, разработчици и организации). Данните идват директно от базата данни на платформата.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var d in datasets)
+        {
+            <div class="col-lg-4">
+                <div class="app-card h-100">
+                    <div class="app-card-body d-flex flex-column">
+                        <h2 class="card-heading h6">@d.Title</h2>
+                        <p class="text-muted small flex-grow-1">@d.Desc</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a class="btn btn-primary btn-sm" href="@d.Csv" download>Изтегли CSV</a>
+                            <a class="btn btn-outline-secondary btn-sm" href="@d.Api" target="_blank" rel="noopener">JSON API</a>
+                        </div>
+                        <code class="small mt-3 text-muted">GET @d.Api</code>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="app-card mt-4">
+        <div class="app-card-body">
+            <h2 class="card-heading h6">Как да четем файловете</h2>
+            <ul class="small mb-0">
+                <li><strong>Суми</strong> са в хиляди евро (колона <code>unit</code> = <code>thousand EUR</code>), с точка за десетичен знак.</li>
+                <li><strong>data_status</strong>: <code>official</code> — въведено от официален документ; <code>demo</code> — илюстративна стойност за прототипа.</li>
+                <li><strong>fiscal_impact</strong> (мерки): отрицателно = разход за бюджета, положително = приход. Не е сума, похарчена по проект.</li>
+                <li><strong>spent</strong> / <strong>physical_progress_percent</strong> (проекти): финансов и физически напредък — различни показатели.</li>
+                <li>API за мерки поддържа филтри: <code>/api/measures?role=parent&amp;role=driver&amp;age=30-50</code>.</li>
+                <li>Други налични JSON крайни точки: <code>/api/dashboard/national</code>, <code>/api/dashboard/categories</code>, <code>/api/dashboard/regions</code>.</li>
+            </ul>
+        </div>
+    </div>
+</section>

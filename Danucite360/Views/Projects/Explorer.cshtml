@@ -1,0 +1,108 @@
+﻿@model IEnumerable<Danucite360.Services.Models.ProjectListItemServiceModel>
+@using Danucite360.Common.Constants
+
+@{
+    ViewData["Title"] = "Всички проекти";
+    var projects = Model.ToList();
+    var types = projects.Select(p => p.ProjectType).Distinct().OrderBy(t => t).ToList();
+    var statuses = projects.Select(p => p.Status).Distinct().ToList();
+    var regions = projects.Select(p => p.RegionName).Distinct().OrderBy(r => r).ToList();
+
+    string StatusClass(string s) => s switch
+    {
+        "Completed" => "status-official",
+        "Ongoing" => "status-ongoing",
+        _ => "status-draft"
+    };
+}
+
+<section class="page-shell">
+    <div class="page-header mb-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-demo">Демо данни</span>
+                <span class="last-updated">Бюджет 2026</span>
+            </div>
+            <h1 class="section-title mb-2">Всички проекти</h1>
+            <p class="section-subtitle mb-0">Каталог на публично финансираните проекти — търсене и филтри.</p>
+        </div>
+        <div class="page-actions">
+            <a class="btn btn-outline-secondary btn-sm" href="/projects/map">Виж на картата</a>
+        </div>
+    </div>
+
+    <div class="filter-bar app-card mb-4">
+        <div class="app-card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label small text-muted" for="projectSearch">Търсене</label>
+                    <input id="projectSearch" type="search" class="form-control" placeholder="Търсене по име…" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted" for="projectType">Сектор</label>
+                    <select id="projectType" class="form-select">
+                        <option value="all" selected>Всички сектори</option>
+                        @foreach (var t in types)
+                        {
+                            <option value="@t">@Labels.ToBg(t)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted" for="projectStatus">Статус</label>
+                    <select id="projectStatus" class="form-select">
+                        <option value="all" selected>Всички статуси</option>
+                        @foreach (var s in statuses)
+                        {
+                            <option value="@s">@Labels.ToBg(s)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted" for="projectRegion">Област</label>
+                    <select id="projectRegion" class="form-select">
+                        <option value="all" selected>Всички</option>
+                        @foreach (var r in regions)
+                        {
+                            <option value="@r">@r</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="project-grid" id="projectGrid">
+        @foreach (var p in projects)
+        {
+            <a class="project-card"
+               href="/projects/@p.Slug"
+               data-title="@p.Title.ToLowerInvariant()"
+               data-type="@p.ProjectType"
+               data-status="@p.Status"
+               data-region="@p.RegionName">
+                <div class="project-card-top">
+                    <span class="project-type-tag">@Labels.ToBg(p.ProjectType)</span>
+                    <span class="status-badge @StatusClass(p.Status)">@Labels.ToBg(p.Status)</span>
+                </div>
+                <h6 class="project-title">@p.Title</h6>
+                <div class="project-region">@p.RegionName</div>
+                <div class="project-budget mono">@MoneyFormatter.FormatThousandEur(p.Budget)</div>
+                <div class="project-progress"><span style="width:@p.CompletionPercent%"></span></div>
+                <div class="project-card-foot">
+                    <span>@p.CompletionPercent% извършено</span>
+                    <span class="source-chip">@Labels.ToBg(p.PrimaryFundingSource)</span>
+                </div>
+            </a>
+        }
+    </div>
+
+    <div id="projectsEmptyState" class="empty-state d-none mt-3">
+        <h5>Няма проекти по тези критерии.</h5>
+        <p>Променете търсенето, сектора, статуса или областта.</p>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/projects-explorer.js" asp-append-version="true"></script>
+}

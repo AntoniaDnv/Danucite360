@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Danucite360.Services.Models.CategorySpendingServiceModel>
 
 @{
-    ViewData["Title"] = "Spending Categories";
+    ViewData["Title"] = "Разходи по области";
 
     var categories = Model.ToList();
     var topCategory = categories.OrderByDescending(c => c.Amount).FirstOrDefault();
@@ -12,15 +12,15 @@
     <div class="page-header mb-4">
         <div>
             <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="status-badge status-demo">⚠ Demo Data</span>
-                <span class="last-updated">Budget year 2026</span>
+                <span class="status-badge status-demo">Демо данни</span>
+                <span class="last-updated">Бюджет 2026</span>
             </div>
 
-            <h1 class="section-title mb-2">Spending Categories</h1>
+            <h1 class="section-title mb-2">Разходи по области</h1>
 
             <p class="section-subtitle mb-0">
-                See how public money is allocated across areas such as healthcare,
-                education, infrastructure, social support, administration, security, and environment.
+                Как се разпределят публичните пари между здравеопазване, образование, инфраструктура,
+                социално подпомагане, администрация, сигурност и околна среда.
             </p>
         </div>
 
@@ -28,7 +28,7 @@
             <a class="btn btn-outline-secondary btn-sm"
                asp-controller="Sources"
                asp-action="Index">
-                View Sources
+                Източници
             </a>
         </div>
     </div>
@@ -36,37 +36,34 @@
     <partial name="_DemoNotice" />
 
     <div class="plain-summary mb-4">
-        <strong>What does this mean?</strong>
-        Categories group spending into citizen-friendly areas.
-        In this MVP, category values are based on demo regional data, so they show the product concept rather than official totals.
+        <strong>Какво означава това?</strong>
+        Разходите са групирани в разбираеми области. В този прототип стойностите идват от демонстрационни
+        регионални данни — те показват идеята, а не официалните суми.
     </div>
 
     <div class="row g-4 mb-4">
         <div class="col-md-4">
             <div class="kpi-card">
-                <div class="kpi-icon kpi-icon-blue">▦</div>
-                <div class="kpi-label">Categories</div>
+                <div class="kpi-label">Области</div>
                 <div class="kpi-value">@categories.Count</div>
-                <div class="kpi-meta">Spending areas shown</div>
+                <div class="kpi-meta">Показани области на разходи</div>
             </div>
         </div>
 
         <div class="col-md-4">
             <div class="kpi-card">
-                <div class="kpi-icon kpi-icon-green">Σ</div>
-                <div class="kpi-label">Total Demo Spending</div>
-                <div class="kpi-value">@total.ToString("N1")</div>
-                <div class="kpi-meta">thousand EUR</div>
+                <div class="kpi-label">Общо (демо)</div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(total)</div>
+                <div class="kpi-meta">Сбор на демо регионалните разходи</div>
             </div>
         </div>
 
         <div class="col-md-4">
             <div class="kpi-card">
-                <div class="kpi-icon kpi-icon-red">★</div>
-                <div class="kpi-label">Largest Category</div>
+                <div class="kpi-label">Най-голяма област</div>
                 <div class="kpi-value">@topCategory?.CategoryName</div>
                 <div class="kpi-meta">
-                    @(topCategory == null ? "No data" : $"{topCategory.Percentage:N2}% of demo spending")
+                    @(topCategory == null ? "Няма данни" : MoneyFormatter.FormatPercent(topCategory.Percentage) + " от демо разходите")
                 </div>
             </div>
         </div>
@@ -76,21 +73,21 @@
         <div class="app-card-body">
             <div class="row g-3 align-items-end">
                 <div class="col-md-5">
-                    <label class="form-label small text-muted">Search category</label>
-                    <input id="categorySearch" type="search" class="form-control" placeholder="Search category..." />
+                    <label class="form-label small text-muted" for="categorySearch">Търсене</label>
+                    <input id="categorySearch" type="search" class="form-control" placeholder="Търсене на област…" />
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label small text-muted">Sort by</label>
+                    <label class="form-label small text-muted">Подреди по</label>
                     <select id="categorySort" class="form-select">
-                        <option value="amount" selected>Amount</option>
-                        <option value="name">Name</option>
-                        <option value="percentage">Percentage</option>
+                        <option value="amount" selected>Сума</option>
+                        <option value="name">Име</option>
+                        <option value="percentage">Дял</option>
                     </select>
                 </div>
 
                 <div class="col-md-4 text-md-end">
-                    <span class="status-badge status-demo">⚠ Demo regional values</span>
+                    <span class="status-badge status-demo">Демо регионални стойности</span>
                 </div>
             </div>
         </div>
@@ -102,13 +99,13 @@
                 <div class="app-card-body">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
-                            <h5 class="card-heading">Category Share</h5>
+                            <h2 class="card-heading h5">Дял на всяка област</h2>
                             <p class="text-muted small mb-0">
-                                Chart.js visualization loaded from the API.
+                                Коя област получава най-голяма част от разходите?
                             </p>
                         </div>
 
-                        <span class="status-badge status-demo">⚠ Demo Data</span>
+                        <span class="status-badge status-demo">Демо данни</span>
                     </div>
 
                     <div class="category-chart">
@@ -121,9 +118,9 @@
         <div class="col-lg-5">
             <div class="app-card h-100">
                 <div class="app-card-body">
-                    <h5 class="card-heading">Top spending areas</h5>
+                    <h2 class="card-heading h5">Най-големи разходи</h2>
                     <p class="text-muted small">
-                        Sorted by total demo amount across all demo regions.
+                        Подредени по обща сума за всички демо области.
                     </p>
 
                     <div class="category-ranking">
@@ -135,12 +132,11 @@
                                  data-category-percentage="@category.Percentage">
                                 <div>
                                     <strong>@category.CategoryName</strong>
-                                    <span>@category.Percentage.ToString("N2")% of demo spending</span>
+                                    <span>@MoneyFormatter.FormatPercent(category.Percentage) от демо разходите</span>
                                 </div>
 
                                 <div>
-                                    <strong>@category.Amount.ToString("N1")</strong>
-                                    <span>@category.Unit</span>
+                                    <strong>@MoneyFormatter.FormatThousandEur(category.Amount)</strong>
                                 </div>
                             </div>
                         }
@@ -154,9 +150,9 @@
         <div class="app-card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                    <h5 class="card-heading">All Categories</h5>
+                    <h2 class="card-heading h5">Всички области</h2>
                     <p class="text-muted small mb-0">
-                        Plain-language category table for citizens.
+                        Какво включва всяка област, на разбираем език.
                     </p>
                 </div>
             </div>
@@ -169,16 +165,15 @@
                        data-category-name="@category.CategoryName.ToLowerInvariant()"
                        data-category-amount="@category.Amount"
                        data-category-percentage="@category.Percentage">
-                        <div class="category-icon">@GetCategoryIcon(category.CategorySlug)</div>
 
                         <div>
                             <h6>@category.CategoryName</h6>
                             <p>@GetCategoryDescription(category.CategorySlug)</p>
 
                             <div class="category-card-meta">
-                                <span>@category.Amount.ToString("N1") @category.Unit</span>
-                                <span>@category.Percentage.ToString("N2")%</span>
-                                <span class="view-detail">View details →</span>
+                                <span>@MoneyFormatter.FormatThousandEur(category.Amount)</span>
+                                <span>@MoneyFormatter.FormatPercent(category.Percentage)</span>
+                                <span class="view-detail">Подробно →</span>
                             </div>
                         </div>
                     </a>
@@ -208,20 +203,20 @@
     {
         return slug switch
         {
-            "healthcare" => "Public spending related to healthcare services and medical support.",
-            "education" => "Funding related to schools, education services, and learning infrastructure.",
-            "infrastructure" => "Spending for roads, public works, and physical infrastructure.",
-            "social-support" => "Programs that support households, vulnerable groups, and social services.",
-            "public-administration" => "Administrative services and public-sector management.",
-            "security" => "Public safety, security services, and related systems.",
-            "environment" => "Environmental protection, sustainability, and green public services.",
-            _ => "Public spending category used in the prototype dataset."
+            "healthcare" => "Публични разходи за здравни услуги и медицинска помощ.",
+            "education" => "Средства за училища, образователни услуги и учебна инфраструктура.",
+            "infrastructure" => "Разходи за пътища, обществени работи и инфраструктура.",
+            "social-support" => "Програми в подкрепа на домакинства, уязвими групи и социални услуги.",
+            "public-administration" => "Административни услуги и управление на публичния сектор.",
+            "security" => "Обществен ред, сигурност и свързаните системи.",
+            "environment" => "Опазване на околната среда и зелени публични услуги.",
+            _ => "Категория разходи в демонстрационния набор данни."
         };
     }
 }
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="~/js/chart-theme.js" asp-append-version="true"></script>
     <script src="~/js/categories.js" asp-append-version="true"></script>
 }

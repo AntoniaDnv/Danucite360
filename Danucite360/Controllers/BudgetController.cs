@@ -17,6 +17,8 @@ public class BudgetController : Controller
     public async Task<IActionResult> National()
     {
         var model = await budgetService.GetNationalOverviewAsync(DataConstants.BudgetYear);
+        ViewBag.Execution = budgetService.GetBudgetExecution(DataConstants.BudgetYear);
+        ViewBag.StateExecution = budgetService.GetStateBudgetExecution(DataConstants.BudgetYear);
         return View(model);
     }
 

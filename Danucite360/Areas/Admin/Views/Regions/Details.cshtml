@@ -1,7 +1,7 @@
 ﻿@model Danucite360.Data.Models.Region
 
 @{
-    ViewData["Title"] = "Region Details";
+    ViewData["Title"] = "Област";
 }
 
 <div class="container py-5">
@@ -10,19 +10,19 @@
     <div class="card border-0 shadow-sm">
         <div class="card-body">
             <dl class="row">
-                <dt class="col-sm-3">Name</dt>
+                <dt class="col-sm-3">Име</dt>
                 <dd class="col-sm-9">@Model.Name</dd>
 
-                <dt class="col-sm-3">Slug</dt>
+                <dt class="col-sm-3">Адрес (slug)</dt>
                 <dd class="col-sm-9">@Model.Slug</dd>
 
-                <dt class="col-sm-3">Population</dt>
+                <dt class="col-sm-3">Население</dt>
                 <dd class="col-sm-9">@Model.Population.ToString("N0")</dd>
 
-                <dt class="col-sm-3">Demo</dt>
+                <dt class="col-sm-3">Демо</dt>
                 <dd class="col-sm-9">@(Model.IsDemo ? "Yes" : "No")</dd>
 
-                <dt class="col-sm-3">Description</dt>
+                <dt class="col-sm-3">Описание</dt>
                 <dd class="col-sm-9">@Model.Description</dd>
             </dl>
 
@@ -31,14 +31,14 @@
                asp-controller="Regions"
                asp-action="Edit"
                asp-route-id="@Model.Id">
-                Edit
+                Редактирай
             </a>
 
             <a class="btn btn-outline-secondary"
                asp-area="Admin"
                asp-controller="Regions"
                asp-action="Index">
-                Back
+                Назад
             </a>
         </div>
     </div>

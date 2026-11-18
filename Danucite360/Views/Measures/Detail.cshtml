@@ -1,0 +1,73 @@
+@using Danucite360.Common.Constants
+@model Danucite360.Services.Models.MeasureServiceModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<section class="page-shell measure-detail">
+    <nav class="breadcrumbs mb-2">
+        <a href="/measures">Регистър на мерките</a>
+        <span>›</span>
+        <span>@Model.Category</span>
+    </nav>
+
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+        <span class="status-badge status-draft">@Model.Status</span>
+        @if (Model.IsDemo)
+        {
+            <span class="status-badge status-demo">Демо данни</span>
+        }
+    </div>
+    <h1 class="section-title mb-2">@Model.Title</h1>
+    <p class="section-subtitle mb-4">@Model.Summary</p>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="app-card mb-4">
+                <div class="app-card-body">
+                    <h2 class="h6 text-uppercase text-muted mb-2">Какво означава това за мен?</h2>
+                    <p class="mb-0 measure-means">@Model.WhatItMeans</p>
+                </div>
+            </div>
+            <div class="app-card">
+                <div class="app-card-body">
+                    <h2 class="h6 text-uppercase text-muted mb-2">Ефект за бюджета</h2>
+                    <p class="mb-2"><partial name="_FiscalImpact" model="Model.FiscalImpact" /></p>
+                    <p class="small text-muted mb-0">
+                        Оценка на годишната промяна в бюджетното салдо (в @Model.Unit). „−“ = разход за бюджета, „+“ = приход.
+                        Не е сума, изразходвана по проект.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="app-card">
+                <div class="app-card-body">
+                    <dl class="measure-facts mb-0">
+                        <dt>Засяга</dt>
+                        <dd>@string.Join(", ", Model.Audiences.Select(MeasureAudiences.Label))</dd>
+                        <dt>Възраст</dt>
+                        <dd>@string.Join(", ", Model.AgeGroups.Select(MeasureAgeGroups.Label))</dd>
+                        <dt>В сила от</dt>
+                        <dd>@(Model.EffectiveDate?.ToString("dd.MM.yyyy") ?? "Неизвестно")</dd>
+                        <dt>Бюджетна година</dt>
+                        <dd>@Model.BudgetYear</dd>
+                        <dt>Източник</dt>
+                        <dd>
+                            @if (!string.IsNullOrEmpty(Model.SourceUrl))
+                            {
+                                <a href="@Model.SourceUrl" target="_blank" rel="noopener">@Model.SourceTitle</a>
+                            }
+                            else
+                            {
+                                @Model.SourceTitle
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a class="btn btn-outline-secondary btn-sm mt-4" href="/measures">← Всички мерки</a>
+</section>

@@ -16,7 +16,7 @@ public partial class Program
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
+            options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure().CommandTimeout(120)));  // free Azure SQL can take ~1 min to resume from auto-pause
 
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -31,6 +31,9 @@ public partial class Program
         builder.Services.AddScoped<IRegionService, RegionService>();
         builder.Services.AddScoped<IBudgetService, BudgetService>();
         builder.Services.AddScoped<ISourceService, SourceService>();
+        builder.Services.AddScoped<IProjectService, ProjectService>();
+        builder.Services.AddScoped<IDebtService, DebtService>();
+        builder.Services.AddScoped<IMeasureService, MeasureService>();
        
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
@@ -75,7 +78,7 @@ public partial class Program
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-            await SeedData.SeedAsync(context, userManager, roleManager);
+            await SeedData.SeedAsync(context, userManager, roleManager, builder.Configuration["Seed:AdminPassword"]);
         }
         app.Run();
     }

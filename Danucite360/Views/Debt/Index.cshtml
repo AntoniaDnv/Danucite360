@@ -1,0 +1,259 @@
+﻿@model Danucite360.Services.Models.DebtOverviewServiceModel
+
+@{
+    ViewData["Title"] = "Държавен дълг";
+
+    var trendLabels = System.Text.Json.JsonSerializer.Serialize(Model.Trend.Select(t => t.Month));
+    var trendDomestic = System.Text.Json.JsonSerializer.Serialize(Model.Trend.Select(t => t.Domestic));
+    var trendExternal = System.Text.Json.JsonSerializer.Serialize(Model.Trend.Select(t => t.External));
+    var instLabels = System.Text.Json.JsonSerializer.Serialize(Model.InstrumentStructure.Select(i => i.Name));
+    var instValues = System.Text.Json.JsonSerializer.Serialize(Model.InstrumentStructure.Select(i => i.Percent));
+    var yieldPoints = System.Text.Json.JsonSerializer.Serialize(Model.YieldCurve.Select(y => new { x = y.Years, y = y.YieldPercent }));
+}
+
+<section class="page-shell">
+    <div class="page-header mb-3">
+        <div>
+            <h1 class="section-title mb-2">Държавен дълг и гаранции</h1>
+            <p class="section-subtitle mb-2">
+                Колко дължи България, как е структуриран дългът и какви гаранции е поела държавата.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="status-badge status-official">Официални данни</span>
+                <span class="status-badge status-draft">Месечен бюлетин</span>
+                <span class="status-badge status-draft">@Model.Period</span>
+                <span class="status-badge status-ongoing">Източник: Министерство на финансите</span>
+            </div>
+        </div>
+        <div class="page-actions">
+            <a class="btn btn-outline-secondary btn-sm" asp-controller="Sources" asp-action="Index">Източник</a>
+        </div>
+    </div>
+
+    <div class="plain-summary mb-4">
+        <strong>Какво означава това?</strong>
+        Държавният дълг са всички пари, които държавата е взела назаем. <strong>Централният държавен дълг</strong>
+        се дължи директно на кредиторите, а <strong>гарантираният дълг</strong> държавата плаща само ако първоначалният
+        длъжник (напр. държавна компания) не може. Дългът е <strong>@MoneyFormatter.FormatPercent(Model.DebtToGdpPercent) от БВП</strong> —
+        тоест около една четвърт от стойността на всичко, произведено в страната за година.
+    </div>
+
+    <!-- KPI row 1 -->
+    <div class="row g-4 mb-1">
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="kpi-label">Централен държавен дълг</div>
+                    <span class="status-badge status-official">Официални</span>
+                </div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.TotalDebt)</div>
+                <div class="kpi-meta">@MoneyFormatter.FormatPercent(Model.DebtToGdpPercent) от БВП</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Вътрешен дълг</div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.DomesticDebt)</div>
+                <div class="kpi-meta">@MoneyFormatter.FormatPercent(Model.DomesticSharePercent) от общия</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Външен дълг</div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.ExternalDebt)</div>
+                <div class="kpi-meta">@MoneyFormatter.FormatPercent(Model.ExternalSharePercent) от общия</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Гарантиран дълг</div>
+                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.GuaranteedDebt)</div>
+                <div class="kpi-meta">@MoneyFormatter.FormatPercent(Model.GuaranteedToGdpPercent) от БВП</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI row 2: composition stats -->
+    <div class="row g-3 mb-4 mt-1">
+        <div class="col-6 col-lg-3">
+            <div class="stat-chip"><div><div class="kpi-label">Държавен дълг</div><div class="stat-chip-value mono">@MoneyFormatter.FormatThousandEur(Model.StateDebt)</div></div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-chip"><div><div class="kpi-label">В евро</div><div class="stat-chip-value mono">@MoneyFormatter.FormatPercent(Model.EurDenominatedPercent)</div></div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-chip"><div><div class="kpi-label">С фиксирана лихва</div><div class="stat-chip-value mono">@MoneyFormatter.FormatPercent(Model.FixedRatePercent)</div></div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-chip"><div><div class="kpi-label">Средна лихва</div><div class="stat-chip-value mono">@MoneyFormatter.FormatPercent(Model.AvgInterestPercent)</div></div></div>
+        </div>
+    </div>
+
+    <!-- Charts row: trend + instrument donut -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body d-flex flex-column">
+                    <h2 class="card-heading h5">Вътрешен и външен дълг във времето</h2>
+                    <p class="text-muted small">Централен държавен дълг за последните 6 отчетни месеца.</p>
+                    <div class="region-chart flex-grow-1">
+                        <canvas id="debtTrendChart"
+                                data-labels='@Html.Raw(trendLabels)'
+                                data-domestic='@Html.Raw(trendDomestic)'
+                                data-external='@Html.Raw(trendExternal)'></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body d-flex flex-column">
+                    <h2 class="card-heading h5">Структура по инструмент</h2>
+                    <div class="donut-wrap flex-grow-1">
+                        <canvas id="debtInstrumentChart"
+                                data-labels='@Html.Raw(instLabels)'
+                                data-values='@Html.Raw(instValues)'></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Currency + Interest structure -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h2 class="card-heading h5">Валутна структура</h2>
+                    <div class="revenue-bars mt-3">
+                        @foreach (var c in Model.CurrencyStructure)
+                        {
+                            <div class="revenue-bar-row">
+                                <span class="revenue-bar-label">@c.Name</span>
+                                <div class="revenue-bar-track"><span style="width:@c.Percent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span></div>
+                                <span class="revenue-bar-value mono">@MoneyFormatter.FormatPercent(c.Percent)</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <h2 class="card-heading h5">Лихвена структура</h2>
+                    <div class="revenue-bars mt-3">
+                        @foreach (var i in Model.InterestStructure)
+                        {
+                            <div class="revenue-bar-row">
+                                <span class="revenue-bar-label">@i.Name</span>
+                                <div class="revenue-bar-track"><span style="width:@i.Percent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span></div>
+                                <span class="revenue-bar-value mono">@MoneyFormatter.FormatPercent(i.Percent)</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guaranteed breakdown + maturity -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <div>
+                            <h2 class="card-heading h5 mb-0">Гарантиран дълг</h2>
+                            <p class="text-muted small mb-0">Общо: @MoneyFormatter.FormatThousandEur(Model.GuaranteedDebt)</p>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-1">
+                        @foreach (var g in Model.GuaranteedBreakdown)
+                        {
+                            <div class="col-6">
+                                <div class="mini-stat">
+                                    <div class="kpi-label">@g.Name</div>
+                                    <div class="mini-stat-value mono">@MoneyFormatter.FormatPercent(g.Percent)</div>
+                                    <div class="project-progress"><span style="width:@g.Percent.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></span></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="app-card h-100">
+                <div class="app-card-body d-flex flex-column justify-content-center">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="card-heading h5 mb-0">Срок до погасяване</h2>
+                        <div class="text-end">
+                            <div class="kpi-label">Среден оставащ срок</div>
+                            <div class="kpi-value" style="font-size:24px;">@Model.AvgMaturity</div>
+                        </div>
+                    </div>
+                    <p class="text-muted small mt-3 mb-0">
+                        Дълъг среден срок (над 8 години) означава, че дългът се изплаща постепенно и няма
+                        голям натиск за ново заемане в близко време.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auctions -->
+    <div class="app-card">
+        <div class="app-card-body">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                <div>
+                    <h2 class="card-heading h5 mb-0">Аукциони на държавни ценни книжа</h2>
+                    <p class="text-muted small mb-0">Доходност, постигната на първичния пазар.</p>
+                </div>
+                <span class="status-badge status-draft">@Model.Period</span>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="region-chart" style="min-height:220px;">
+                        <canvas id="yieldCurveChart" data-points='@Html.Raw(yieldPoints)'></canvas>
+                    </div>
+                    <p class="text-muted small mt-2 mb-0">
+                        Доходността показва на каква лихва държавата заема пари на пазара.
+                    </p>
+                </div>
+                <div class="col-lg-7">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Вид</th>
+                                    <th>Срок</th>
+                                    <th class="num">Средна доходност</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var a in Model.Auctions)
+                                {
+                                    <tr>
+                                        <td class="mono">@a.Date</td>
+                                        <td>@a.Type</td>
+                                        <td>@a.Maturity</td>
+                                        <td class="num">@MoneyFormatter.FormatPercent(a.YieldPercent, 2)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="source-ref">Източник: @Model.SourceTitle. Левовите суми са превалутирани по фиксирания курс 1,95583 лв. за 1 евро.</div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="~/js/chart-theme.js" asp-append-version="true"></script>
+    <script src="~/js/debt.js" asp-append-version="true"></script>
+}

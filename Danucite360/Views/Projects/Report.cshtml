@@ -1,0 +1,51 @@
+@model Danucite360.Services.Models.ProjectDetailServiceModel
+@using Danucite360.Common.Constants
+@{
+    ViewData["Title"] = "Справка: " + Model.Title;
+    var url = $"{Context.Request.Scheme}://{Context.Request.Host}/projects/{Model.Slug}";
+    var paid = Model.Evidence.Where(e => e.Stage == EvidenceStages.Payment).Sum(e => e.Amount ?? 0);
+}
+
+<section class="page-shell report">
+    <div class="d-flex justify-content-between align-items-center gap-3 mb-4 no-print">
+        <a href="/projects/@Model.Slug">← Към проекта</a>
+        <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">Печат / запази като PDF</button>
+    </div>
+
+    <p class="report-kicker">Справка от Danucite360 · @DateTime.Today.ToString("dd.MM.yyyy")</p>
+    <h1 class="section-title mb-2">@Model.Title</h1>
+    <p class="text-secondary mb-3">@Model.Description</p>
+    @if (Model.IsDemo)
+    {
+        <p class="report-warning"><span class="status-badge status-demo">Демо данни</span> Проектът, сумите и документите са илюстративни и не са официална информация.</p>
+    }
+
+    <table class="table report-facts">
+        <tbody>
+            <tr><th scope="row">Място</th><td>@(Model.City ?? Model.RegionName)</td></tr>
+            <tr><th scope="row">Сектор · статус</th><td>@Labels.ToBg(Model.ProjectType) · @Labels.ToBg(Model.Status)</td></tr>
+            <tr><th scope="row">Общ бюджет</th><td class="mono">@MoneyFormatter.FormatThousandEur(Model.Budget)</td></tr>
+            <tr><th scope="row">Изплатено по документите</th><td class="mono">@MoneyFormatter.FormatThousandEur(paid)</td></tr>
+            <tr><th scope="row">Физически напредък</th><td class="mono">@Model.CompletionPercent%</td></tr>
+        </tbody>
+    </table>
+
+    <h2 class="h5 mt-4 mb-2">Следата на парите</h2>
+    <table class="table">
+        <thead><tr><th>Дата</th><th>Стъпка</th><th>Документ</th><th class="num">Сума</th></tr></thead>
+        <tbody>
+            @foreach (var e in Model.Evidence)
+            {
+                <tr>
+                    <td class="mono">@e.OccurredOn.ToString("dd.MM.yyyy")</td>
+                    <td>@e.StageLabel — @e.Title</td>
+                    <td>@e.DocumentTitle</td>
+                    <td class="num">@(e.Amount.HasValue ? MoneyFormatter.FormatThousandEur(e.Amount.Value) : "—")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p class="small text-muted mt-4 mb-1">Постоянен адрес: <span class="mono">@url</span></p>
+    <p class="small text-muted mb-0">Данни в машиночетим вид: <span class="mono">@url.Replace("/projects/", "/api/projects/")</span></p>
+</section>

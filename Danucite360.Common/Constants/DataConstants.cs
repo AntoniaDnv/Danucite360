@@ -13,6 +13,6 @@ namespace Danucite360.Common.Constants
         public const string DefaultUnit = "thousand EUR";
 
         public const string DemoDatasetNotice =
-            "Demo dataset for prototype purposes. Regional values are not official municipal finance data.";
+            "Демонстрационни данни за прототипа. Регионалните стойности не са официални общински финансови данни.";
     }
 }

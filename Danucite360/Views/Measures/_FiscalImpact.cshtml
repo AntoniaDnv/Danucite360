@@ -1,0 +1,14 @@
+@model decimal?
+@* Budget-balance effect: negative = costs the budget, positive = brings revenue in. *@
+@if (Model == null)
+{
+    <span class="impact impact-none" title="Мярката няма пряк ефект върху бюджетното салдо">Без пряк ефект</span>
+}
+else if (Model < 0)
+{
+    <span class="impact impact-cost" title="Разход за бюджета: по-малко приходи или повече разходи">−@MoneyFormatter.FormatThousandEur(-Model.Value) / год. за бюджета</span>
+}
+else
+{
+    <span class="impact impact-revenue" title="Приход за бюджета: повече постъпления">+@MoneyFormatter.FormatThousandEur(Model.Value) / год. за бюджета</span>
+}

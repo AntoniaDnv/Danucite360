@@ -1,0 +1,108 @@
+﻿@using Danucite360.Common.Constants
+@model IReadOnlyList<Danucite360.Services.Models.MeasureServiceModel>
+@{
+    ViewData["Title"] = "Регистър на мерките";
+    var selectedRoles = (string[])ViewData["SelectedRoles"]!;
+    var selectedAge = ViewData["SelectedAge"] as string;
+    var anyFilter = selectedRoles.Length > 0 || selectedAge != null;
+}
+
+<section class="page-shell">
+    <div class="page-header mb-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-demo">Демо данни</span>
+                <span class="last-updated">Бюджет 2026</span>
+            </div>
+            <h1 class="section-title mb-2">Кои нови мерки засягат мен?</h1>
+            <p class="section-subtitle mb-0">
+                Изберете своята ситуация и възраст — ще видите мерките, които се отнасят до вас, обяснени на разбираем език.
+            </p>
+        </div>
+    </div>
+
+    <form method="get" action="/measures" class="app-card mb-4 measures-filter" id="measuresFilter">
+        <div class="app-card-body">
+            <fieldset class="mb-3">
+                <legend class="form-label small text-muted mb-2">Аз съм… (може повече от едно)</legend>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var (key, label) in MeasureAudiences.Selectable)
+                    {
+                        var id = "role-" + key;
+                        <input type="checkbox" class="btn-check" name="role" value="@key" id="@id" autocomplete="off" checked="@selectedRoles.Contains(key)" />
+                        <label class="btn btn-outline-primary btn-sm filter-pill" for="@id">@label</label>
+                    }
+                </div>
+            </fieldset>
+            <fieldset class="mb-3">
+                <legend class="form-label small text-muted mb-2">Възраст</legend>
+                <div class="d-flex flex-wrap gap-2">
+                    <input type="radio" class="btn-check" name="age" value="" id="age-any" autocomplete="off" checked="@(selectedAge == null)" />
+                    <label class="btn btn-outline-primary btn-sm filter-pill" for="age-any">Без значение</label>
+                    @foreach (var (key, label) in MeasureAgeGroups.Selectable)
+                    {
+                        var id = "age-" + key;
+                        <input type="radio" class="btn-check" name="age" value="@key" id="@id" autocomplete="off" checked="@(selectedAge == key)" />
+                        <label class="btn btn-outline-primary btn-sm filter-pill" for="@id">@label</label>
+                    }
+                </div>
+            </fieldset>
+            <div class="d-flex align-items-center gap-3">
+                <button type="submit" class="btn btn-primary btn-sm">Покажи мерките</button>
+                @if (anyFilter)
+                {
+                    <a href="/measures" class="small">Изчисти филтрите</a>
+                }
+                <span class="ms-auto small text-muted" role="status">Намерени: <strong>@Model.Count</strong></span>
+            </div>
+        </div>
+    </form>
+
+    @if (Model.Count == 0)
+    {
+        <div class="app-card"><div class="app-card-body text-muted">Няма мерки за избраната комбинация. Опитайте с по-малко филтри.</div></div>
+    }
+    else
+    {
+        <div class="measure-list">
+            @foreach (var m in Model)
+            {
+                <a class="measure-card app-card" href="/measures/@m.Slug">
+                    <div class="app-card-body">
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                            <span class="chip-muted">@m.Category</span>
+                            <span class="status-badge status-draft">@m.Status</span>
+                            @if (m.IsDemo)
+                            {
+                                <span class="status-badge status-demo">Демо</span>
+                            }
+                        </div>
+                        <h2 class="measure-title">@m.Title</h2>
+                        <p class="measure-summary mb-2">@m.Summary</p>
+                        <div class="d-flex flex-wrap justify-content-between gap-2 small">
+                            <span class="text-muted">
+                                За: @string.Join(", ", m.Audiences.Select(MeasureAudiences.Label))
+                            </span>
+                            <partial name="_FiscalImpact" model="m.FiscalImpact" />
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+
+    <p class="small text-muted mt-4 mb-0">
+        „Ефект за бюджета“ показва как мярката променя бюджетното салдо за година: <strong>−</strong> означава разход
+        (по-малко приходи или повече плащания), <strong>+</strong> — допълнителни приходи. Това не са пари, похарчени за конкретен проект.
+    </p>
+    <div class="source-ref demo">Илюстративни мерки за прототипа · бюджет 2026 · не са официални решения</div>
+
+    <a class="next-q" href="/sources"><span>Следващ въпрос</span><strong>Откъде знаем тези числа?</strong><span aria-hidden="true">→</span></a>
+</section>
+
+@section Scripts {
+    <script>
+        // Progressive enhancement: apply filters immediately; the submit button still works without JS.
+        document.getElementById('measuresFilter').addEventListener('change', e => e.currentTarget.submit());
+    </script>
+}

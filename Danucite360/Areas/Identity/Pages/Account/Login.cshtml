@@ -1,0 +1,45 @@
+@page
+@model Danucite360.Web.Areas.Identity.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Вход за администратори";
+}
+
+<section class="page-shell">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="app-card">
+                <div class="app-card-body">
+                    <h1 class="section-title h3 mb-2">Вход за администратори</h1>
+                    <p class="text-muted small mb-4">Само за екипа, който поддържа данните. Посетителите не се нуждаят от профил.</p>
+
+                    <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.Email" class="form-label"></label>
+                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.Password" class="form-label"></label>
+                            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
+                            <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input asp-for="Input.RememberMe" class="form-check-input" />
+                            <label asp-for="Input.RememberMe" class="form-check-label"></label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Вход</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

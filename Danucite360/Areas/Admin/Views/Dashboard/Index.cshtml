@@ -1,21 +1,21 @@
 ﻿@model Danucite360.Web.ViewModels.Admin.AdminDashboardViewModel
 
 @{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "Администрация";
 }
 
 <section class="admin-shell">
     <div class="admin-page-header mb-4">
         <div>
             <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="status-badge status-official">✓ Admin</span>
+                <span class="status-badge status-official">Администратор</span>
                 <span class="last-updated">Budget year @Model.BudgetYear</span>
             </div>
 
-            <h1 class="section-title mb-2">Admin Dashboard</h1>
+            <h1 class="section-title mb-2">Администрация</h1>
 
             <p class="section-subtitle mb-0">
-                Manage budget records, review demo data, and keep the public dashboard accurate.
+                Управление на бюджетните записи и демо данните, за да са точни публичните страници.
             </p>
         </div>
 
@@ -24,52 +24,52 @@
                asp-area="Admin"
                asp-controller="BudgetRecords"
                asp-action="Create">
-                Add Budget Record
+                Нов бюджетен запис
             </a>
 
             <a class="btn btn-outline-primary btn-sm"
                asp-area=""
                asp-controller="Home"
                asp-action="Index">
-                View Public Site
+                Публичен сайт
             </a>
         </div>
     </div>
 
     <div class="admin-layout">
         <aside class="admin-sidebar">
-            <div class="admin-sidebar-title">Admin</div>
+            <div class="admin-sidebar-title">Администрация</div>
 
             <nav class="admin-nav">
                 <a class="active"
                    asp-area="Admin"
                    asp-controller="Dashboard"
                    asp-action="Index">
-                    Dashboard
+                    Табло
                 </a>
 
                 <a asp-area="Admin"
                    asp-controller="Regions"
                    asp-action="Index">
-                    Regions
+                    Области
                 </a>
 
                 <a asp-area="Admin"
                    asp-controller="BudgetRecords"
                    asp-action="Index">
-                    Budget Records
+                    Бюджетни записи
                 </a>
 
                 <a asp-area=""
                    asp-controller="Sources"
                    asp-action="Index">
-                    Sources
+                    Източници
                 </a>
             </nav>
 
             <div class="admin-sidebar-note">
-                <strong>MVP mode</strong>
-                <span>Regional data is currently demo data for prototype purposes.</span>
+                <strong>Прототип</strong>
+                <span>Регионалните данни засега са демонстрационни.</span>
             </div>
         </aside>
 
@@ -78,27 +78,27 @@
                 <div class="col-md-4">
                     <div class="admin-metric-card">
                         <div class="kpi-icon kpi-icon-blue">◎</div>
-                        <div class="kpi-label">Regions</div>
+                        <div class="kpi-label">Области</div>
                         <div class="kpi-value">@Model.RegionsCount</div>
-                        <div class="kpi-meta">Prototype regions</div>
+                        <div class="kpi-meta">Прототипни области</div>
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="admin-metric-card">
                         <div class="kpi-icon kpi-icon-green">▦</div>
-                        <div class="kpi-label">Categories</div>
+                        <div class="kpi-label">Категории</div>
                         <div class="kpi-value">@Model.CategoriesCount</div>
-                        <div class="kpi-meta">Budget categories</div>
+                        <div class="kpi-meta">Бюджетни категории</div>
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="admin-metric-card">
                         <div class="kpi-icon kpi-icon-blue">Σ</div>
-                        <div class="kpi-label">Budget Records</div>
+                        <div class="kpi-label">Бюджетни записи</div>
                         <div class="kpi-value">@Model.BudgetRecordsCount</div>
-                        <div class="kpi-meta">Records in database</div>
+                        <div class="kpi-meta">Записи в базата</div>
                     </div>
                 </div>
             </div>
@@ -107,15 +107,15 @@
                 <div class="col-lg-6">
                     <div class="app-card h-100">
                         <div class="app-card-body">
-                            <h5 class="card-heading">Data quality summary</h5>
+                            <h5 class="card-heading">Качество на данните</h5>
                             <p class="text-muted small">
-                                MVP dataset status overview.
+                                Състояние на данните.
                             </p>
 
                             <div class="confidence-row">
                                 <div class="confidence-label">
                                     <span class="confidence-dot official"></span>
-                                    Source documents
+                                    Документи-източници
                                 </div>
                                 <div class="confidence-bar">
                                     <span style="width: 100%" class="official"></span>
@@ -126,7 +126,7 @@
                             <div class="confidence-row">
                                 <div class="confidence-label">
                                     <span class="confidence-dot demo"></span>
-                                    Demo records
+                                    Демо записи
                                 </div>
                                 <div class="confidence-bar">
                                     @{
@@ -140,9 +140,8 @@
                             </div>
 
                             <div class="methodology-note mt-4">
-                                <strong>Admin note:</strong>
-                                Use budget records to control what appears in public charts.
-                                Editing a record updates the public dashboard immediately.
+                                <strong>Бележка:</strong>
+                                Бюджетните записи определят какво показват публичните графики. Редакцията се отразява веднага.
                             </div>
                         </div>
                     </div>
@@ -151,38 +150,38 @@
                 <div class="col-lg-6">
                     <div class="app-card h-100">
                         <div class="app-card-body">
-                            <h5 class="card-heading">Quick actions</h5>
+                            <h5 class="card-heading">Бързи действия</h5>
                             <p class="text-muted small">
-                                Common admin tasks for managing the MVP dataset.
+                                Чести задачи по поддръжката на данните.
                             </p>
 
                             <div class="quick-action-list">
                                 <a asp-area="Admin"
                                    asp-controller="BudgetRecords"
                                    asp-action="Create">
-                                    <strong>Add Budget Record</strong>
-                                    <span>Create a national or regional budget entry.</span>
+                                    <strong>Нов бюджетен запис</strong>
+                                    <span>Нов национален или регионален бюджетен запис.</span>
                                 </a>
 
                                 <a asp-area="Admin"
                                    asp-controller="BudgetRecords"
                                    asp-action="Index">
-                                    <strong>Review Budget Records</strong>
-                                    <span>Edit chart data and source-linked values.</span>
+                                    <strong>Преглед на бюджетните записи</strong>
+                                    <span>Редакция на данните зад графиките, свързани с източник.</span>
                                 </a>
 
                                 <a asp-area="Admin"
                                    asp-controller="Regions"
                                    asp-action="Index">
-                                    <strong>Manage Regions</strong>
-                                    <span>Create, edit, or review region records.</span>
+                                    <strong>Области</strong>
+                                    <span>Създаване, редакция и преглед на областите.</span>
                                 </a>
 
                                 <a asp-area=""
                                    asp-controller="Sources"
                                    asp-action="Index">
-                                    <strong>Check Sources</strong>
-                                    <span>Review public source and methodology pages.</span>
+                                    <strong>Източници</strong>
+                                    <span>Преглед на публичните страници с източници и методология.</span>
                                 </a>
                             </div>
                         </div>
@@ -194,22 +193,22 @@
                 <div class="app-card-body">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
                         <div>
-                            <h5 class="card-heading">Recommended next product improvements</h5>
+                            <h5 class="card-heading">Препоръчани следващи подобрения</h5>
                             <p class="text-muted small mb-0">
-                                These are not required for the MVP, but they prepare Danucite360 for a sellable version.
+                                Не са нужни за прототипа, но подготвят следващата версия.
                             </p>
                         </div>
 
-                        <span class="status-badge status-review">! Roadmap</span>
+                        <span class="status-badge status-review">Следващи стъпки</span>
                     </div>
 
                     <div class="product-roadmap-list">
-                        <span>Publish / unpublish records</span>
-                        <span>Source upload workflow</span>
-                        <span>Funded projects by category</span>
-                        <span>Audit history</span>
-                        <span>Multi-year comparison</span>
-                        <span>Bulgarian language mode</span>
+                        <span>Публикуване / скриване на записи</span>
+                        <span>Качване на документи-източници</span>
+                        <span>Финансирани проекти по категории</span>
+                        <span>История на промените</span>
+                        <span>Сравнение по години</span>
+                        <span>Български език</span>
                     </div>
                 </div>
             </div>

@@ -1,7 +1,7 @@
-@model Danucite360.Services.Models.CategoryDetailServiceModel
+﻿@model Danucite360.Services.Models.CategoryDetailServiceModel
 
 @{
-    ViewData["Title"] = Model.CategoryName + " Spending";
+    ViewData["Title"] = "Разходи: " + Model.CategoryName;
 
     var maxAmount = Model.Regions.Any() ? Model.Regions.Max(r => r.Amount) : 1m;
 }
@@ -10,21 +10,20 @@
     <div class="page-header mb-3">
         <div>
             <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="status-badge status-demo">⚠ Demo Data</span>
-                <span class="last-updated">Budget year @Model.BudgetYear</span>
+                <span class="status-badge status-demo">Демо данни</span>
+                <span class="last-updated">Бюджет @Model.BudgetYear</span>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <span class="category-icon category-icon-lg">@GetCategoryIcon(Model.CategorySlug)</span>
                 <div>
-                    <h1 class="section-title mb-1">@Model.CategoryName Spending</h1>
-                    <p class="section-subtitle mb-0">Category analysis and regional distribution.</p>
+                    <h1 class="section-title mb-1">@Model.CategoryName</h1>
+                    <p class="section-subtitle mb-0">Колко се харчи и как се разпределя по области.</p>
                 </div>
             </div>
         </div>
 
         <div class="page-actions">
             <a class="btn btn-outline-secondary btn-sm" asp-controller="Budget" asp-action="Categories">
-                ← All Categories
+                ← Всички области
             </a>
         </div>
     </div>
@@ -34,30 +33,30 @@
     <div class="row g-4 my-1">
         <div class="col-6 col-lg-3">
             <div class="kpi-card">
-                <div class="kpi-label">Total Spending</div>
+                <div class="kpi-label">Общо разходи</div>
                 <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.TotalAmount)</div>
-                <div class="kpi-meta">Across @Model.Regions.Count regions</div>
+                <div class="kpi-meta">В @Model.Regions.Count области</div>
             </div>
         </div>
         <div class="col-6 col-lg-3">
             <div class="kpi-card">
-                <div class="kpi-label">% of Demo Spending</div>
-                <div class="kpi-value">@Model.Percentage.ToString("N1")%</div>
-                <div class="kpi-meta">Share of all regional demo spend</div>
+                <div class="kpi-label">Дял от демо разходите</div>
+                <div class="kpi-value">@MoneyFormatter.FormatPercent(Model.Percentage)</div>
+                <div class="kpi-meta">От всички демо регионални разходи</div>
             </div>
         </div>
         <div class="col-6 col-lg-3">
             <div class="kpi-card">
-                <div class="kpi-label">Spending per Capita</div>
-                <div class="kpi-value">€@Model.PerCapita.ToString("N0")</div>
-                <div class="kpi-meta">Per resident</div>
+                <div class="kpi-label">На човек</div>
+                <div class="kpi-value">@Model.PerCapita.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("bg-BG")) €</div>
+                <div class="kpi-meta">На жител годишно</div>
             </div>
         </div>
         <div class="col-6 col-lg-3">
             <div class="kpi-card">
-                <div class="kpi-label">Regions Covered</div>
+                <div class="kpi-label">Обхванати области</div>
                 <div class="kpi-value">@Model.Regions.Count</div>
-                <div class="kpi-meta">Demo comparison set</div>
+                <div class="kpi-meta">Демо набор за сравнение</div>
             </div>
         </div>
     </div>
@@ -66,8 +65,8 @@
         <div class="col-lg-7">
             <div class="app-card h-100">
                 <div class="app-card-body">
-                    <h5 class="card-heading">Regional Breakdown</h5>
-                    <p class="text-muted small">Demo @Model.CategoryName.ToLower() spending by region (thousand EUR).</p>
+                    <h2 class="card-heading h5">По области</h2>
+                    <p class="text-muted small">Демо разходи по области.</p>
 
                     <div class="revenue-bars mt-3">
                         @foreach (var r in Model.Regions.OrderByDescending(r => r.Amount))
@@ -78,14 +77,14 @@
                                     <a class="text-decoration-none" href="/regions/@r.RegionSlug">@r.RegionName</a>
                                 </span>
                                 <div class="revenue-bar-track">
-                                    <span style="width:@(((double)(r.Amount / maxAmount) * 100).ToString("F1"))%"></span>
+                                    <span style="width:@(((double)(r.Amount / maxAmount) * 100).ToString("F1", System.Globalization.CultureInfo.InvariantCulture))%"></span>
                                 </div>
-                                <span class="revenue-bar-value mono">@MoneyFormatter.FormatThousandEur(r.Amount) · @pct.ToString("F1")%</span>
+                                <span class="revenue-bar-value mono">@MoneyFormatter.FormatThousandEur(r.Amount) · @MoneyFormatter.FormatPercent((decimal)pct)</span>
                             </div>
                         }
                     </div>
 
-                    <div class="source-ref">Source: Danucite360 demo distribution</div>
+                    <div class="source-ref demo">Източник: демонстрационно разпределение</div>
                 </div>
             </div>
         </div>
@@ -93,16 +92,16 @@
         <div class="col-lg-5">
             <div class="app-card h-100">
                 <div class="app-card-body">
-                    <h5 class="card-heading">Regional Disparity</h5>
-                    <p class="text-muted small">Per-capita spending vs the category average (€@Model.PerCapita.ToString("N0")).</p>
+                    <h2 class="card-heading h5">Разлики между областите</h2>
+                    <p class="text-muted small">Разходи на човек спрямо средното (@Model.PerCapita.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("bg-BG")) €).</p>
 
                     <div class="table-responsive">
                         <table class="table align-middle mb-0">
                             <thead>
                                 <tr>
-                                    <th>Region</th>
-                                    <th class="num">Per Capita (EUR)</th>
-                                    <th class="num">vs avg</th>
+                                    <th>Област</th>
+                                    <th class="num">На човек (€)</th>
+                                    <th class="num">Спрямо средното</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -110,10 +109,10 @@
                                 {
                                     <tr>
                                         <td><a class="text-decoration-none" href="/regions/@r.RegionSlug">@r.RegionName</a></td>
-                                        <td class="num">€@r.PerCapita.ToString("N0")</td>
+                                        <td class="num">@r.PerCapita.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("bg-BG")) €</td>
                                         <td class="num">
                                             <span class="vs-avg @(r.VsAveragePercent >= 0 ? "vs-up" : "vs-down")">
-                                                @(r.VsAveragePercent >= 0 ? "▲ +" : "▼ ")@r.VsAveragePercent.ToString("N1")%
+                                                @(r.VsAveragePercent >= 0 ? "▲ +" : "▼ ")@MoneyFormatter.FormatPercent(r.VsAveragePercent)
                                             </span>
                                         </td>
                                     </tr>
@@ -128,7 +127,7 @@
 
     <div class="app-card mt-4">
         <div class="app-card-body">
-            <h5 class="card-heading">What this category includes</h5>
+            <h2 class="card-heading h5">Какво включва тази област</h2>
             <p class="mb-0 text-secondary">@GetCategoryDescription(Model.CategorySlug)</p>
         </div>
     </div>
@@ -154,14 +153,14 @@
     {
         return slug switch
         {
-            "healthcare" => "Healthcare encompasses public spending designed to improve health outcomes: funding for state and municipal hospitals, clinical care, medical programs, health administration, and related services.",
-            "education" => "Education covers funding for schools, universities, teaching staff, learning materials, and the public education infrastructure that supports students across the country.",
-            "infrastructure" => "Infrastructure includes spending on roads, bridges, public works, utilities, and the physical assets that keep regions connected and functioning.",
-            "social-support" => "Social support funds programs for households, pensions, vulnerable groups, family assistance, and the social safety net.",
-            "public-administration" => "Public administration covers the cost of running public institutions: administrative services, public-sector management, and government operations.",
-            "security" => "Security includes public safety, policing, emergency services, and the systems that protect citizens and public order.",
-            "environment" => "Environment covers environmental protection, sustainability programs, waste management, and green public services.",
-            _ => "Public spending category used in the Danucite360 prototype dataset."
+            "healthcare" => "Здравеопазването включва разходи за държавни и общински болници, медицинска помощ, здравни програми и администрация.",
+            "education" => "Образованието включва средства за училища, университети, учители, учебни материали и образователна инфраструктура.",
+            "infrastructure" => "Инфраструктурата включва пътища, мостове, обществени работи и комунални съоръжения, които свързват областите.",
+            "social-support" => "Социалното подпомагане финансира помощи за домакинства, уязвими групи, семейства и социалната мрежа за сигурност.",
+            "public-administration" => "Държавната администрация включва разходите за работата на публичните институции и административните услуги.",
+            "security" => "Сигурността включва обществения ред, полицията, спешните служби и защитата на гражданите.",
+            "environment" => "Околната среда включва опазване на природата, управление на отпадъците и зелени публични услуги.",
+            _ => "Категория разходи в демонстрационния набор данни на Danucite360."
         };
     }
 }

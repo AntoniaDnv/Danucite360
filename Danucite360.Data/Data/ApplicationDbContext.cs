@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Danucite360.Data.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -21,6 +22,22 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<BudgetSource> BudgetSources { get; set; } = null!;
 
     public DbSet<BudgetRecord> BudgetRecords { get; set; } = null!;
+
+    public DbSet<FundedProject> FundedProjects { get; set; } = null!;
+
+    public DbSet<ProjectFunding> ProjectFundings { get; set; } = null!;
+
+    public DbSet<BudgetMeasure> BudgetMeasures { get; set; } = null!;
+
+    public DbSet<ProjectEvidence> ProjectEvidence { get; set; } = null!;
+
+    public DbSet<DebtSnapshot> DebtSnapshots { get; set; } = null!;
+
+    public DbSet<DebtBreakdownItem> DebtBreakdownItems { get; set; } = null!;
+
+    public DbSet<DebtTrendPoint> DebtTrendPoints { get; set; } = null!;
+
+    public DbSet<DebtAuction> DebtAuctions { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -55,5 +72,74 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany(s => s.BudgetRecords)
             .HasForeignKey(r => r.BudgetSourceId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<FundedProject>()
+            .HasIndex(p => p.Slug)
+            .IsUnique();
+
+        builder.Entity<FundedProject>()
+            .Property(p => p.Budget)
+            .HasPrecision(18, 2);
+
+        builder.Entity<FundedProject>()
+            .Property(p => p.Spent)
+            .HasPrecision(18, 2);
+
+        builder.Entity<FundedProject>()
+            .HasOne(p => p.Region)
+            .WithMany()
+            .HasForeignKey(p => p.RegionId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<FundedProject>()
+            .HasOne(p => p.BudgetSource)
+            .WithMany()
+            .HasForeignKey(p => p.BudgetSourceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<ProjectEvidence>()
+            .Property(e => e.Amount)
+            .HasPrecision(18, 2);
+
+        builder.Entity<ProjectEvidence>()
+            .HasOne(e => e.FundedProject)
+            .WithMany(p => p.Evidence)
+            .HasForeignKey(e => e.FundedProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<BudgetMeasure>()
+            .HasIndex(m => m.Slug)
+            .IsUnique();
+
+        builder.Entity<BudgetMeasure>()
+            .Property(m => m.FiscalImpact)
+            .HasPrecision(18, 2);
+
+        builder.Entity<ProjectFunding>()
+            .Property(f => f.Amount)
+            .HasPrecision(18, 2);
+
+        builder.Entity<ProjectFunding>()
+            .HasOne(f => f.FundedProject)
+            .WithMany(p => p.FundingShares)
+            .HasForeignKey(f => f.FundedProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Debt snapshot: give all monetary/percentage decimals explicit precision,
+        // and cascade-delete the child rows with their parent snapshot.
+        foreach (var clr in new[]
+        {
+            typeof(DebtSnapshot), typeof(DebtBreakdownItem), typeof(DebtTrendPoint), typeof(DebtAuction)
+        })
+        {
+            foreach (var prop in clr.GetProperties().Where(p => p.PropertyType == typeof(decimal)))
+            {
+                builder.Entity(clr).Property(prop.Name).HasPrecision(18, 2);
+            }
+        }
+
+        builder.Entity<DebtSnapshot>()
+            .HasIndex(s => new { s.BudgetYear, s.Period })
+            .IsUnique();
     }
 }

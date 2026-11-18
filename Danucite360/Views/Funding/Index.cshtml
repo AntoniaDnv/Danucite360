@@ -1,0 +1,134 @@
+﻿@model Danucite360.Services.Models.FundingOverviewServiceModel
+
+@{
+    ViewData["Title"] = "Източници на финансиране";
+    var topSource = Model.AllocationBySource.FirstOrDefault();
+    var labels = System.Text.Json.JsonSerializer.Serialize(Model.AllocationBySource.Select(a => a.Name));
+    var values = System.Text.Json.JsonSerializer.Serialize(Model.AllocationBySource.Select(a => a.Amount));
+
+    // Lean scope: operational programs / procedures are a small demo list.
+    var programs = new (string Name, string Period, decimal Allocation, int Spent, string Status)[]
+    {
+        ("Пример: регионална програма 2021–2027", "Оперативна програма", 1_380_000m, 38, "Примерна"),
+        ("Пример: преход към нисковъглеродна икономика", "План за възстановяване", 1_290_000m, 21, "Примерна"),
+        ("Пример: национална пътна програма", "Национална програма", 1_140_000m, 64, "Примерна")
+    };
+
+    var procedures = new (string Code, string Fund, decimal Budget, string Deadline)[]
+    {
+        ("ДЕМО-001", "Кохезионен фонд на ЕС", 230_000m, "15.10.2026"),
+        ("ДЕМО-002", "План за възстановяване и устойчивост", 180_000m, "30.11.2026"),
+        ("ДЕМО-003", "Държавен бюджет", 95_000m, "20.12.2026")
+    };
+}
+
+<section class="page-shell">
+    <div class="page-header mb-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-demo">Демо данни</span>
+                <span class="last-updated">Бюджет @Model.BudgetYear</span>
+            </div>
+            <h1 class="section-title mb-2">Източници на финансиране</h1>
+            <p class="section-subtitle mb-0">
+                Откъде идват парите за публичните проекти: държавен бюджет, общинско съфинансиране и европейски фондове.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="app-card h-100">
+                <div class="app-card-body d-flex flex-column">
+                    <h2 class="card-heading h5">Дял на всеки източник (@Model.BudgetYear)</h2>
+                    <div class="donut-wrap flex-grow-1">
+                        <canvas id="fundingDonut" data-labels='@Html.Raw(labels)' data-values='@Html.Raw(values)'></canvas>
+                    </div>
+                    <div class="source-ref demo">Източник: демонстрационни проекти в базата данни</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Най-голям източник</div>
+                        <div class="kpi-value">@MoneyFormatter.FormatPercent(topSource?.Percent ?? 0)</div>
+                        <div class="kpi-meta">@Danucite360.Common.Constants.Labels.ToBg(topSource?.Name ?? "—")</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Общо отпуснати</div>
+                        <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.TotalAllocated)</div>
+                        <div class="kpi-meta">По всички демо проекти</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Проекти в подготовка</div>
+                        <div class="kpi-value">@Model.OpenProcedures</div>
+                        <div class="kpi-meta">Още не са започнали</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-card mb-4">
+        <div class="app-card-body">
+            <h2 class="card-heading h5">Програми (илюстративни примери)</h2>
+            <div class="row g-4 mt-1">
+                @foreach (var prog in programs)
+                {
+                    <div class="col-md-4">
+                        <div class="program-card">
+                            <span class="status-badge status-ongoing mb-2">@prog.Status</span>
+                            <h6>@prog.Name</h6>
+                            <p class="text-muted small">@prog.Period</p>
+                            <div class="kpi-meta mb-1">Бюджет</div>
+                            <div class="mono fw-bold mb-2">@MoneyFormatter.FormatThousandEur(prog.Allocation)</div>
+                            <div class="project-progress"><span style="width:@prog.Spent%"></span></div>
+                            <div class="kpi-meta mt-1">@prog.Spent% договорени</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="app-card">
+        <div class="app-card-body">
+            <h2 class="card-heading h5">Процедури за кандидатстване (илюстративни примери)</h2>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Процедура</th>
+                            <th>Фонд</th>
+                            <th class="num">Наличен бюджет</th>
+                            <th class="num">Краен срок</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pr in procedures)
+                        {
+                            <tr>
+                                <td class="mono">@pr.Code</td>
+                                <td>@pr.Fund</td>
+                                <td class="num">@MoneyFormatter.FormatThousandEur(pr.Budget)</td>
+                                <td class="num">@pr.Deadline</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="~/js/chart-theme.js" asp-append-version="true"></script>
+    <script src="~/js/funding.js" asp-append-version="true"></script>
+}

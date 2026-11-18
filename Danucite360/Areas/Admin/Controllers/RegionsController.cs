@@ -159,7 +159,7 @@ public class RegionsController : Controller
 
         if (region.BudgetRecords.Any())
         {
-            TempData["ErrorMessage"] = "This region cannot be deleted because it has budget records.";
+            TempData["ErrorMessage"] = "Областта не може да бъде изтрита, защото има бюджетни записи.";
             return RedirectToAction(nameof(Index));
         }
 

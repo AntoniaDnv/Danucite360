@@ -1,150 +1,107 @@
-@model Danucite360.Services.Models.NationalBudgetServiceModel
+﻿@model Danucite360.Services.Models.NationalBudgetServiceModel
 
 @{
-    ViewData["Title"] = "Overview";
+    ViewData["Title"] = "Начало";
+    string Money(decimal v) => MoneyFormatter.FormatThousandEur(v);
+    string Width(decimal part, decimal whole) => (whole == 0 ? 0 : Math.Min(100, (double)(part / whole) * 100)).ToString("F1", System.Globalization.CultureInfo.InvariantCulture);
+    string Share(decimal part, decimal whole) => MoneyFormatter.FormatPercent(whole == 0 ? 0 : part / whole * 100, 0);
 
-    // Values are stored in "thousand EUR"; present citizen-friendly billions of EUR.
-    string Bn(decimal v) => "€" + (v / 1_000_000m).ToString("N2") + "B";
-
-    // Revenue streams come from the seeded national revenue records (data-driven).
-    var revenueStreams = Model.RevenueBreakdown;
-    var maxStream = revenueStreams.Any() ? revenueStreams.Max(s => s.Amount) : 1m;
+    var exec = ViewBag.StateExecution as Danucite360.Services.Models.StateBudgetExecutionServiceModel;
+    const int monthsElapsed = 4;
+    var timeLeft = (monthsElapsed / 12.0 * 100).ToString("F1", System.Globalization.CultureInfo.InvariantCulture);
 }
 
-<section class="page-shell overview-page">
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
-        <span class="status-badge status-demo">⚠ Demo Prototype</span>
-        <span class="last-updated">Last updated: 28 May @Model.BudgetYear</span>
-    </div>
-
-    <div class="overview-hero">
-        <div class="overview-hero-copy">
-            <span class="hero-eyebrow">Public Finance Transparency Initiative</span>
-            <h1 class="hero-title">
-                Understand Bulgaria’s <span class="hero-accent">public money</span>.
-            </h1>
+<section class="page-shell home">
+    <div class="home-hero">
+        <div class="home-hero-copy">
+            <h1 class="hero-title">Разбери къде отиват публичните пари</h1>
             <p class="hero-subtitle">
-                Danucite360 turns the public budget into clear dashboards. Explore how taxes are
-                collected and where public funds are invested — with objective, analytical precision.
+                Държавният бюджет, публичните проекти и новите мерки — обяснени на разбираем език,
+                с източник до всяко число.
             </p>
             <div class="d-flex gap-3 flex-wrap mt-4">
-                <a class="btn btn-primary btn-lg" asp-controller="Budget" asp-action="National">Explore</a>
-                <a class="btn btn-outline-secondary btn-lg" asp-controller="Map" asp-action="Index">Compare Regions</a>
+                <a class="btn btn-primary btn-lg" asp-controller="Budget" asp-action="National">Разгледай бюджета</a>
+                <a class="btn btn-outline-secondary btn-lg" href="/projects/map">Виж финансираните проекти</a>
             </div>
         </div>
 
-        <div class="app-card overview-snapshot">
-            <div class="app-card-body">
-                <div class="d-flex align-items-center justify-content-between mb-1">
-                    <h6 class="card-heading mb-0">@Model.BudgetYear Budget Snapshot</h6>
-                    <span class="chip-muted">Official data</span>
-                </div>
-                <div class="snapshot-headline mono @(Model.Balance < 0 ? "text-danger" : "text-success")">
-                    @Bn(Model.Balance)
-                </div>
-                <div class="kpi-meta mb-2">Projected budget balance</div>
-                <div class="snapshot-chart">
-                    <canvas id="budgetSnapshotChart"></canvas>
-                </div>
+        <aside class="app-card snapshot" aria-labelledby="snapshotTitle">
+            <div class="snapshot-head">
+                <h2 class="snapshot-title" id="snapshotTitle">Държавният бюджет за @Model.BudgetYear</h2>
+                <span class="status-badge status-official">Официални данни</span>
             </div>
-        </div>
+
+            <div class="snapshot-row">
+                <div class="snapshot-line"><span>Приходи · план</span><strong>@Money(Model.Revenue)</strong></div>
+                @if (exec != null)
+                {
+                    <div class="ledger-track"><div class="ledger-fill" style="width:@Width(exec.Revenue, Model.Revenue)%"></div><div class="ledger-time" style="left:@timeLeft%"></div></div>
+                    <div class="snapshot-meta">събрани досега @Money(exec.Revenue) · @Share(exec.Revenue, Model.Revenue)</div>
+                }
+            </div>
+
+            <div class="snapshot-row">
+                <div class="snapshot-line"><span>Разходи · план</span><strong>@Money(Model.Expenses)</strong></div>
+                @if (exec != null)
+                {
+                    <div class="ledger-track"><div class="ledger-fill spend" style="width:@Width(exec.Expenditure, Model.Expenses)%"></div><div class="ledger-time" style="left:@timeLeft%"></div></div>
+                    <div class="snapshot-meta">похарчени досега @Money(exec.Expenditure) · @Share(exec.Expenditure, Model.Expenses)</div>
+                }
+            </div>
+
+            <div class="snapshot-row snapshot-balance">
+                <div class="snapshot-line"><span>Салдо · план</span><strong class="text-danger">@Money(Model.Balance)</strong></div>
+                <div class="snapshot-meta">@(Model.Balance < 0 ? "Дефицит: държавата планира да харчи повече, отколкото събира" : "Излишък")@(exec != null ? " · досега " + Money(exec.Balance) : "")</div>
+            </div>
+
+            @if (exec != null)
+            {
+                <div class="ledger-legend"><i aria-hidden="true"></i> Червената черта: изминали @monthsElapsed от 12 месеца</div>
+            }
+            <partial name="_Explain" model='"Приходите са парите, които държавата събира — най-вече от данъци като ДДС, който плащаме при всяка покупка. Разходите са всичко, за което плаща: пенсии, заплати, болници, пътища. Когато разходите са повече от приходите, има дефицит и държавата взема назаем. Лентите показват колко от годишния план вече се е случило, а червената черта — колко от годината е минала. Ако лентата свършва преди чертата, парите се събират или харчат по-бавно от равномерния темп."' />
+            <div class="source-ref">План: проектозакон за държавния бюджет @Model.BudgetYear · Изпълнение: МФ, @(exec?.Period ?? "—")</div>
+        </aside>
     </div>
 
-    <div class="row g-4 my-1">
-        <div class="col-6 col-lg-3">
-            <div class="kpi-card">
-                <div class="kpi-label">Total Revenue</div>
-                <div class="kpi-value">@Bn(Model.Revenue)</div>
-                <div class="kpi-meta text-success">▲ Revenue, aid &amp; donations</div>
-            </div>
-        </div>
-        <div class="col-6 col-lg-3">
-            <div class="kpi-card">
-                <div class="kpi-label">Total Spending</div>
-                <div class="kpi-value">@Bn(Model.Expenses)</div>
-                <div class="kpi-meta">Planned expenditure</div>
-            </div>
-        </div>
-        <div class="col-6 col-lg-3">
-            <div class="kpi-card">
-                <div class="kpi-label">Budget Balance</div>
-                <div class="kpi-value @(Model.Balance < 0 ? "text-danger" : "text-success")">@Bn(Model.Balance)</div>
-                <div class="kpi-meta">@(Model.Balance < 0 ? "Planned deficit" : "Planned surplus")</div>
-            </div>
-        </div>
-        <div class="col-6 col-lg-3">
-            <div class="kpi-card">
-                <div class="kpi-label">Fiscal Year</div>
-                <div class="kpi-value">@Model.BudgetYear</div>
-                <div class="kpi-meta">Draft state budget</div>
-            </div>
-        </div>
-    </div>
+    <h2 class="home-section-title">Какво можете да разгледате</h2>
+    <nav class="contents" aria-label="Основни раздели">
+        <a asp-controller="Budget" asp-action="National">
+            <span class="n">01</span>
+            <span><strong>Откъде идват и къде отиват парите?</strong>Откъде идват парите и за какво се харчат — с обяснения на разбираем език</span>
+            <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a href="/projects/map">
+            <span class="n">02</span>
+            <span><strong>Какво се строи с публични пари?</strong>Карта на проектите с бюджет, изплатени суми и напредък</span>
+            <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a href="/measures">
+            <span class="n">03</span>
+            <span><strong>Какво се променя за мен?</strong>Изберете „Родител“, „Шофьор“ или „Пенсионер“ и вижте какво се променя</span>
+            <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a asp-controller="Budget" asp-action="National" asp-fragment="execution">
+            <span class="n">04</span>
+            <span><strong>Изпълнява ли се бюджетът?</strong>Колко от плана реално е събрано и похарчено към последния отчет</span>
+            <span class="arrow" aria-hidden="true">→</span>
+        </a>
+    </nav>
 
-    <div class="row g-4 mt-1">
-        <div class="col-lg-6">
-            <div class="app-card h-100">
-                <div class="app-card-body">
-                    <h5 class="card-heading">Where does the money come from?</h5>
-                    <p class="text-muted small">
-                        A breakdown of primary revenue streams, highlighting tax collection across the
-                        @Model.BudgetYear draft budget.
-                    </p>
-
-                    <div class="revenue-bars mt-3">
-                        @foreach (var s in revenueStreams)
-                        {
-                            <div class="revenue-bar-row">
-                                <span class="revenue-bar-label">@s.CategoryName</span>
-                                <div class="revenue-bar-track">
-                                    <span style="width:@(((double)(s.Amount / maxStream) * 100).ToString("F1"))%"></span>
-                                </div>
-                                <span class="revenue-bar-value mono">@Bn(s.Amount)</span>
-                            </div>
-                        }
-                    </div>
-
-                    <div class="source-ref">Source: @Model.SourceTitle</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="app-card h-100">
-                <div class="app-card-body d-flex flex-column">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h5 class="card-heading">Where does it go?</h5>
-                            <p class="text-muted small mb-0">
-                                Categorized public spending across social services, administration and infrastructure.
-                            </p>
-                        </div>
-                        <span class="status-badge status-demo">⚠ Demo</span>
-                    </div>
-
-                    <div class="donut-wrap flex-grow-1">
-                        <canvas id="spendingDonut"></canvas>
-                    </div>
-
-                    <div class="source-ref">Source: Danucite360 demo distribution</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="deep-dive mt-4">
-        <div>
-            <h4 class="mb-1">Deep dive into the data</h4>
-            <p class="mb-0">
-                Access the source documents, methodology notes, and regional breakdowns behind every figure.
+    <div class="trust">
+        <div class="trust-copy">
+            <h2 class="home-section-title mt-0">Всяко число има източник</h2>
+            <p>
+                Стойностите са въведени от официални документи на Министерството на финансите и Народното събрание.
+                Където още няма официални данни, показваме демонстрационни стойности — и винаги ги отбелязваме.
             </p>
+            <div class="trust-legend">
+                <span class="status-badge status-official">Официални данни</span> въведени от публикуван документ
+                <span class="status-badge status-demo ms-md-3">Демо данни</span> илюстрация, не се цитира като факт
+            </div>
         </div>
-        <a class="btn btn-primary" asp-controller="Sources" asp-action="Index">View Sources</a>
+        <div class="trust-links">
+            <a class="btn btn-outline-secondary" asp-controller="Sources" asp-action="Index">Източници и методология</a>
+            <a class="btn btn-outline-secondary" href="/open-data">Изтегли данните (CSV / JSON)</a>
+        </div>
     </div>
 </section>
-
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="~/js/chart-theme.js" asp-append-version="true"></script>
-    <script src="~/js/home-overview.js" asp-append-version="true"></script>
-}
