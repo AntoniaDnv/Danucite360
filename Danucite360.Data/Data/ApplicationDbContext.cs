@@ -29,6 +29,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<BudgetMeasure> BudgetMeasures { get; set; } = null!;
 
+    public DbSet<ProjectEvidence> ProjectEvidence { get; set; } = null!;
+
     public DbSet<DebtSnapshot> DebtSnapshots { get; set; } = null!;
 
     public DbSet<DebtBreakdownItem> DebtBreakdownItems { get; set; } = null!;
@@ -94,6 +96,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany()
             .HasForeignKey(p => p.BudgetSourceId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<ProjectEvidence>()
+            .Property(e => e.Amount)
+            .HasPrecision(18, 2);
+
+        builder.Entity<ProjectEvidence>()
+            .HasOne(e => e.FundedProject)
+            .WithMany(p => p.Evidence)
+            .HasForeignKey(e => e.FundedProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<BudgetMeasure>()
             .HasIndex(m => m.Slug)

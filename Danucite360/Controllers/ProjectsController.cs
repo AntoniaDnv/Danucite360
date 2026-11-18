@@ -1,4 +1,4 @@
-using Danucite360.Common.Constants;
+﻿using Danucite360.Common.Constants;
 using Danucite360.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,6 +45,13 @@ public class ProjectsController : Controller
         }
 
         return View(model);
+    }
+
+    [HttpGet("/projects/{slug}/report")]
+    public async Task<IActionResult> Report(string slug)
+    {
+        var model = await projectService.GetProjectDetailAsync(slug, DataConstants.BudgetYear);
+        return model == null ? NotFound() : View(model);
     }
 
     [HttpGet("/projects/{slug}")]

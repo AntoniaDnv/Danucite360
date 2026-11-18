@@ -595,6 +595,54 @@ namespace Danucite360.Data.Migrations
                     b.ToTable("FundedProjects");
                 });
 
+            modelBuilder.Entity("Danucite360.Data.Models.ProjectEvidence", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("DocumentTitle")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("DocumentUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("FundedProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDemo")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("OccurredOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Stage")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FundedProjectId");
+
+                    b.ToTable("ProjectEvidence");
+                });
+
             modelBuilder.Entity("Danucite360.Data.Models.ProjectFunding", b =>
                 {
                     b.Property<int>("Id")
@@ -873,6 +921,17 @@ namespace Danucite360.Data.Migrations
                     b.Navigation("Region");
                 });
 
+            modelBuilder.Entity("Danucite360.Data.Models.ProjectEvidence", b =>
+                {
+                    b.HasOne("Danucite360.Data.Models.FundedProject", "FundedProject")
+                        .WithMany("Evidence")
+                        .HasForeignKey("FundedProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FundedProject");
+                });
+
             modelBuilder.Entity("Danucite360.Data.Models.ProjectFunding", b =>
                 {
                     b.HasOne("Danucite360.Data.Models.FundedProject", "FundedProject")
@@ -956,6 +1015,8 @@ namespace Danucite360.Data.Migrations
 
             modelBuilder.Entity("Danucite360.Data.Models.FundedProject", b =>
                 {
+                    b.Navigation("Evidence");
+
                     b.Navigation("FundingShares");
                 });
 

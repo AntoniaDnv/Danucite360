@@ -6,17 +6,18 @@
    ========================================================================== */
 :root {
     /* Ink light ramp */
-    --page-bg: #f5f7fa;
+    --page-bg: #f8fafc;
     --card-bg: #ffffff;
-    --raised-bg: #eceff4;
-    --text-primary: #111827;
-    --text-secondary: #4b5565;
-    --text-muted: #6b7487;
-    --deep-ink: #111827;
-    --slate: #6b7487;
-    --slate-soft: #eceff4;
-    --border-light: rgba(17, 24, 39, 0.08);
-    --border-medium: rgba(17, 24, 39, 0.14);
+    --raised-bg: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --deep-ink: #0f172a;
+    --civic-navy: #1e3a5f;
+    --slate: #64748b;
+    --slate-soft: #f1f5f9;
+    --border-light: #e5e7eb;
+    --border-medium: #d1d5db;
     /* One accent. Old teal variables point at it so every existing use follows. */
     --accent: #2563eb;
     --accent-strong: #1d4ed8;
@@ -104,7 +105,7 @@ strong, b, th, .fw-bold, .hero-accent, .stat-chip-value, .milestone-dot, .mini-s
 .navbar { border-bottom-color: var(--border-light) !important; }
 .navbar .nav-link { font-weight: 500; color: var(--text-secondary); }
 .navbar .nav-link.active { color: var(--text-primary); }
-.brand-mark { background: var(--text-primary); border-radius: 6px; }
+.brand-mark { background: var(--civic-navy); border-radius: 6px; }
 
 /* Bars: value column never wraps, accent fill, neutral alt */
 .revenue-bars { gap: 12px; }
@@ -136,7 +137,7 @@ strong, b, th, .fw-bold, .hero-accent, .stat-chip-value, .milestone-dot, .mini-s
 .ledger-row-top strong { font-family: var(--font-mono); font-weight: 500; font-size: 20px; font-variant-numeric: tabular-nums; }
 .ledger-track { position: relative; height: 12px; background: var(--raised-bg); border-radius: 4px; }
 .ledger-fill { position: absolute; top: 0; bottom: 0; left: 0; background: var(--accent); border-radius: 4px; }
-.ledger-fill.spend { background: var(--text-primary); }
+.ledger-fill.spend { background: var(--civic-navy); }
 .ledger-time { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--review-red); }
 .ledger-row-meta { display: flex; justify-content: space-between; margin-top: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .ledger-legend { display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 13px; color: var(--text-secondary); }
@@ -168,4 +169,89 @@ strong, b, th, .fw-bold, .hero-accent, .stat-chip-value, .milestone-dot, .mini-s
 @media (max-width: 575.98px) {
     /* Half-width stat cards are too narrow for a figure like "33,75 млрд. €": stack them one per row. */
     .row > .col-6:has(> .kpi-card) { flex: 0 0 100%; max-width: 100%; }
+}
+
+/* Regions: two-region comparison */
+.compare-pickers { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: end; }
+.compare-vs { color: var(--text-muted); font-size: 14px; padding-bottom: 8px; }
+.compare-card { border: 1px solid var(--border-light); border-radius: var(--radius-card); padding: 20px; height: 100%; border-top: 3px solid var(--accent); }
+.compare-b { border-top-color: var(--civic-navy); }
+.compare-letter { font-size: 13px; color: var(--text-muted); }
+.compare-name { font-size: 20px; font-weight: 600; margin: 4px 0 12px; }
+.compare-facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin-bottom: 12px; font-size: 14px; }
+.compare-facts dt { color: var(--text-secondary); font-weight: 400; }
+.compare-facts dd { margin: 0; text-align: right; font-weight: 500; font-variant-numeric: tabular-nums; }
+.compare-chart { position: relative; height: 320px; }
+.diff-up { color: var(--accent-strong); }
+.diff-down { color: var(--civic-navy); }
+@media (max-width: 575.98px) {
+    .compare-pickers { grid-template-columns: 1fr; }
+    .compare-vs { display: none; }
+}
+
+/* Home (rebuilt 2026-11-18): hero + snapshot, four destinations, sources strip */
+.home { padding-top: 64px; }
+.home-hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 48px; align-items: center; }
+.home .hero-title { font-size: 56px; line-height: 1.04; letter-spacing: -0.03em; max-width: 16ch; margin-bottom: 20px; }
+.home .hero-subtitle { font-size: 19px; line-height: 30px; }
+.snapshot { padding: 24px; }
+.snapshot-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; }
+.snapshot-title { font-size: 16px; font-weight: 600; margin: 0; }
+.snapshot-row + .snapshot-row { margin-top: 20px; }
+.snapshot-line { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+.snapshot-line span { color: var(--text-secondary); font-size: 14px; }
+.snapshot-line strong { font-family: var(--font-mono); font-weight: 500; font-size: 22px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.snapshot-meta { margin-top: 8px; font-size: 13px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.snapshot-balance { padding-top: 16px; border-top: 1px solid var(--border-light); }
+.home-section-title { font-size: 22px; font-weight: 600; margin: 96px 0 20px; }
+.trust { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: center; margin-top: 96px; padding: 32px 0; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); }
+.trust-copy p { color: var(--text-secondary); max-width: 60ch; margin-bottom: 16px; }
+.trust-legend { font-size: 13px; color: var(--text-muted); display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.trust-links { display: flex; flex-direction: column; gap: 12px; }
+@media (max-width: 991.98px) {
+    .home { padding-top: 40px; }
+    .home-hero { grid-template-columns: 1fr; gap: 32px; }
+    .home .hero-title { font-size: 40px; max-width: none; }
+    .home-section-title { margin-top: 64px; }
+    .trust { grid-template-columns: 1fr; margin-top: 64px; }
+    .trust-links { flex-direction: row; flex-wrap: wrap; }
+}
+@media (max-width: 575.98px) {
+    .home .hero-title { font-size: 34px; }
+    .snapshot-line strong { font-size: 18px; }
+}
+
+/* Flatten leftover gradient bars from site.css */
+.category-line div span, .region-bar-track span { background: var(--accent); }
+
+/* Project evidence trail ("Следата на парите") */
+.trail { list-style: none; padding: 0; margin: 0; position: relative; }
+.trail::before { content: ""; position: absolute; left: 92px; top: 6px; bottom: 6px; width: 1px; background: var(--border-light); }
+.trail-step { display: grid; grid-template-columns: 80px 1fr auto; gap: 24px; padding: 12px 0; position: relative; }
+.trail-step::before { content: ""; position: absolute; left: 88px; top: 18px; width: 9px; height: 9px; border-radius: 50%; background: var(--card-bg); border: 2px solid var(--text-muted); }
+.trail-payment::before { border-color: var(--accent); background: var(--accent); }
+.trail-allocation::before { border-color: var(--civic-navy); }
+.trail-date { font-size: 12px; color: var(--text-muted); padding-top: 2px; }
+.trail-stage { font-size: 12px; color: var(--text-muted); }
+.trail-title { font-weight: 500; color: var(--text-primary); }
+.trail-doc { font-size: 13px; color: var(--text-secondary); margin-top: 4px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.trail-amount { font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.trail-total { display: flex; justify-content: space-between; padding-top: 12px; margin-top: 4px; border-top: 1px solid var(--border-light); }
+.trail-total span { color: var(--text-secondary); }
+@media (max-width: 575.98px) {
+    .trail::before, .trail-step::before { display: none; }
+    .trail-step { grid-template-columns: 1fr auto; gap: 4px 12px; }
+    .trail-date { grid-column: 1 / -1; }
+}
+
+/* Shareable report: prints as a clean one-pager */
+.report { max-width: 860px; }
+.report-kicker { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+.report-warning { font-size: 14px; color: var(--text-secondary); }
+.report-facts th { width: 40%; color: var(--text-secondary); font-weight: 400 !important; }
+@media print {
+    .app-header, .app-footer, .no-print { display: none !important; }
+    body { background: #fff; }
+    .page-shell { padding: 0; }
+    a[href]::after { content: none; }
 }

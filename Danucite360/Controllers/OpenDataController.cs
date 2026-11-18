@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Danucite360.Common;
 using Danucite360.Common.Constants;
 using Danucite360.Services.Contracts;
@@ -57,6 +57,13 @@ public class OpenDataController : Controller
     [HttpGet("/api/projects")]
     public async Task<IActionResult> ProjectsJson() =>
         Ok(await projectService.GetAllProjectsAsync(DataConstants.BudgetYear));
+
+    [HttpGet("/api/projects/{slug}")]
+    public async Task<IActionResult> ProjectJson(string slug)
+    {
+        var project = await projectService.GetProjectDetailAsync(slug, DataConstants.BudgetYear);
+        return project == null ? NotFound() : Ok(project);
+    }
 
     [HttpGet("/api/measures")]
     public async Task<IActionResult> MeasuresJson([FromQuery] string[]? role, [FromQuery] string? age) =>

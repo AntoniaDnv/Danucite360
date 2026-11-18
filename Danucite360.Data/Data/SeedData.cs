@@ -25,6 +25,7 @@ public static partial class SeedData
         await SeedDebtAsync(context);
         await SeedMeasuresAsync(context);
         await LocalizeAsync(context);
+        await SeedEvidenceAsync(context); // after LocalizeAsync, which sets Spent
     }
 
     private static async Task SeedMeasuresAsync(ApplicationDbContext context)

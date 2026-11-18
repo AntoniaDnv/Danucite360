@@ -2,25 +2,21 @@
 
 @{
     ViewData["Title"] = "Сравнение на областите";
-    var regions = Model.ToList();
+    var bg = System.Globalization.CultureInfo.GetCultureInfo("bg-BG");
+    decimal PerCapita(Danucite360.Services.Models.RegionListServiceModel r) => r.Population > 0 ? r.TotalDemoSpending * 1_000m / r.Population : 0m;
 
-    // TotalDemoSpending is in "thousand EUR".
-    decimal SpendMillions(decimal thousandEur) => thousandEur / 1_000m;
-    decimal PerCapitaEur(Danucite360.Services.Models.RegionListServiceModel r)
-        => r.Population > 0 ? r.TotalDemoSpending * 1_000m / r.Population : 0m;
-
-    var byPerCapita = regions
-        .Select(r => new { r.Name, r.Slug, r.Population, r.TotalDemoSpending, PerCapita = PerCapitaEur(r) })
+    var ranked = Model
+        .Select(r => new { r.Name, r.Slug, r.Population, r.TotalDemoSpending, PerCapita = PerCapita(r) })
         .OrderByDescending(r => r.PerCapita)
         .ToList();
+    var maxPerCapita = ranked.Any() ? ranked.Max(r => r.PerCapita) : 1m;
+    string Width(decimal v) => ((double)(maxPerCapita == 0 ? 0 : v / maxPerCapita) * 100).ToString("F1", System.Globalization.CultureInfo.InvariantCulture);
 
-    var topPerCapita = byPerCapita.Take(5).ToList();
-    var chartLabels = System.Text.Json.JsonSerializer.Serialize(topPerCapita.Select(r => r.Name));
-    var chartValues = System.Text.Json.JsonSerializer.Serialize(topPerCapita.Select(r => Math.Round(r.PerCapita, 0)));
+    var regionData = ranked.Select(r => new { r.Name, r.Slug, r.Population, total = r.TotalDemoSpending, perCapita = Math.Round(r.PerCapita, 0) });
 }
 
 <section class="page-shell">
-    <div class="page-header mb-3">
+    <div class="page-header mb-4">
         <div>
             <div class="d-flex align-items-center gap-2 mb-2">
                 <span class="status-badge status-demo">Демо данни</span>
@@ -28,125 +24,123 @@
             </div>
             <h1 class="section-title mb-2">Сравнение на областите</h1>
             <p class="section-subtitle mb-0">
-                Колко публични средства се харчат на човек в различните области (демонстрационни стойности).
+                Изберете две области и вижте как се разпределят публичните разходи в тях — общо, на човек и по сектори.
             </p>
         </div>
-        <div class="page-actions">
-            <span class="status-badge status-demo">Демонстрационни регионални данни</span>
-        </div>
     </div>
 
-    <div class="filter-bar app-card mb-4">
-        <div class="app-card-body">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label small text-muted" for="regionSearch">Търсене</label>
-                    <input id="regionSearch" type="search" class="form-control" placeholder="Търсене на област…" />
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small text-muted" for="regionYear">Година</label>
-                    <select id="regionYear" class="form-select"><option selected>2026</option></select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small text-muted" for="regionStatus">Статус на данните</label>
-                    <select id="regionStatus" class="form-select">
-                        <option value="all" selected>Всички</option>
-                        <option value="demo">Демо</option>
-                        <option value="official">Официални</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small text-muted" for="regionSort">Подреди по</label>
-                    <select id="regionSort" class="form-select">
-                        <option value="percapita" selected>На човек</option>
-                        <option value="spending">Общо разходи</option>
-                        <option value="population">Население</option>
-                        <option value="name">Име</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4 mb-4">
-        <div class="col-lg-5">
-            <div class="app-card h-100">
-                <div class="app-card-body d-flex flex-column">
-                    <h2 class="card-heading h5">На картата</h2>
-                    <div class="map-placeholder flex-grow-1">
-                        <div class="map-placeholder-inner">
-                            <p>Вижте публичните проекти по области на интерактивната карта.</p>
-                            <a class="btn btn-primary btn-sm" href="/projects/map">Отвори картата на проектите</a>
-                        </div>
+    @if (ranked.Count >= 2)
+    {
+        <div class="app-card mb-4">
+            <div class="app-card-body">
+                <div class="compare-pickers">
+                    <div>
+                        <label class="form-label small text-muted" for="regionA">Област А</label>
+                        <select id="regionA" class="form-select">
+                            @for (var i = 0; i < ranked.Count; i++)
+                            {
+                                <option value="@ranked[i].Slug" selected="@(i == 0)">@ranked[i].Name</option>
+                            }
+                        </select>
+                    </div>
+                    <span class="compare-vs" aria-hidden="true">срещу</span>
+                    <div>
+                        <label class="form-label small text-muted" for="regionB">Област Б</label>
+                        <select id="regionB" class="form-select">
+                            @for (var i = 0; i < ranked.Count; i++)
+                            {
+                                <option value="@ranked[i].Slug" selected="@(i == 1)">@ranked[i].Name</option>
+                            }
+                        </select>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="col-lg-7">
-            <div class="app-card h-100">
-                <div class="app-card-body d-flex flex-column">
-                    <h2 class="card-heading h5">Топ 5 области: разходи на човек (€)</h2>
-                    <p class="text-muted small">Демо разходите, разделени на броя жители.</p>
-                    <div class="region-chart flex-grow-1">
-                        <canvas id="perCapitaChart"
-                                data-labels='@Html.Raw(chartLabels)'
-                                data-values='@Html.Raw(chartValues)'></canvas>
-                    </div>
-                    <div class="source-ref demo">Източник: демонстрационно разпределение</div>
+                <div class="row g-4 mt-1" id="compareCards" aria-live="polite">
+                    <div class="col-md-6"><div class="compare-card compare-a" id="cardA"></div></div>
+                    <div class="col-md-6"><div class="compare-card compare-b" id="cardB"></div></div>
                 </div>
+
+                <h2 class="card-heading h6 mt-4 mb-1">Разходи по сектори</h2>
+                <p class="text-muted small mb-2">Къде всяка от двете области харчи повече.</p>
+                <div class="compare-chart"><canvas id="compareChart" role="img" aria-label="Сравнение на разходите по сектори"></canvas></div>
+
+                <div class="table-responsive mt-3">
+                    <table class="table align-middle mb-0" id="compareTable">
+                        <thead>
+                            <tr><th>Сектор</th><th class="num" id="thA">А</th><th class="num" id="thB">Б</th><th class="num">Разлика (А − Б)</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="source-ref demo">Демонстрационни регионални данни · бюджет 2026 · не са официални общински данни</div>
             </div>
         </div>
-    </div>
+    }
 
     <div class="app-card">
         <div class="app-card-body">
-            <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
                 <div>
-                    <h2 class="card-heading h5">Данни по области</h2>
+                    <h2 class="card-heading h5 mb-1">Класиране на областите</h2>
                     <p class="text-muted small mb-0">Изберете област, за да видите подробностите.</p>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <div>
+                        <label class="visually-hidden" for="regionSearch">Търсене на област</label>
+                        <input id="regionSearch" type="search" class="form-control form-control-sm" placeholder="Търсене" />
+                    </div>
+                    <div>
+                        <label class="visually-hidden" for="regionSort">Подреди по</label>
+                        <select id="regionSort" class="form-select form-select-sm">
+                            <option value="percapita" selected>По разходи на човек</option>
+                            <option value="spending">По общи разходи</option>
+                            <option value="population">По население</option>
+                            <option value="name">По име</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div class="table-responsive">
-                <table class="table align-middle" id="regionsTable">
+                <table class="table align-middle mb-0" id="regionsTable">
                     <thead>
                         <tr>
                             <th>Област</th>
                             <th class="num">Население</th>
-                            <th class="num">Разходи (млн. €)</th>
-                            <th class="num">На човек (€)</th>
+                            <th class="num">Общо разходи</th>
+                            <th style="min-width:200px">На човек годишно</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var r in byPerCapita)
+                        @foreach (var r in ranked)
                         {
-                            <tr data-region-name="@r.Name.ToLowerInvariant()"
-                                data-status="demo"
-                                data-percapita="@Math.Round(r.PerCapita, 0)"
-                                data-spending="@Math.Round(SpendMillions(r.TotalDemoSpending), 1)"
-                                data-population="@r.Population">
+                            <tr data-name="@r.Name.ToLowerInvariant()" data-percapita="@Math.Round(r.PerCapita, 0)" data-spending="@r.TotalDemoSpending.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-population="@r.Population">
+                                <td><a class="text-decoration-none fw-semibold" href="/regions/@r.Slug">@r.Name</a></td>
+                                <td class="num">@r.Population.ToString("N0", bg)</td>
+                                <td class="num">@MoneyFormatter.FormatThousandEur(r.TotalDemoSpending)</td>
                                 <td>
-                                    <a class="fw-semibold text-decoration-none" href="/regions/@r.Slug">@r.Name</a>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="revenue-bar-track flex-grow-1"><span style="width:@Width(r.PerCapita)%"></span></div>
+                                        <span class="mono num" style="min-width:72px;text-align:right">@r.PerCapita.ToString("N0", bg) €</span>
+                                    </div>
                                 </td>
-                                <td class="num">@r.Population.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("bg-BG"))</td>
-                                <td class="num">@SpendMillions(r.TotalDemoSpending).ToString("N1", System.Globalization.CultureInfo.GetCultureInfo("bg-BG"))</td>
-                                <td class="num">@r.PerCapita.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("bg-BG"))</td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-
-            <div id="regionsEmptyState" class="empty-state d-none">
-                <h5>Няма области по тези критерии.</h5>
-                <p>Променете търсенето или статуса на данните.</p>
-            </div>
+            <p id="regionsEmptyState" class="text-muted small mt-3 mb-0" hidden>Няма области с това име.</p>
+            <div class="source-ref demo">Демонстрационни регионални данни · бюджет 2026 · разходи на човек = общо разходи ÷ население</div>
         </div>
     </div>
+
+    <p class="small text-muted mt-4 mb-0">
+        Търсите конкретни проекти по места? Те са на <a href="/projects/map">картата на проектите</a>.
+    </p>
 </section>
 
 @section Scripts {
+    <script id="regionData" type="application/json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(regionData, new System.Text.Json.JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Default, PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }))</script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="~/js/chart-theme.js" asp-append-version="true"></script>
     <script src="~/js/regions-compare.js" asp-append-version="true"></script>

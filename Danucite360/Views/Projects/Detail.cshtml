@@ -11,12 +11,7 @@
         _ => "status-draft"
     };
 
-    // Derive a milestone timeline from completion %.
-    var c = Model.CompletionPercent;
-    var currentStage = c >= 100 ? 3 : c >= 40 ? 2 : c >= 10 ? 1 : 0;
-    var milestones = new[] { "Планиране", "Обществена поръчка", "Изпълнение", "Предаване" };
     var financialPct = Model.Spent.HasValue && Model.Budget > 0 ? (int)Math.Round(Model.Spent.Value / Model.Budget * 100) : (int?)null;
-    string StageState(int i) => i < currentStage || c >= 100 ? "done" : i == currentStage ? "current" : "upcoming";
 
     var maxShare = Model.FundingShares.Any() ? Model.FundingShares.Max(f => f.Amount) : 1m;
 }
@@ -75,20 +70,36 @@
                 </div>
             </div>
 
-            <div class="app-card mb-4">
+            <div class="app-card mb-4" id="evidence">
                 <div class="app-card-body">
-                    <h2 class="card-heading h5">Етапи</h2>
-                    <div class="milestones">
-                        @for (var i = 0; i < milestones.Length; i++)
-                        {
-                            var state = StageState(i);
-                            <div class="milestone milestone-@state">
-                                <div class="milestone-dot">@(state == "done" ? "✓" : (i + 1).ToString())</div>
-                                <div class="milestone-label">@milestones[i]</div>
-                                <div class="milestone-state">@(state == "done" ? "Завършен" : state == "current" ? "В ход" : "Предстои")</div>
-                            </div>
-                        }
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                        <h2 class="card-heading h5 mb-0">Следата на парите</h2>
+                        <a class="small" href="/projects/@Model.Slug/report">Сподели / печат</a>
                     </div>
+                    <p class="text-muted small mb-3">От реда в бюджета до свършената работа — всяка стъпка с дата, сума и документ.</p>
+                    @if (Model.Evidence.Any())
+                    {
+                        <ol class="trail">
+                            @foreach (var e in Model.Evidence)
+                            {
+                                <li class="trail-step trail-@e.Stage">
+                                    <div class="trail-date mono">@e.OccurredOn.ToString("dd.MM.yyyy")</div>
+                                    <div class="trail-body">
+                                        <div class="trail-stage">@e.StageLabel</div>
+                                        <div class="trail-title">@e.Title</div>
+                                        <div class="trail-doc"><span class="status-badge @(e.IsDemo ? "status-demo" : "status-official")">@(e.IsDemo ? "Демо" : "Официален")</span> @e.DocumentTitle</div>
+                                    </div>
+                                    <div class="trail-amount mono">@(e.Amount.HasValue ? MoneyFormatter.FormatThousandEur(e.Amount.Value) : "")</div>
+                                </li>
+                            }
+                        </ol>
+                        var paid = Model.Evidence.Where(e => e.Stage == Danucite360.Common.Constants.EvidenceStages.Payment).Sum(e => e.Amount ?? 0);
+                        <div class="trail-total"><span>Изплатено по документите</span><strong class="mono">@MoneyFormatter.FormatThousandEur(paid)</strong></div>
+                    }
+                    else
+                    {
+                        <p class="text-muted small mb-0">Още няма въведени документи за този проект.</p>
+                    }
                 </div>
             </div>
 

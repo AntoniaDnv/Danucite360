@@ -68,4 +68,6 @@ public class FundedProject
     public BudgetSource BudgetSource { get; set; } = null!;
 
     public ICollection<ProjectFunding> FundingShares { get; set; } = new List<ProjectFunding>();
+
+    public ICollection<ProjectEvidence> Evidence { get; set; } = new List<ProjectEvidence>();
 }

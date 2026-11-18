@@ -3,8 +3,8 @@
 (function () {
     const palette = {
         // Civic layer: one accent (blue) leads; "teal"/"navy" now map to accent / ink so old charts follow.
-        navy: "#111827",
-        brandNavy: "#111827",
+        navy: "#1E3A5F",
+        brandNavy: "#1E3A5F",
         teal: "#2563EB",
         blue: "#2563EB",
         amber: "#F59E0B",
@@ -14,12 +14,12 @@
         cyan: "#0891B2",
         slate: "#6B7487",
         slateLight: "#9AA3B5",
-        border: "rgba(17, 24, 39, 0.08)"
+        border: "#E5E7EB"
     };
 
     // Ordered series colors for categorical charts (donuts, multi-series).
     // Accent leads, the rest step down through ink neutrals.
-    const series = ["#2563EB", "#111827", "#4B5565", "#6B7487", "#9AA3B5", "#C3C9D4", "#E1E5EC"];
+    const series = ["#2563EB", "#1E3A5F", "#475569", "#64748B", "#94A3B8", "#CBD5E1", "#E2E8F0"];
 
     // Values arrive in "thousand EUR"; show Bulgarian-formatted billions of EUR (e.g. "30,37 млрд. €").
     function formatBillionsEur(thousandEur) {

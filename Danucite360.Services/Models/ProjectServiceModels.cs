@@ -54,6 +54,7 @@ public class ProjectDetailServiceModel
     public decimal? Spent { get; set; }
     public string? City { get; set; }
     public bool IsDemo { get; set; }
+    public IReadOnlyList<ProjectEvidenceServiceModel> Evidence { get; set; } = new List<ProjectEvidenceServiceModel>();
     public IReadOnlyList<ProjectFundingShareServiceModel> FundingShares { get; set; }
         = new List<ProjectFundingShareServiceModel>();
     public IReadOnlyList<ProjectListItemServiceModel> RelatedProjects { get; set; }
@@ -91,4 +92,16 @@ public class FundingOverviewServiceModel
         = new List<CategoryShareServiceModel>();
     public IReadOnlyList<ProjectListItemServiceModel> LargestProjects { get; set; }
         = new List<ProjectListItemServiceModel>();
+}
+
+public class ProjectEvidenceServiceModel
+{
+    public string Stage { get; set; } = null!;
+    public string StageLabel { get; set; } = null!;
+    public string Title { get; set; } = null!;
+    public DateTime OccurredOn { get; set; }
+    public decimal? Amount { get; set; }
+    public string DocumentTitle { get; set; } = null!;
+    public string DocumentUrl { get; set; } = string.Empty;
+    public bool IsDemo { get; set; }
 }

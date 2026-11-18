@@ -54,6 +54,7 @@ public class ProjectService : IProjectService
             .Include(p => p.Region)
             .Include(p => p.FundingShares)
             .Include(p => p.BudgetSource)
+            .Include(p => p.Evidence)
             .FirstOrDefaultAsync(p => p.Slug == slug && p.BudgetYear == year);
 
         if (project == null)
@@ -100,6 +101,20 @@ public class ProjectService : IProjectService
             Spent = project.Spent,
             City = project.City,
             IsDemo = project.IsDemo,
+            Evidence = project.Evidence
+                .OrderBy(e => e.OccurredOn).ThenBy(e => e.Id)
+                .Select(e => new ProjectEvidenceServiceModel
+                {
+                    Stage = e.Stage,
+                    StageLabel = EvidenceStages.Label(e.Stage),
+                    Title = e.Title,
+                    OccurredOn = e.OccurredOn,
+                    Amount = e.Amount,
+                    DocumentTitle = e.DocumentTitle,
+                    DocumentUrl = e.DocumentUrl,
+                    IsDemo = e.IsDemo
+                })
+                .ToList(),
             FundingShares = shares,
             RelatedProjects = related.Select(ToListItem).ToList()
         };

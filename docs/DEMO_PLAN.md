@@ -57,3 +57,51 @@ Builds, tests pass, app starts from a cold Docker start; every nav link works; m
 
 ## Demo walkthrough (2-3 min)
 Home -> national budget (planned vs actual) -> project map -> measures ("Родител" + "Шофьор") -> execution + sources -> download CSV / open JSON.
+
+
+---
+# Reassessment 2026-11-18 (repository = source of truth)
+
+## A. Health report
+Builds clean, 36/36 tests, deployed and live (https://danucite360.azurewebsites.net). 3 projects (Web/Data/Services/Common/Tests) unchanged.
+6 migrations, all additive. Public pages Bulgarian. Risks: local Docker engine stopped (blocks local runs), new Bulgarian
+login page not yet runtime-tested, homepage too dense, Regions page carries a leftover map block and two fake controls.
+
+## B. Feature status
+| Feature | Status | Issues | Prio | Action |
+|---|---|---|---|---|
+| Homepage | Works, too dense | hero+ledger, KPI row repeats ledger plan figures, 6-item contents, revenue bars + demo spending duplicate /budget/national | P0 | Rebuild: hero, one snapshot, 4 explore items, sources strip |
+| National budget + execution (F) | Done | plan vs actual vs % vs period; scopes separated | — | Keep |
+| Spending categories | Works (demo) | secondary page | P2 | Keep |
+| Regions comparison | Works, cluttered | map leftover, single-option Year select, status filter that filters nothing | P0 | Remove map, add 2-region compare, ranking table |
+| Region details | Works (demo) | — | P2 | Keep |
+| Project map (D) + details | Done | Separate from Regions; must stay | — | Keep |
+| Measures register (E) | Done, tested | — | — | Keep |
+| Open data CSV/JSON (C) | Done | XLSX not built | P2 | XLSX later |
+| Sources & methodology | Done | — | — | Keep |
+| Admin login + CRUD | Bulgarian, registration disabled | login not runtime-tested; edit->public check pending | P0 | Verify locally when Docker is back |
+| Deploy | Live on F1 + free SQL | cold start ~1 min | P0 | Warm up before demo |
+
+## C. Roadmap (ordered)
+1. P0 Regions page without map (30-45 min) — Views/Map/Index.cshtml, wwwroot/js/regions-compare.js. Done when: no map UI, compare two regions by category from /api/dashboard/regions/{slug}, sortable ranking table links to /regions/{slug}, all demo-labelled, /projects/map untouched.
+2. P0 Homepage rebuild + unslop (45-60 min) — Views/Home/Index.cshtml, civic.css. Done when: 5 sections only, snapshot labelled plan/execution + scope + status, no duplicated dashboards, 375px clean.
+3. P0 Palette aligned to Civic Clarity tokens (#1E3A5F, #2563EB, #EFF6FF, #0F172A, #F8FAFC, #E5E7EB) — civic.css (15 min).
+4. P0 Verify admin login + edit -> public update locally (needs Docker) (15 min).
+5. P0 Build, tests, deploy, live smoke test (20 min). 6. P0 Demo walkthrough doc (15 min).
+P1: XLSX export, consistency pass on categories/debt/funding. P2: real municipal data, PDF import, accounts.
+
+## D. Homepage proposal
+Keep: headline idea, two CTAs, real execution data. Remove: separate KPI row (merged into snapshot), revenue bars and demo
+"where it goes" block (live on /budget/national), 6-row contents (cut to 4: Бюджет, Проекти, Мерки, Изпълнение; open data and
+sources move to the transparency strip). Sections: nav -> hero -> budget snapshot (plan + executed so far, scope/period/status) ->
+explore (4) -> transparency & sources -> footer.
+
+## E. Regions proposal
+Delete only the map UI block and fake controls in Views/Map/Index.cshtml. Region entities, IRegionService, MapController route
+(/Map, nav "Региони"), /regions/{slug}, FundedProject coordinates and /projects/map stay untouched.
+New layout: header + demo notice -> compare panel (pick A and B; two summary cards; grouped bar chart by category; difference table)
+-> ranking table (search + sort, per-capita bar, link to details).
+
+## F. Sequence
+Regions first (smallest, isolated, removes visible clutter), then homepage (largest visual impact, reuses existing data), then
+palette, then verification + deploy. Functional checks before polish.
