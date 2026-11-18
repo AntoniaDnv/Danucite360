@@ -1,14 +1,15 @@
 # Danucite360 — demo walkthrough (2–3 min)
 
 **Live:** https://danucite360.azurewebsites.net
+**Tip:** open one „Какво означава това?“ panel on the homepage to show the plain-language layer.
 **Warm up 3 minutes before:** open the homepage and `/projects/map` once (the free tier sleeps; first load can take ~1 min).
 
 | Time | Where | What to do | What to say |
 |---|---|---|---|
 | 0:00 | Начало `/` | Point at the headline and the budget card | "Бюджетът е в PDF-и и таблици. Тук всеки вижда план срещу реално изпълнение: събрани са 26% от приходите след 4 от 12 месеца — червената черта е изминалото време." |
 | 0:25 | Бюджет `/budget/national` | Scroll to „2. Какво реално се е случило досега“ | "Планът и отчетът са от един и същ обхват (държавния бюджет), с ясен отчетен период. По-широката КФП е отделно, за да не се смесват числа." |
-| 0:55 | Проекти `/projects/map` | Choose „Варна“ in the area filter, click the port marker | "Всеки проект: бюджет, изплатено, физически и финансов напредък — двете не са едно и също." Mention: projects are **demo** records (amber dot). |
-| 1:25 | Мерки `/measures` | Tick „Родител“ + „Шофьор“ → 5 measures; open „Данъчно облекчение за деца“ | "Гражданинът избира своята ситуация и вижда какво го засяга, на човешки език. Минус означава разход за бюджета, плюс — приход." Measures are illustrative demo. |
+| 0:55 | Проекти `/projects/map` | Choose „Варна“, click the port marker → „Пълна информация“ → scroll to „Следата на парите“ | "Тук сме различни: проследяваме конкретен проект от реда в бюджета до договора, плащанията и напредъка — с документ за всяка стъпка. Изплатеното е сборът от платежните документи." Click „Сподели / печат“. Projects and documents are **demo** (amber dot). |
+| 1:25 | Какво се променя `/measures` | Tick „Родител“ + „Шофьор“ → 5 measures; open „Данъчно облекчение за деца“ | "Гражданинът избира своята ситуация и вижда какво го засяга, на човешки език. Минус означава разход за бюджета, плюс — приход." Measures are illustrative demo. |
 | 1:55 | Данни `/open-data` | Click „Изтегли CSV“ on projects; open „JSON API“ on measures | "Не снимки на таблици — отворени данни. Същите числа като на екрана, със статус и източник на всеки ред." |
 | 2:20 | Източници `/sources` | Show the status labels | "Всяко число е отбелязано: официално или демонстрационно. Ако документът е официален, но стойността е въведена ръчно — казваме го." |
 
