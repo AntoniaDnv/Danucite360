@@ -66,7 +66,7 @@
                         <strong class="mono">@(financialPct.HasValue ? financialPct + "%" : "няма данни")</strong>
                     </div>
                     <div class="project-progress lg financial"><span style="width:@(financialPct ?? 0)%"></span></div>
-                    <p class="small text-muted mt-3 mb-0">Двата показателя могат да се различават: работа може да е извършена, но още неплатена, или да е платен аванс преди началото ѝ.</p>
+                    <partial name="_Explain" model='"Физическият напредък показва колко от работата е свършена, а финансовият — колко пари са изплатени. Двата показателя могат да се различават: работа може да е извършена, но още неплатена, или да е платен аванс преди началото ѝ."' />
                 </div>
             </div>
 

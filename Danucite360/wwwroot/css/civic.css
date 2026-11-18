@@ -255,3 +255,18 @@ strong, b, th, .fw-bold, .hero-accent, .stat-chip-value, .milestone-dot, .mini-s
     .page-shell { padding: 0; }
     a[href]::after { content: none; }
 }
+
+/* "Какво означава това?" — plain-language explanation, collapsed by default */
+.explain { margin-top: 16px; font-size: 14px; }
+.explain summary { cursor: pointer; color: var(--accent-strong); font-weight: 500; list-style: none; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; }
+.explain summary::-webkit-details-marker { display: none; }
+.explain summary::before { content: "+"; font-family: var(--font-mono); width: 16px; text-align: center; }
+.explain[open] summary::before { content: "−"; }
+.explain p { margin: 8px 0 0; padding: 12px 16px; background: var(--accent-soft); border-radius: var(--radius-sm); color: var(--text-secondary); line-height: 1.6; max-width: 72ch; }
+
+/* "Следващ въпрос" — guided path between pages */
+.next-q { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: baseline; margin-top: 48px; padding: 20px 0; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); color: var(--text-secondary); text-decoration: none; }
+.next-q span:first-child { font-size: 13px; color: var(--text-muted); }
+.next-q strong { font-size: 18px; font-weight: 600; color: var(--text-primary); transition: color 150ms var(--ease); }
+.next-q:hover strong, .next-q:focus-visible strong { color: var(--accent-strong); }
+@media (max-width: 575.98px) { .next-q { grid-template-columns: 1fr auto; } .next-q span:first-child { grid-column: 1 / -1; } }

@@ -51,10 +51,10 @@
                         <li class="nav-item"><a class="@NavActive(overviewActive)" asp-area="" asp-controller="Home" asp-action="Index">Начало</a></li>
                         <li class="nav-item"><a class="@NavActive(budgetActive)" asp-area="" asp-controller="Budget" asp-action="National">Бюджет</a></li>
                         <li class="nav-item"><a class="@NavActive(projectsActive)" href="/projects/map">Проекти</a></li>
-                        <li class="nav-item"><a class="@NavActive(measuresActive)" href="/measures">Мерки</a></li>
+                        <li class="nav-item"><a class="@NavActive(measuresActive)" href="/measures">Какво се променя</a></li>
                         <li class="nav-item"><a class="@NavActive(regionsActive)" asp-area="" asp-controller="Map" asp-action="Index">Региони</a></li>
                         <li class="nav-item"><a class="@NavActive(debtActive)" asp-area="" asp-controller="Debt" asp-action="Index">Дълг</a></li>
-                        <li class="nav-item"><a class="@NavActive(sourcesActive)" asp-area="" asp-controller="Sources" asp-action="Index">Данни и източници</a></li>
+                        <li class="nav-item"><a class="@NavActive(sourcesActive)" asp-area="" asp-controller="Sources" asp-action="Index">Източници</a></li>
                         @if (User.IsInRole(RoleConstants.Admin))
                         {
                             <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Администрация</a></li>

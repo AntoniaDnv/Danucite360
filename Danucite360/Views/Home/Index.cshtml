@@ -1,4 +1,4 @@
-@model Danucite360.Services.Models.NationalBudgetServiceModel
+﻿@model Danucite360.Services.Models.NationalBudgetServiceModel
 
 @{
     ViewData["Title"] = "Начало";
@@ -58,6 +58,7 @@
             {
                 <div class="ledger-legend"><i aria-hidden="true"></i> Червената черта: изминали @monthsElapsed от 12 месеца</div>
             }
+            <partial name="_Explain" model='"Приходите са парите, които държавата събира — най-вече от данъци като ДДС, който плащаме при всяка покупка. Разходите са всичко, за което плаща: пенсии, заплати, болници, пътища. Когато разходите са повече от приходите, има дефицит и държавата взема назаем. Лентите показват колко от годишния план вече се е случило, а червената черта — колко от годината е минала. Ако лентата свършва преди чертата, парите се събират или харчат по-бавно от равномерния темп."' />
             <div class="source-ref">План: проектозакон за държавния бюджет @Model.BudgetYear · Изпълнение: МФ, @(exec?.Period ?? "—")</div>
         </aside>
     </div>
@@ -66,22 +67,22 @@
     <nav class="contents" aria-label="Основни раздели">
         <a asp-controller="Budget" asp-action="National">
             <span class="n">01</span>
-            <span><strong>Държавният бюджет</strong>Откъде идват парите и за какво се харчат — с обяснения на разбираем език</span>
+            <span><strong>Откъде идват и къде отиват парите?</strong>Откъде идват парите и за какво се харчат — с обяснения на разбираем език</span>
             <span class="arrow" aria-hidden="true">→</span>
         </a>
         <a href="/projects/map">
             <span class="n">02</span>
-            <span><strong>Финансирани проекти</strong>Карта на проектите с бюджет, изплатени суми и напредък</span>
+            <span><strong>Какво се строи с публични пари?</strong>Карта на проектите с бюджет, изплатени суми и напредък</span>
             <span class="arrow" aria-hidden="true">→</span>
         </a>
         <a href="/measures">
             <span class="n">03</span>
-            <span><strong>Мерки, които ви засягат</strong>Изберете „Родител“, „Шофьор“ или „Пенсионер“ и вижте какво се променя</span>
+            <span><strong>Какво се променя за мен?</strong>Изберете „Родител“, „Шофьор“ или „Пенсионер“ и вижте какво се променя</span>
             <span class="arrow" aria-hidden="true">→</span>
         </a>
         <a asp-controller="Budget" asp-action="National" asp-fragment="execution">
             <span class="n">04</span>
-            <span><strong>Изпълнение през годината</strong>Колко от плана реално е събрано и похарчено към последния отчет</span>
+            <span><strong>Изпълнява ли се бюджетът?</strong>Колко от плана реално е събрано и похарчено към последния отчет</span>
             <span class="arrow" aria-hidden="true">→</span>
         </a>
     </nav>
