@@ -1,99 +1,82 @@
 ﻿@model IEnumerable<Danucite360.Services.Models.SourceServiceModel>
 
 @{
-    ViewData["Title"] = "Sources and Methodology";
+    ViewData["Title"] = "Източници и методология";
     var sources = Model.ToList();
 }
 
 <section class="page-shell">
     <div class="page-header mb-4">
         <div>
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="status-badge status-official">✓ Official Data</span>
-                <span class="status-badge status-demo">⚠ Demo Data</span>
-            </div>
-
-            <h1 class="section-title mb-2">Sources and Methodology</h1>
-
-            <p class="section-subtitle mb-0">
-                Every number in Danucite360 should be connected to a source,
-                a freshness date, and a confidence label.
-            </p>
+            <span class="hero-eyebrow">Проверимост</span>
+            <h1 class="section-title mb-2">Източници и методология</h1>
+            <p class="section-subtitle mb-0">Откъде идва всяко число, за кой период е и доколко е проверено.</p>
         </div>
     </div>
 
     <div class="plain-summary mb-4">
-        <strong>Why this page matters.</strong>
-        Danucite360 separates official source-based national values from demo regional values.
-        This helps citizens understand which numbers come from public documents and which are prototype data.
+        <strong>Накратко.</strong>
+        Националните бюджетни стойности са въведени ръчно от официални документи на Министерството на финансите и Народното събрание.
+        Проектите, регионалните разходи и регистърът на мерките в този прототип са <strong>демонстрационни данни</strong> —
+        те показват как ще работи платформата, но не са официална информация.
     </div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="kpi-card">
-                <div class="kpi-icon kpi-icon-green">✓</div>
-                <div class="kpi-label">Official Sources</div>
-                <div class="kpi-value">@sources.Count</div>
-                <div class="kpi-meta">Registered source documents</div>
+    <div class="app-card mb-4">
+        <div class="app-card-body">
+            <h2 class="card-heading h5">Етикети за статус на данните</h2>
+            <div class="status-explainer">
+                <div>
+                    <span class="status-badge status-official">Официални данни</span>
+                    <p>Стойността е въведена от публикуван официален документ (проектобюджет, месечен бюлетин, отчет). Посочен е документът и периодът.</p>
+                </div>
+                <div>
+                    <span class="status-badge status-demo">Демо данни</span>
+                    <p>Илюстративна стойност за прототипа. Не трябва да се цитира като факт.</p>
+                </div>
+                <div>
+                    <span class="status-badge status-review">За проверка</span>
+                    <p>Запланувано: записи, въведени от официален документ, но още непроверени от втори човек.</p>
+                </div>
             </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="kpi-card">
-                <div class="kpi-icon kpi-icon-blue">↻</div>
-                <div class="kpi-label">Data Freshness</div>
-                <div class="kpi-value">Tracked</div>
-                <div class="kpi-meta">Retrieved date stored per source</div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="kpi-card">
-                <div class="kpi-icon kpi-icon-red">!</div>
-                <div class="kpi-label">Demo Data</div>
-                <div class="kpi-value">Marked</div>
-                <div class="kpi-meta">Prototype regional values are labeled</div>
-            </div>
+            <p class="small text-muted mt-3 mb-0">
+                Важно: това, че документът е официален, не означава, че всяка ръчно въведена стойност е проверена. Ако откриете разминаване, моля, сигнализирайте.
+            </p>
         </div>
     </div>
-
-    <partial name="_DemoNotice" />
 
     <div class="row g-4 mb-4">
         <div class="col-lg-7">
             <div class="app-card h-100">
                 <div class="app-card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div>
-                            <h5 class="card-heading">Official Sources List</h5>
-                            <p class="text-muted small mb-0">
-                                Source documents used to support official national budget values.
-                            </p>
-                        </div>
-
-                        <span class="status-badge status-official">✓ Source referenced</span>
-                    </div>
-
+                    <h2 class="card-heading h5">Документи-източници</h2>
                     <div class="source-list">
                         @foreach (var source in sources)
                         {
-                            <a class="source-list-item"
-                               asp-controller="Sources"
-                               asp-action="Details"
-                               asp-route-id="@source.Id">
-                                <div class="source-document-icon">📄</div>
-
+                            <a class="source-list-item" asp-controller="Sources" asp-action="Details" asp-route-id="@source.Id">
                                 <div class="source-list-content">
-                                    <h6>@source.Title</h6>
+                                    <h3 class="h6">@source.Title</h3>
                                     <p>@source.Publisher</p>
-
                                     <div class="source-meta-row">
-                                        <span>Retrieved: @source.RetrievedOn.ToString("yyyy-MM-dd")</span>
-                                        <span class="status-badge status-official">✓ Official Source</span>
+                                        <span>Въведено: @source.RetrievedOn.ToString("dd.MM.yyyy")</span>
+                                        <span class="status-badge status-official">Официален източник</span>
                                     </div>
                                 </div>
                             </a>
                         }
+                        <div class="source-list-item">
+                            <div class="source-list-content">
+                                <h3 class="h6">Месечни бюлетини за изпълнението на Консолидираната фискална програма и отчети за изпълнението на държавния бюджет (януари – април 2026)</h3>
+                                <p>Министерство на финансите — използвани за раздела „Какво реално се е случило досега“.</p>
+                                <div class="source-meta-row"><span class="status-badge status-official">Официален източник</span></div>
+                            </div>
+                        </div>
+                        <div class="source-list-item">
+                            <div class="source-list-content">
+                                <h3 class="h6">Месечен бюлетин „Държавен дълг“ (април 2026)</h3>
+                                <p>Министерство на финансите — използван за страницата „Дълг“.</p>
+                                <div class="source-meta-row"><span class="status-badge status-official">Официален източник</span></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -102,122 +85,28 @@
         <div class="col-lg-5">
             <div class="app-card h-100">
                 <div class="app-card-body">
-                    <h5 class="card-heading">Source confidence</h5>
-                    <p class="text-muted small">
-                        The MVP uses official source-backed national values and demo regional data.
+                    <h2 class="card-heading h5">Как работим</h2>
+                    <ol class="small methodology-steps">
+                        <li><strong>Избор на документ</strong> — официален PDF или таблица от държавна институция.</li>
+                        <li><strong>Ръчно въвеждане</strong> — стойностите се пренасят в базата данни заедно с документа, периода, мерната единица и статуса.</li>
+                        <li><strong>Проверка на сумите</strong> — съставните части трябва да дават общата сума (напр. приходите по видове = общите приходи).</li>
+                        <li><strong>Без смесване на обхвати</strong> — държавният бюджет и Консолидираната фискална програма се показват отделно и не се сравняват директно.</li>
+                        <li><strong>Публикуване</strong> — графиките и отворените данни четат от една и съща база, затова изтегленият файл съвпада с това, което виждате.</li>
+                    </ol>
+                    <p class="small text-muted mb-0">
+                        Всички суми са в евро. В графиките са закръглени (млн./млрд. €); във файловете за изтегляне са точни, в хиляди евро.
+                        Планираните стойности (проектобюджет) и отчетените (изпълнение досега) винаги са отбелязани като такива.
                     </p>
-
-                    <div class="confidence-row">
-                        <div class="confidence-label">
-                            <span class="confidence-dot official"></span>
-                            Official Data
-                        </div>
-                        <div class="confidence-bar">
-                            <span style="width: 65%" class="official"></span>
-                        </div>
-                        <strong>65%</strong>
-                    </div>
-
-                    <div class="confidence-row">
-                        <div class="confidence-label">
-                            <span class="confidence-dot demo"></span>
-                            Demo Data
-                        </div>
-                        <div class="confidence-bar">
-                            <span style="width: 35%" class="demo"></span>
-                        </div>
-                        <strong>35%</strong>
-                    </div>
-
-                    <div class="mt-4">
-                        <div class="methodology-note">
-                            <strong>Product principle:</strong>
-                            official values should always link to a public source, while demo values must be clearly labeled.
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="app-card mb-4">
-        <div class="app-card-body">
-            <h5 class="card-heading">The Data Journey</h5>
-            <p class="text-muted small">
-                Raw public finance data is notoriously complex and inconsistently formatted.
-                Our methodology applies a rigorous, four-step process to transform government
-                records into structured, analysis-ready figures.
-            </p>
-
-            <div class="data-journey mt-3">
-                <div class="journey-step">
-                    <span class="journey-num">01</span>
-                    <strong>Ingestion &amp; Cleaning</strong>
-                    <span>Raw CSVs and PDF payloads are ingested. Formatting errors, null values and encoding artifacts are systematically removed or flagged.</span>
-                </div>
-                <div class="journey-step">
-                    <span class="journey-num">02</span>
-                    <strong>Categorization</strong>
-                    <span>Transactions are mapped to standardized economic classifications (e.g. COFOG) using heuristic models matching payment descriptions.</span>
-                </div>
-                <div class="journey-step">
-                    <span class="journey-num">03</span>
-                    <strong>Normalization</strong>
-                    <span>Entities (municipalities, ministries, contractors) are resolved against a unified registry to eliminate duplicates and variations.</span>
-                </div>
-                <div class="journey-step">
-                    <span class="journey-num">04</span>
-                    <strong>Visualization</strong>
-                    <span>Clean, relational data is exposed via internal APIs to power the dashboards, ensuring fast, accurate rendering of complex datasets.</span>
-                </div>
-            </div>
+    <div class="deep-dive">
+        <div>
+            <h4 class="mb-1">Искате да проверите сами?</h4>
+            <p class="mb-0">Изтеглете данните в CSV или ги вземете през JSON API — със статус и източник за всеки ред.</p>
         </div>
-    </div>
-
-    <div class="row g-4">
-        <div class="col-lg-12">
-            <div class="app-card h-100">
-                <div class="app-card-body">
-                    <h5 class="card-heading">Data status labels</h5>
-
-                    <div class="status-explainer">
-                        <div>
-                            <span class="status-badge status-official">✓ Official Data</span>
-                            <p>
-                                Comes from a confirmed public institution or published public finance source.
-                            </p>
-                        </div>
-
-                        <div>
-                            <span class="status-badge status-demo">⚠ Demo Data</span>
-                            <p>
-                                Used for prototype and design testing. It should not be treated as official.
-                            </p>
-                        </div>
-
-                        <div>
-                            <span class="status-badge status-review">! Needs Review</span>
-                            <p>
-                                A future status for records that require verification before being published.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <a class="btn btn-primary"
-                           asp-controller="Budget"
-                           asp-action="National">
-                            View National Budget
-                        </a>
-
-                        <a class="btn btn-outline-primary"
-                           asp-controller="Map"
-                           asp-action="Index">
-                            Compare Regions
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <a class="btn btn-primary" href="/open-data">Отворени данни</a>
     </div>
 </section>

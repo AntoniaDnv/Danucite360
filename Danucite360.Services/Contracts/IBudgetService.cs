@@ -21,4 +21,7 @@ public interface IBudgetService
     Task<ChartDataServiceModel?> GetRegionChartDataAsync(string regionSlug, int year);
 
     Task<IEnumerable<RegionListServiceModel>> GetMapDataAsync(int year);
+
+    /// <summary>All budget records for the year with category, region and source, for CSV/JSON export.</summary>
+    Task<IReadOnlyList<BudgetRecordExportServiceModel>> GetRecordsForExportAsync(int year);
 }

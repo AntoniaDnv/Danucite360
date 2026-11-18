@@ -2,39 +2,33 @@
 // Load this once before any page chart script.
 (function () {
     const palette = {
-        navy: "#1E3A5F",
-        brandNavy: "#131B2E",
-        teal: "#0D9488",
+        // Civic layer: one accent (blue) leads; "teal"/"navy" now map to accent / ink so old charts follow.
+        navy: "#111827",
+        brandNavy: "#111827",
+        teal: "#2563EB",
         blue: "#2563EB",
         amber: "#F59E0B",
         green: "#16A34A",
         red: "#DC2626",
         purple: "#7C3AED",
         cyan: "#0891B2",
-        slate: "#64748B",
-        slateLight: "#94A3B8",
-        border: "#E2E8F0"
+        slate: "#6B7487",
+        slateLight: "#9AA3B5",
+        border: "rgba(17, 24, 39, 0.08)"
     };
 
     // Ordered series colors for categorical charts (donuts, multi-series).
-    const series = [
-        palette.navy,
-        palette.teal,
-        palette.blue,
-        palette.amber,
-        palette.purple,
-        palette.cyan,
-        palette.slate
-    ];
+    // Accent leads, the rest step down through ink neutrals.
+    const series = ["#2563EB", "#111827", "#4B5565", "#6B7487", "#9AA3B5", "#C3C9D4", "#E1E5EC"];
 
-    // Values arrive in "thousand EUR"; show citizen-friendly billions of EUR.
+    // Values arrive in "thousand EUR"; show Bulgarian-formatted billions of EUR (e.g. "30,37 млрд. €").
     function formatBillionsEur(thousandEur) {
         const billions = Number(thousandEur) / 1_000_000;
-        return "€" + billions.toFixed(2) + "B";
+        return billions.toLocaleString("bg-BG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " млрд. €";
     }
 
     function formatThousandEur(value) {
-        return Number(value).toLocaleString(undefined, { maximumFractionDigits: 1 });
+        return Number(value).toLocaleString("bg-BG", { maximumFractionDigits: 1 });
     }
 
     function applyDefaults() {

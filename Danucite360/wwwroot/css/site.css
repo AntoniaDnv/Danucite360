@@ -1884,3 +1884,37 @@ canvas {
         text-align: left;
     }
 }
+
+/* Budget measures register */
+.measure-list { display: grid; gap: 12px; }
+.measure-card { display: block; color: inherit; text-decoration: none; transition: border-color .15s; }
+.measure-card:hover, .measure-card:focus-visible { border-color: var(--institution-blue); color: inherit; }
+.measure-title { font-size: 18px; font-weight: 700; margin: 0 0 4px; color: var(--deep-ink); }
+.measure-summary { color: var(--text-secondary); }
+.measure-means { font-size: 17px; line-height: 1.6; }
+.filter-pill { border-radius: 999px; }
+.impact { font-weight: 600; font-variant-numeric: tabular-nums; }
+.impact-cost { color: #B45309; }
+.impact-revenue { color: #15803D; }
+.impact-none { color: var(--text-muted); }
+.measure-facts dt { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); font-weight: 600; }
+.measure-facts dd { margin-bottom: 12px; }
+
+/* Project map */
+.map-card { overflow: hidden; position: relative; }
+.project-map { height: 520px; width: 100%; }
+.map-fallback { padding: 24px; color: var(--text-secondary); background: var(--demo-soft); }
+.project-panel { position: sticky; top: 16px; }
+.project-panel .progress { height: 8px; }
+.num { font-variant-numeric: tabular-nums; }
+@media (max-width: 991.98px) { .project-map { height: 380px; } .project-panel { position: static; } }
+
+/* Homepage feature tiles */
+.feature-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.feature-tile { display: flex; flex-direction: column; gap: 6px; padding: 20px; background: var(--card-bg);
+  border: 1px solid var(--border-light); border-radius: var(--radius-card); color: var(--text-secondary); text-decoration: none; transition: border-color .15s; }
+.feature-tile:hover, .feature-tile:focus-visible { border-color: var(--institution-blue); color: var(--text-secondary); }
+.feature-tile strong { color: var(--deep-ink); font-size: 17px; }
+.feature-kicker { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--institution-blue); }
+
+.project-progress.financial span { background: var(--official-green); }

@@ -24,6 +24,7 @@ public class HomeController : Controller
 
         ViewBag.RegionCount = regions.Count();
         ViewBag.BudgetYear = DataConstants.BudgetYear;
+        ViewBag.StateExecution = budgetService.GetStateBudgetExecution(DataConstants.BudgetYear);
 
         return View(nationalBudget);
     }

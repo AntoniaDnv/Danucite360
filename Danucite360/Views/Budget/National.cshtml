@@ -1,91 +1,57 @@
 ﻿@model Danucite360.Services.Models.NationalBudgetServiceModel
 
 @{
-    ViewData["Title"] = "National Budget Overview";
+    ViewData["Title"] = "Държавен бюджет";
+    string Money(decimal v) => MoneyFormatter.FormatThousandEur(v);
+    string Width(decimal part, decimal max) => ((double)(max == 0 ? 0 : part / max) * 100).ToString("F1", System.Globalization.CultureInfo.InvariantCulture);
+    var streams = Model.RevenueBreakdown;
+    var maxStream = streams.Any() ? streams.Max(s => s.Amount) : 1m;
+    var exec = ViewBag.Execution as Danucite360.Services.Models.BudgetExecutionServiceModel;
+    var stateExec = ViewBag.StateExecution as Danucite360.Services.Models.StateBudgetExecutionServiceModel;
 }
 
 <section class="page-shell">
     <div class="page-header mb-4">
         <div>
             <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="status-badge status-official">✓ Official Data</span>
-                <span class="last-updated">Last updated: 28 May 2026</span>
+                <span class="status-badge status-official">Официален източник</span>
+                <span class="last-updated">Бюджетна година @Model.BudgetYear</span>
             </div>
-
-            <h1 class="section-title mb-2">National Budget Overview</h1>
-
-            <p class="section-subtitle mb-0">
-                See how much public money is collected, how much is spent,
-                and whether the budget shows a surplus or deficit.
-            </p>
+            <h1 class="section-title mb-2">Държавният бюджет накратко</h1>
+            <p class="section-subtitle mb-0">Колко пари планира да събере държавата, колко да похарчи и колко от това вече се е случило.</p>
         </div>
-
         <div class="page-actions">
-            <button class="btn btn-outline-secondary btn-sm" type="button">
-                Share
-            </button>
-            <button class="btn btn-outline-secondary btn-sm" type="button">
-                Export
-            </button>
+            <a class="btn btn-outline-secondary btn-sm" href="/open-data">Изтегли данните (CSV / JSON)</a>
         </div>
     </div>
 
     <div class="plain-summary mb-4">
-        <strong>What does this mean?</strong>
-        This overview compares national revenue, expenses, and budget balance for @Model.BudgetYear.
-        A negative balance means planned expenses and transfers are higher than revenue.
+        <strong>Какво означава това?</strong>
+        Бюджетът е планът на държавата за една година: колко пари ще събере (най-вече от данъци) и за какво ще ги похарчи.
+        Когато разходите са повече от приходите, има <strong>дефицит</strong> — разликата се покрива с нов дълг.
     </div>
 
-    <div class="filter-bar app-card mb-4">
-        <div class="app-card-body">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label small text-muted">Year</label>
-                    <select class="form-select">
-                        <option selected>@Model.BudgetYear</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label small text-muted">Data type</label>
-                    <select class="form-select">
-                        <option selected>All</option>
-                        <option>Official Data</option>
-                        <option>Demo Data</option>
-                    </select>
-                </div>
-
-                <div class="col-md-6 text-md-end">
-                    <span class="status-badge status-official">✓ Source referenced</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <h2 class="h5 mb-3">1. Планът за @Model.BudgetYear г.</h2>
     <div class="row g-4 mb-4">
         <div class="col-md-4">
             <div class="kpi-card">
-                <div class="kpi-label">Total Revenue</div>
-                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.Revenue)</div>
-                <div class="kpi-meta text-success">▲ Revenue, aid &amp; donations</div>
+                <div class="kpi-label">Планирани приходи</div>
+                <div class="kpi-value">@Money(Model.Revenue)</div>
+                <div class="kpi-meta">Данъци, такси, помощи и дарения</div>
             </div>
         </div>
-
         <div class="col-md-4">
             <div class="kpi-card">
-                <div class="kpi-label">Total Expenses</div>
-                <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.Expenses)</div>
-                <div class="kpi-meta">Planned expenditure &amp; transfers</div>
+                <div class="kpi-label">Планирани разходи</div>
+                <div class="kpi-value">@Money(Model.Expenses)</div>
+                <div class="kpi-meta">Разходи и трансфери</div>
             </div>
         </div>
-
         <div class="col-md-4">
             <div class="kpi-card">
-                <div class="kpi-label">Budget Balance</div>
-                <div class="kpi-value @(Model.Balance < 0 ? "text-danger" : "text-success")">
-                    @MoneyFormatter.FormatThousandEur(Model.Balance)
-                </div>
-                <div class="kpi-meta">@(Model.Balance < 0 ? "Planned deficit" : "Planned surplus")</div>
+                <div class="kpi-label">Планирано салдо</div>
+                <div class="kpi-value @(Model.Balance < 0 ? "text-danger" : "text-success")">@Money(Model.Balance)</div>
+                <div class="kpi-meta">@(Model.Balance < 0 ? "Дефицит — покрива се с дълг" : "Излишък")</div>
             </div>
         </div>
     </div>
@@ -96,121 +62,143 @@
                 <div class="app-card-body">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
-                            <h5 class="card-heading">Revenue vs Expenses vs Balance</h5>
-                            <p class="text-muted small mb-0">
-                                Loaded from the API using JavaScript fetch and Chart.js.
-                            </p>
+                            <h3 class="card-heading h6">Приходи, разходи и салдо</h3>
+                            <p class="text-muted small mb-0">Колко по-големи са планираните разходи от приходите.</p>
                         </div>
-                        <span class="status-badge status-official">✓ Official Data</span>
+                        <span class="status-badge status-official">Официален източник</span>
                     </div>
-
-                    <canvas id="nationalBudgetChart"></canvas>
+                    <canvas id="nationalBudgetChart" role="img" aria-label="Стълбовидна графика: приходи, разходи и салдо"></canvas>
                 </div>
             </div>
         </div>
-
         <div class="col-lg-5">
             <div class="app-card h-100">
                 <div class="app-card-body">
-                    <h5 class="card-heading">Budget relationship</h5>
-                    <p class="text-muted">
-                        Revenue shows how much money is expected to be collected.
-                        Expenses show planned spending. The balance shows the difference.
-                    </p>
-
-                    <div class="budget-equation">
-                        <div>
-                            <span>Revenue</span>
-                            <strong>@MoneyFormatter.FormatThousandEur(Model.Revenue)</strong>
-                        </div>
-
-                        <div>
-                            <span>Expenses</span>
-                            <strong>@MoneyFormatter.FormatThousandEur(Model.Expenses)</strong>
-                        </div>
-
-                        <div>
-                            <span>Balance</span>
-                            <strong class="@(Model.Balance < 0 ? "text-danger" : "text-success")">
-                                @MoneyFormatter.FormatThousandEur(Model.Balance)
-                            </strong>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <a class="fw-semibold text-decoration-none"
-                           asp-controller="Sources"
-                           asp-action="Index">
-                            Learn more about sources and methodology →
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4">
-        <div class="col-lg-7">
-            <div class="app-card h-100">
-                <div class="app-card-body">
-                    <h5 class="card-heading">Where does the money come from?</h5>
-                    <p class="text-muted small">
-                        Primary revenue streams in the @Model.BudgetYear draft budget, by share of total revenue.
-                    </p>
-
-                    @{
-                        var streams = Model.RevenueBreakdown;
-                        var maxStream = streams.Any() ? streams.Max(s => s.Amount) : 1m;
-                    }
-
+                    <h3 class="card-heading h6">Откъде идват парите?</h3>
+                    <p class="text-muted small">Основните приходи в проектобюджета.</p>
                     <div class="revenue-bars mt-3">
                         @foreach (var s in streams)
                         {
                             <div class="revenue-bar-row">
                                 <span class="revenue-bar-label">@s.CategoryName</span>
-                                <div class="revenue-bar-track">
-                                    <span style="width:@(((double)(s.Amount / maxStream) * 100).ToString("F1"))%"></span>
-                                </div>
-                                <span class="revenue-bar-value mono">@MoneyFormatter.FormatThousandEur(s.Amount)</span>
+                                <div class="revenue-bar-track"><span style="width:@Width(s.Amount, maxStream)%"></span></div>
+                                <span class="revenue-bar-value mono">@Money(s.Amount)</span>
                             </div>
                         }
                     </div>
-
-                    <div class="source-ref">Source: @Model.SourceTitle</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-5">
-            <div class="app-card h-100">
-                <div class="app-card-body">
-                    <h5 class="card-heading">Related source</h5>
-
-                    <div class="source-mini-card">
-                        <div class="source-icon">📄</div>
-                        <div>
-                            <strong>@Model.SourceTitle</strong>
-                            <p class="text-muted small mb-0">
-                                Manually seeded national values from the 2026 draft budget source.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="mt-4">
-                        <a class="btn btn-outline-primary"
-                           asp-controller="Sources"
-                           asp-action="Index">
-                            View all sources
-                        </a>
-                    </div>
+                    <div class="source-ref">Източник: @Model.SourceTitle — стойностите са въведени ръчно от документа.</div>
                 </div>
             </div>
         </div>
     </div>
 
-    @{
-        var exec = ViewBag.Execution as Danucite360.Services.Models.BudgetExecutionServiceModel;
+    @if (stateExec != null)
+    {
+        var maxRev = stateExec.RevenueBreakdown.Any() ? stateExec.RevenueBreakdown.Max(x => x.Amount) : 1m;
+        var maxExp = stateExec.ExpenditureBreakdown.Any() ? stateExec.ExpenditureBreakdown.Max(x => x.Amount) : 1m;
+        var revPct = Model.Revenue == 0 ? 0 : stateExec.Revenue / Model.Revenue * 100;
+        var expPct = Model.Expenses == 0 ? 0 : stateExec.Expenditure / Model.Expenses * 100;
+        const int monthsElapsed = 4;
+        var timePct = monthsElapsed / 12m * 100;
+
+        <h2 class="h5 mt-5 mb-3" id="execution">2. Какво реално се е случило досега</h2>
+        <div class="app-card">
+            <div class="app-card-body">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                    <div>
+                        <h3 class="card-heading h6 mb-1">Изпълнение на държавния бюджет — отчетен период: @stateExec.Period</h3>
+                        <p class="text-muted small mb-0">Натрупани стойности от началото на годината, не годишни суми.</p>
+                    </div>
+                    <span class="status-badge status-official">Отчет · @stateExec.Period</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle execution-table mb-3">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col" class="text-end">Годишен план</th>
+                                <th scope="col" class="text-end">Изпълнено досега</th>
+                                <th scope="col" style="min-width:220px">Изпълнение спрямо плана</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">Приходи</th>
+                                <td class="text-end num">@Money(Model.Revenue)</td>
+                                <td class="text-end num">@Money(stateExec.Revenue)</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" role="progressbar" aria-label="Изпълнение на приходите" aria-valuenow="@((int)revPct)" aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar bg-success" style="width:@Width(revPct, 100)%"></div>
+                                        </div>
+                                        <strong class="num">@MoneyFormatter.FormatPercent(revPct)</strong>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Разходи</th>
+                                <td class="text-end num">@Money(Model.Expenses)</td>
+                                <td class="text-end num">@Money(stateExec.Expenditure)</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="progress flex-grow-1" role="progressbar" aria-label="Изпълнение на разходите" aria-valuenow="@((int)expPct)" aria-valuemin="0" aria-valuemax="100">
+                                            <div class="progress-bar bg-primary" style="width:@Width(expPct, 100)%"></div>
+                                        </div>
+                                        <strong class="num">@MoneyFormatter.FormatPercent(expPct)</strong>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Салдо</th>
+                                <td class="text-end num">@Money(Model.Balance)</td>
+                                <td class="text-end num text-danger">@Money(stateExec.Balance)</td>
+                                <td class="small text-muted">Дефицитът се финансира с нов дълг</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="plain-summary mb-3">
+                    <strong>Как да го четем?</strong>
+                    Изминали са @monthsElapsed от 12 месеца (@MoneyFormatter.FormatPercent(timePct, 0) от годината). Ако процентът на изпълнение е
+                    под този дял, парите се събират или харчат по-бавно от равномерния темп. Сравнението е ориентировъчно:
+                    и планът, и отчетът са за обхвата на държавния бюджет, но планът е от проектозакона.
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <h4 class="card-heading" style="font-size:15px;">Приходи по източник (досега)</h4>
+                        <div class="revenue-bars mt-2">
+                            @foreach (var r in stateExec.RevenueBreakdown)
+                            {
+                                <div class="revenue-bar-row">
+                                    <span class="revenue-bar-label">@r.CategoryName</span>
+                                    <div class="revenue-bar-track"><span style="width:@Width(r.Amount, maxRev)%"></span></div>
+                                    <span class="revenue-bar-value mono">@Money(r.Amount) · @MoneyFormatter.FormatPercent(r.Percentage)</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <h4 class="card-heading" style="font-size:15px;">Разходи по вид (досега)</h4>
+                        <div class="revenue-bars mt-2">
+                            @foreach (var e in stateExec.ExpenditureBreakdown)
+                            {
+                                <div class="revenue-bar-row">
+                                    <span class="revenue-bar-label">@e.CategoryName</span>
+                                    <div class="revenue-bar-track"><span class="alt" style="width:@Width(e.Amount, maxExp)%"></span></div>
+                                    <span class="revenue-bar-value mono">@Money(e.Amount) · @MoneyFormatter.FormatPercent(e.Percentage)</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="source-ref">Източник: @stateExec.SourceTitle</div>
+            </div>
+        </div>
     }
+
     @if (exec != null)
     {
         var execLabels = System.Text.Json.JsonSerializer.Serialize(exec.Months.Select(m => m.Month));
@@ -220,139 +208,61 @@
             <div class="app-card-body">
                 <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-1">
                     <div>
-                        <h5 class="card-heading mb-1">@exec.BudgetYear Budget Execution</h5>
+                        <h3 class="card-heading h6 mb-1">По-широката картина: Консолидирана фискална програма</h3>
                         <p class="text-muted small mb-0">
-                            Actual cumulative execution under the <strong>Consolidated Fiscal Programme</strong> —
-                            broader in scope than the State Budget Law plan above (it also covers municipalities,
-                            social funds and EU funds).
+                            Включва и общините, осигурителните фондове и средствата от ЕС, затова сумите са по-големи
+                            и <strong>не се сравняват</strong> директно с плана на държавния бюджет по-горе.
                         </p>
                     </div>
-                    <span class="status-badge status-draft">Actuals · @exec.LatestMonth</span>
-                </div>
-
-                <div class="row g-4 my-1">
-                    <div class="col-6 col-lg-3">
-                        <div class="kpi-card">
-                            <div class="kpi-label">Revenue (YTD)</div>
-                            <div class="kpi-value">@MoneyFormatter.FormatThousandEur(exec.LatestRevenue)</div>
-                            <div class="kpi-meta">Collected to @exec.LatestMonth</div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-lg-3">
-                        <div class="kpi-card">
-                            <div class="kpi-label">Spending (YTD)</div>
-                            <div class="kpi-value">@MoneyFormatter.FormatThousandEur(exec.LatestExpenditure)</div>
-                            <div class="kpi-meta">Spent to @exec.LatestMonth</div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-lg-3">
-                        <div class="kpi-card">
-                            <div class="kpi-label">Balance (YTD)</div>
-                            <div class="kpi-value text-danger">@MoneyFormatter.FormatThousandEur(exec.LatestBalance)</div>
-                            <div class="kpi-meta">
-                                @(exec.LatestBalancePercentGdp.HasValue ? exec.LatestBalancePercentGdp.Value.ToString("N1") + "% of GDP" : "Deficit")
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-lg-3">
-                        <div class="kpi-card">
-                            <div class="kpi-label">Context</div>
-                            <div class="kpi-value" style="font-size:18px;line-height:1.3;">Highest April deficit in 15 years</div>
-                            <div class="kpi-meta">Per the Fiscal Council</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="region-chart">
-                    <canvas id="executionChart"
-                            data-labels='@Html.Raw(execLabels)'
-                            data-values='@Html.Raw(execValues)'></canvas>
-                </div>
-                <div class="source-ref">Source: @exec.SourceTitle</div>
-            </div>
-        </div>
-    }
-    @{
-        var stateExec = ViewBag.StateExecution as Danucite360.Services.Models.StateBudgetExecutionServiceModel;
-    }
-    @if (stateExec != null)
-    {
-        var maxRev = stateExec.RevenueBreakdown.Any() ? stateExec.RevenueBreakdown.Max(x => x.Amount) : 1m;
-        var maxExp = stateExec.ExpenditureBreakdown.Any() ? stateExec.ExpenditureBreakdown.Max(x => x.Amount) : 1m;
-
-        <div class="app-card mt-4">
-            <div class="app-card-body">
-                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-1">
-                    <div>
-                        <h5 class="card-heading mb-1">State Budget — Where the Money Goes</h5>
-                        <p class="text-muted small mb-0">
-                            Actual state budget execution to <strong>@stateExec.Period</strong>, by economic type.
-                        </p>
-                    </div>
-                    <span class="status-badge status-draft">Actuals · @stateExec.Period</span>
+                    <span class="status-badge status-official">Отчет · @exec.LatestMonth</span>
                 </div>
 
                 <div class="row g-4 my-1">
                     <div class="col-6 col-lg-4">
                         <div class="kpi-card">
-                            <div class="kpi-label">Revenue (YTD)</div>
-                            <div class="kpi-value">@MoneyFormatter.FormatThousandEur(stateExec.Revenue)</div>
-                            <div class="kpi-meta">Collected to @stateExec.Period</div>
+                            <div class="kpi-label">Приходи досега</div>
+                            <div class="kpi-value">@Money(exec.LatestRevenue)</div>
+                            <div class="kpi-meta">Към @exec.LatestMonth</div>
                         </div>
                     </div>
                     <div class="col-6 col-lg-4">
                         <div class="kpi-card">
-                            <div class="kpi-label">Expenditure (YTD)</div>
-                            <div class="kpi-value">@MoneyFormatter.FormatThousandEur(stateExec.Expenditure)</div>
-                            <div class="kpi-meta">Spent &amp; transferred</div>
+                            <div class="kpi-label">Разходи досега</div>
+                            <div class="kpi-value">@Money(exec.LatestExpenditure)</div>
+                            <div class="kpi-meta">Към @exec.LatestMonth</div>
                         </div>
                     </div>
                     <div class="col-12 col-lg-4">
                         <div class="kpi-card">
-                            <div class="kpi-label">Balance (YTD)</div>
-                            <div class="kpi-value text-danger">@MoneyFormatter.FormatThousandEur(stateExec.Balance)</div>
-                            <div class="kpi-meta">Deficit, financed by debt issuance</div>
+                            <div class="kpi-label">Салдо досега</div>
+                            <div class="kpi-value text-danger">@Money(exec.LatestBalance)</div>
+                            <div class="kpi-meta">@(exec.LatestBalancePercentGdp.HasValue ? MoneyFormatter.FormatPercent(exec.LatestBalancePercentGdp.Value) + " от БВП" : "Дефицит")</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row g-4 mt-1">
-                    <div class="col-lg-6">
-                        <h6 class="card-heading" style="font-size:15px;">Revenue by source</h6>
-                        <div class="revenue-bars mt-2">
-                            @foreach (var r in stateExec.RevenueBreakdown)
-                            {
-                                <div class="revenue-bar-row">
-                                    <span class="revenue-bar-label">@r.CategoryName</span>
-                                    <div class="revenue-bar-track"><span style="width:@(((double)(r.Amount / maxRev) * 100).ToString("F1"))%"></span></div>
-                                    <span class="revenue-bar-value mono">@MoneyFormatter.FormatThousandEur(r.Amount) · @r.Percentage.ToString("F1")%</span>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <h6 class="card-heading" style="font-size:15px;">Expenditure by economic type</h6>
-                        <div class="revenue-bars mt-2">
-                            @foreach (var e in stateExec.ExpenditureBreakdown)
-                            {
-                                <div class="revenue-bar-row">
-                                    <span class="revenue-bar-label">@e.CategoryName</span>
-                                    <div class="revenue-bar-track"><span class="alt" style="width:@(((double)(e.Amount / maxExp) * 100).ToString("F1"))%"></span></div>
-                                    <span class="revenue-bar-value mono">@MoneyFormatter.FormatThousandEur(e.Amount) · @e.Percentage.ToString("F1")%</span>
-                                </div>
-                            }
-                        </div>
-                    </div>
+                <h4 class="card-heading mt-2" style="font-size:15px;">Как се натрупват приходите месец по месец</h4>
+                <div class="region-chart">
+                    <canvas id="executionChart" role="img" aria-label="Линейна графика на натрупаните приходи"
+                            data-labels='@Html.Raw(execLabels)'
+                            data-values='@Html.Raw(execValues)'></canvas>
                 </div>
-
-                <div class="source-ref">Source: @stateExec.SourceTitle</div>
+                <div class="source-ref">Източник: @exec.SourceTitle</div>
             </div>
         </div>
     }
+
+    <div class="deep-dive mt-4">
+        <div>
+            <h4 class="mb-1">Откъде са тези числа?</h4>
+            <p class="mb-0">Вижте документите-източници, методологията и кои стойности са официални и кои — демонстрационни.</p>
+        </div>
+        <a class="btn btn-primary" asp-controller="Sources" asp-action="Index">Източници и методология</a>
+    </div>
 </section>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="~/js/chart-theme.js" asp-append-version="true"></script>
     <script src="~/js/national-budget.js" asp-append-version="true"></script>
 }

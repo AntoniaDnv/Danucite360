@@ -19,9 +19,15 @@ public class ProjectListItemServiceModel
     public int CompletionPercent { get; set; }
     public decimal Budget { get; set; }
     public string Unit { get; set; } = "thousand EUR";
-    public string RegionName { get; set; } = "National";
+    public string RegionName { get; set; } = "Национален обхват";
     public string? RegionSlug { get; set; }
     public string PrimaryFundingSource { get; set; } = string.Empty;
+    public decimal? Spent { get; set; } // thousand EUR paid out so far
+    public string? City { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+    public string Description { get; set; } = string.Empty;
+    public bool IsDemo { get; set; }
 }
 
 public class ProjectFundingShareServiceModel
@@ -42,9 +48,12 @@ public class ProjectDetailServiceModel
     public decimal Budget { get; set; }
     public string Unit { get; set; } = "thousand EUR";
     public int BudgetYear { get; set; }
-    public string RegionName { get; set; } = "National";
+    public string RegionName { get; set; } = "Национален обхват";
     public string? RegionSlug { get; set; }
     public string SourceTitle { get; set; } = string.Empty;
+    public decimal? Spent { get; set; }
+    public string? City { get; set; }
+    public bool IsDemo { get; set; }
     public IReadOnlyList<ProjectFundingShareServiceModel> FundingShares { get; set; }
         = new List<ProjectFundingShareServiceModel>();
     public IReadOnlyList<ProjectListItemServiceModel> RelatedProjects { get; set; }

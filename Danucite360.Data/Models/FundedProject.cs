@@ -41,6 +41,17 @@ public class FundedProject
     [MaxLength(30)]
     public string Unit { get; set; } = "thousand EUR";
 
+    // Amount actually paid out so far, thousand EUR (financial progress; CompletionPercent is physical progress).
+    public decimal? Spent { get; set; }
+
+    // Approximate city-level location for the map (never an exact site address).
+    [MaxLength(100)]
+    public string? City { get; set; }
+
+    public double? Latitude { get; set; }
+
+    public double? Longitude { get; set; }
+
     public int BudgetYear { get; set; }
 
     public bool IsDemo { get; set; } = true;

@@ -27,6 +27,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<ProjectFunding> ProjectFundings { get; set; } = null!;
 
+    public DbSet<BudgetMeasure> BudgetMeasures { get; set; } = null!;
+
     public DbSet<DebtSnapshot> DebtSnapshots { get; set; } = null!;
 
     public DbSet<DebtBreakdownItem> DebtBreakdownItems { get; set; } = null!;
@@ -78,6 +80,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasPrecision(18, 2);
 
         builder.Entity<FundedProject>()
+            .Property(p => p.Spent)
+            .HasPrecision(18, 2);
+
+        builder.Entity<FundedProject>()
             .HasOne(p => p.Region)
             .WithMany()
             .HasForeignKey(p => p.RegionId)
@@ -88,6 +94,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany()
             .HasForeignKey(p => p.BudgetSourceId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<BudgetMeasure>()
+            .HasIndex(m => m.Slug)
+            .IsUnique();
+
+        builder.Entity<BudgetMeasure>()
+            .Property(m => m.FiscalImpact)
+            .HasPrecision(18, 2);
 
         builder.Entity<ProjectFunding>()
             .Property(f => f.Amount)

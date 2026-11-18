@@ -1,95 +1,41 @@
-// Home / National Overview page charts.
-document.addEventListener("DOMContentLoaded", () => {
-    const C = window.DanuciteCharts;
-    renderSnapshot();
-    renderSpendingDonut();
+// Home: "Къде отиват" as a ranked list with thin bars (a share reads better as a list than a donut).
+document.addEventListener("DOMContentLoaded", async () => {
+    const list = document.getElementById("spendingList");
+    if (!list) return;
 
-    // Hero snapshot: Revenue vs Spending vs Balance (official national data).
-    async function renderSnapshot() {
-        const canvas = document.getElementById("budgetSnapshotChart");
-        if (!canvas) return;
-
-        const res = await fetch("/api/dashboard/national");
-        if (!res.ok) {
-            console.error("Failed to load national snapshot data.");
-            return;
-        }
-        const data = await res.json();
-
-        new Chart(canvas, {
-            type: "bar",
-            data: {
-                labels: data.labels,
-                datasets: [{
-                    data: data.values,
-                    backgroundColor: [C.palette.teal, C.palette.navy, C.palette.amber],
-                    borderRadius: 4,
-                    borderSkipped: false,
-                    maxBarThickness: 48
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => C.formatBillionsEur(ctx.parsed.y)
-                        }
-                    }
-                },
-                scales: {
-                    x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-                    y: {
-                        grid: { color: C.palette.border },
-                        ticks: { callback: v => C.formatBillionsEur(v) }
-                    }
-                }
-            }
-        });
+    const res = await fetch("/api/dashboard/categories");
+    if (!res.ok) {
+        list.textContent = "Данните не можаха да се заредят.";
+        return;
     }
 
-    // "Where does it go?" — spending categories (demo regional distribution).
-    async function renderSpendingDonut() {
-        const canvas = document.getElementById("spendingDonut");
-        if (!canvas) return;
+    const data = await res.json();
+    const total = data.values.reduce((a, b) => a + Number(b), 0);
+    const rows = data.labels
+        .map((label, i) => ({ label, value: Number(data.values[i]) }))
+        .sort((a, b) => b.value - a.value);
+    const max = rows.length ? rows[0].value : 1;
 
-        const res = await fetch("/api/dashboard/categories");
-        if (!res.ok) {
-            console.error("Failed to load category spending data.");
-            return;
-        }
-        const data = await res.json();
-        const total = data.values.reduce((a, b) => a + Number(b), 0);
+    rows.forEach((r, i) => {
+        const row = document.createElement("div");
+        row.className = "revenue-bar-row";
 
-        new Chart(canvas, {
-            type: "doughnut",
-            data: {
-                labels: data.labels,
-                datasets: [{
-                    data: data.values,
-                    backgroundColor: C.series,
-                    borderColor: "#ffffff",
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: "62%",
-                plugins: {
-                    legend: { position: "right" },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => {
-                                const pct = total ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
-                                return `${ctx.label}: ${pct}%`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
+        const label = document.createElement("span");
+        label.className = "revenue-bar-label";
+        label.textContent = r.label;
+
+        const track = document.createElement("div");
+        track.className = "revenue-bar-track";
+        const fill = document.createElement("span");
+        if (i > 0) fill.className = "alt"; // only the largest share carries the accent
+        fill.style.width = (r.value / max * 100).toFixed(1) + "%";
+        track.append(fill);
+
+        const value = document.createElement("span");
+        value.className = "revenue-bar-value mono";
+        value.textContent = total ? (r.value / total * 100).toLocaleString("bg-BG", { maximumFractionDigits: 1 }) + "%" : "—";
+
+        row.append(label, track, value);
+        list.append(row);
+    });
 });

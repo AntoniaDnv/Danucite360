@@ -1,7 +1,7 @@
-@model Danucite360.Services.Models.FundingOverviewServiceModel
+﻿@model Danucite360.Services.Models.FundingOverviewServiceModel
 
 @{
-    ViewData["Title"] = "Funding Sources & Programs";
+    ViewData["Title"] = "Източници на финансиране";
     var topSource = Model.AllocationBySource.FirstOrDefault();
     var labels = System.Text.Json.JsonSerializer.Serialize(Model.AllocationBySource.Select(a => a.Name));
     var values = System.Text.Json.JsonSerializer.Serialize(Model.AllocationBySource.Select(a => a.Amount));
@@ -9,16 +9,16 @@
     // Lean scope: operational programs / procedures are a small demo list.
     var programs = new (string Name, string Period, decimal Allocation, int Spent, string Status)[]
     {
-        ("Regions in Growth 2021–27", "Operational Programme", 1_380_000m, 38, "Active"),
-        ("Low-Carbon Economy Transition", "Recovery & Resilience", 1_290_000m, 21, "Active"),
-        ("Hemus Highway Extension", "National Programme", 1_140_000m, 64, "Active")
+        ("Пример: регионална програма 2021–2027", "Оперативна програма", 1_380_000m, 38, "Примерна"),
+        ("Пример: преход към нисковъглеродна икономика", "План за възстановяване", 1_290_000m, 21, "Примерна"),
+        ("Пример: национална пътна програма", "Национална програма", 1_140_000m, 64, "Примерна")
     };
 
     var procedures = new (string Code, string Fund, decimal Budget, string Deadline)[]
     {
-        ("BG16RFOP002-2.089", "EU Cohesion Fund", 230_000m, "15 Oct 2026"),
-        ("BG-RRP-4.025", "EU Recovery Plan", 180_000m, "30 Nov 2026"),
-        ("BG05SFPR002-2.003", "National Budget", 95_000m, "20 Dec 2026")
+        ("ДЕМО-001", "Кохезионен фонд на ЕС", 230_000m, "15.10.2026"),
+        ("ДЕМО-002", "План за възстановяване и устойчивост", 180_000m, "30.11.2026"),
+        ("ДЕМО-003", "Държавен бюджет", 95_000m, "20.12.2026")
     };
 }
 
@@ -26,13 +26,12 @@
     <div class="page-header mb-3">
         <div>
             <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="status-badge status-demo">⚠ Demo Data</span>
-                <span class="last-updated">Budget year @Model.BudgetYear</span>
+                <span class="status-badge status-demo">Демо данни</span>
+                <span class="last-updated">Бюджет @Model.BudgetYear</span>
             </div>
-            <h1 class="section-title mb-2">Funding Sources &amp; Programs</h1>
+            <h1 class="section-title mb-2">Източници на финансиране</h1>
             <p class="section-subtitle mb-0">
-                Comprehensive analysis of capital allocation for public infrastructure projects, aggregating
-                national budgets, municipal co-financing, and European Union mechanisms.
+                Откъде идват парите за публичните проекти: държавен бюджет, общинско съфинансиране и европейски фондове.
             </p>
         </div>
     </div>
@@ -41,11 +40,11 @@
         <div class="col-lg-7">
             <div class="app-card h-100">
                 <div class="app-card-body d-flex flex-column">
-                    <h5 class="card-heading">National Capital Allocation Share (@Model.BudgetYear)</h5>
+                    <h2 class="card-heading h5">Дял на всеки източник (@Model.BudgetYear)</h2>
                     <div class="donut-wrap flex-grow-1">
                         <canvas id="fundingDonut" data-labels='@Html.Raw(labels)' data-values='@Html.Raw(values)'></canvas>
                     </div>
-                    <div class="source-ref">Source: Danucite360 demo distribution</div>
+                    <div class="source-ref demo">Източник: демонстрационни проекти в базата данни</div>
                 </div>
             </div>
         </div>
@@ -53,23 +52,23 @@
             <div class="row g-4">
                 <div class="col-12">
                     <div class="kpi-card">
-                        <div class="kpi-label">Key Allocation Share</div>
-                        <div class="kpi-value">@(topSource?.Percent.ToString("F1") ?? "0")%</div>
-                        <div class="kpi-meta">@(topSource?.Name ?? "—") leads funding</div>
+                        <div class="kpi-label">Най-голям източник</div>
+                        <div class="kpi-value">@MoneyFormatter.FormatPercent(topSource?.Percent ?? 0)</div>
+                        <div class="kpi-meta">@Danucite360.Common.Constants.Labels.ToBg(topSource?.Name ?? "—")</div>
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="kpi-card">
-                        <div class="kpi-label">Total Allocated</div>
+                        <div class="kpi-label">Общо отпуснати</div>
                         <div class="kpi-value">@MoneyFormatter.FormatThousandEur(Model.TotalAllocated)</div>
-                        <div class="kpi-meta">Across all project funding shares</div>
+                        <div class="kpi-meta">По всички демо проекти</div>
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="kpi-card">
-                        <div class="kpi-label">Active Open Procedures</div>
+                        <div class="kpi-label">Проекти в подготовка</div>
                         <div class="kpi-value">@Model.OpenProcedures</div>
-                        <div class="kpi-meta">Projects in planning</div>
+                        <div class="kpi-meta">Още не са започнали</div>
                     </div>
                 </div>
             </div>
@@ -78,7 +77,7 @@
 
     <div class="app-card mb-4">
         <div class="app-card-body">
-            <h5 class="card-heading">Major Operational Programs</h5>
+            <h2 class="card-heading h5">Програми (илюстративни примери)</h2>
             <div class="row g-4 mt-1">
                 @foreach (var prog in programs)
                 {
@@ -87,10 +86,10 @@
                             <span class="status-badge status-ongoing mb-2">@prog.Status</span>
                             <h6>@prog.Name</h6>
                             <p class="text-muted small">@prog.Period</p>
-                            <div class="kpi-meta mb-1">Allocation</div>
+                            <div class="kpi-meta mb-1">Бюджет</div>
                             <div class="mono fw-bold mb-2">@MoneyFormatter.FormatThousandEur(prog.Allocation)</div>
                             <div class="project-progress"><span style="width:@prog.Spent%"></span></div>
-                            <div class="kpi-meta mt-1">@prog.Spent% committed</div>
+                            <div class="kpi-meta mt-1">@prog.Spent% договорени</div>
                         </div>
                     </div>
                 }
@@ -100,15 +99,15 @@
 
     <div class="app-card">
         <div class="app-card-body">
-            <h5 class="card-heading">Open Application Procedures</h5>
+            <h2 class="card-heading h5">Процедури за кандидатстване (илюстративни примери)</h2>
             <div class="table-responsive">
                 <table class="table align-middle mb-0">
                     <thead>
                         <tr>
-                            <th>Procedure</th>
-                            <th>Fund</th>
-                            <th class="num">Available Budget</th>
-                            <th class="num">Deadline</th>
+                            <th>Процедура</th>
+                            <th>Фонд</th>
+                            <th class="num">Наличен бюджет</th>
+                            <th class="num">Краен срок</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -129,7 +128,7 @@
 </section>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="~/js/chart-theme.js" asp-append-version="true"></script>
     <script src="~/js/funding.js" asp-append-version="true"></script>
 }

@@ -1,150 +1,166 @@
 @model Danucite360.Services.Models.NationalBudgetServiceModel
 
 @{
-    ViewData["Title"] = "Overview";
+    ViewData["Title"] = "Начало";
 
-    // Values are stored in "thousand EUR"; present citizen-friendly billions of EUR.
-    string Bn(decimal v) => "€" + (v / 1_000_000m).ToString("N2") + "B";
-
-    // Revenue streams come from the seeded national revenue records (data-driven).
     var revenueStreams = Model.RevenueBreakdown;
     var maxStream = revenueStreams.Any() ? revenueStreams.Max(s => s.Amount) : 1m;
+    string Money(decimal v) => MoneyFormatter.FormatThousandEur(v);
+    string Pct(decimal part, decimal whole) => (whole == 0 ? 0 : (double)(part / whole) * 100).ToString("F1", System.Globalization.CultureInfo.InvariantCulture);
+
+    var exec = ViewBag.StateExecution as Danucite360.Services.Models.StateBudgetExecutionServiceModel;
+    const int monthsElapsed = 4;
+    var timePct = (monthsElapsed / 12.0 * 100).ToString("F1", System.Globalization.CultureInfo.InvariantCulture);
 }
 
 <section class="page-shell overview-page">
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
-        <span class="status-badge status-demo">⚠ Demo Prototype</span>
-        <span class="last-updated">Last updated: 28 May @Model.BudgetYear</span>
-    </div>
-
     <div class="overview-hero">
         <div class="overview-hero-copy">
-            <span class="hero-eyebrow">Public Finance Transparency Initiative</span>
+            <span class="hero-eyebrow">Публичните финанси на България, разбираемо</span>
             <h1 class="hero-title">
-                Understand Bulgaria’s <span class="hero-accent">public money</span>.
+                Не просто колко пари са отпуснати, а <span class="hero-accent">за какво, къде и как</span> се използват
             </h1>
             <p class="hero-subtitle">
-                Danucite360 turns the public budget into clear dashboards. Explore how taxes are
-                collected and where public funds are invested — with objective, analytical precision.
+                Danucite360 превръща бюджетните таблици и PDF документи в ясни страници, карта на проектите и отворени данни.
+                До всяко число стои откъде е и дали е официално.
             </p>
             <div class="d-flex gap-3 flex-wrap mt-4">
-                <a class="btn btn-primary btn-lg" asp-controller="Budget" asp-action="National">Explore</a>
-                <a class="btn btn-outline-secondary btn-lg" asp-controller="Map" asp-action="Index">Compare Regions</a>
+                <a class="btn btn-primary btn-lg" asp-controller="Budget" asp-action="National">Разгледай бюджета</a>
+                <a class="btn btn-outline-secondary btn-lg" href="/measures">Кои мерки ме засягат</a>
             </div>
         </div>
 
-        <div class="app-card overview-snapshot">
-            <div class="app-card-body">
-                <div class="d-flex align-items-center justify-content-between mb-1">
-                    <h6 class="card-heading mb-0">@Model.BudgetYear Budget Snapshot</h6>
-                    <span class="chip-muted">Official data</span>
+        @if (exec != null)
+        {
+            <a class="app-card ledger text-reset text-decoration-none" asp-controller="Budget" asp-action="National" asp-fragment="execution" aria-label="Изпълнение на държавния бюджет — подробно">
+                <div class="ledger-head">
+                    <h2 class="ledger-title">Планирано срещу случило се</h2>
+                    <span class="ledger-period">@exec.Period</span>
                 </div>
-                <div class="snapshot-headline mono @(Model.Balance < 0 ? "text-danger" : "text-success")">
-                    @Bn(Model.Balance)
+
+                <div class="ledger-row">
+                    <div class="ledger-row-top"><span>Събрани приходи</span><strong>@Money(exec.Revenue)</strong></div>
+                    <div class="ledger-track">
+                        <div class="ledger-fill" style="width:@Pct(exec.Revenue, Model.Revenue)%"></div>
+                        <div class="ledger-time" style="left:@timePct%"></div>
+                    </div>
+                    <div class="ledger-row-meta"><span>@MoneyFormatter.FormatPercent(Model.Revenue == 0 ? 0 : exec.Revenue / Model.Revenue * 100) от плана</span><span>план @Money(Model.Revenue)</span></div>
                 </div>
-                <div class="kpi-meta mb-2">Projected budget balance</div>
-                <div class="snapshot-chart">
-                    <canvas id="budgetSnapshotChart"></canvas>
+
+                <div class="ledger-row">
+                    <div class="ledger-row-top"><span>Похарчени</span><strong>@Money(exec.Expenditure)</strong></div>
+                    <div class="ledger-track">
+                        <div class="ledger-fill spend" style="width:@Pct(exec.Expenditure, Model.Expenses)%"></div>
+                        <div class="ledger-time" style="left:@timePct%"></div>
+                    </div>
+                    <div class="ledger-row-meta"><span>@MoneyFormatter.FormatPercent(Model.Expenses == 0 ? 0 : exec.Expenditure / Model.Expenses * 100) от плана</span><span>план @Money(Model.Expenses)</span></div>
                 </div>
-            </div>
-        </div>
+
+                <div class="ledger-legend"><i aria-hidden="true"></i> Изминали @monthsElapsed от 12 месеца</div>
+
+                <div class="ledger-balance"><span>Дефицит досега</span><strong>@Money(exec.Balance)</strong></div>
+
+                <div class="source-ref">МФ, отчет за изпълнението на държавния бюджет · @exec.Period · официални</div>
+            </a>
+        }
     </div>
 
     <div class="row g-4 my-1">
-        <div class="col-6 col-lg-3">
+        <div class="col-md-4">
             <div class="kpi-card">
-                <div class="kpi-label">Total Revenue</div>
-                <div class="kpi-value">@Bn(Model.Revenue)</div>
-                <div class="kpi-meta text-success">▲ Revenue, aid &amp; donations</div>
+                <div class="kpi-label">Планирани приходи за @Model.BudgetYear</div>
+                <div class="kpi-value">@Money(Model.Revenue)</div>
+                <div class="kpi-meta">Данъци, такси, помощи и дарения</div>
             </div>
         </div>
-        <div class="col-6 col-lg-3">
+        <div class="col-md-4">
             <div class="kpi-card">
-                <div class="kpi-label">Total Spending</div>
-                <div class="kpi-value">@Bn(Model.Expenses)</div>
-                <div class="kpi-meta">Planned expenditure</div>
+                <div class="kpi-label">Планирани разходи за @Model.BudgetYear</div>
+                <div class="kpi-value">@Money(Model.Expenses)</div>
+                <div class="kpi-meta">Всички разходи и трансфери</div>
             </div>
         </div>
-        <div class="col-6 col-lg-3">
+        <div class="col-md-4">
             <div class="kpi-card">
-                <div class="kpi-label">Budget Balance</div>
-                <div class="kpi-value @(Model.Balance < 0 ? "text-danger" : "text-success")">@Bn(Model.Balance)</div>
-                <div class="kpi-meta">@(Model.Balance < 0 ? "Planned deficit" : "Planned surplus")</div>
-            </div>
-        </div>
-        <div class="col-6 col-lg-3">
-            <div class="kpi-card">
-                <div class="kpi-label">Fiscal Year</div>
-                <div class="kpi-value">@Model.BudgetYear</div>
-                <div class="kpi-meta">Draft state budget</div>
+                <div class="kpi-label">Планирано салдо</div>
+                <div class="kpi-value @(Model.Balance < 0 ? "text-danger" : "text-success")">@Money(Model.Balance)</div>
+                <div class="kpi-meta">@(Model.Balance < 0 ? "Държавата планира да харчи повече, отколкото събира" : "Държавата планира да събере повече, отколкото харчи")</div>
             </div>
         </div>
     </div>
 
-    <div class="row g-4 mt-1">
-        <div class="col-lg-6">
-            <div class="app-card h-100">
-                <div class="app-card-body">
-                    <h5 class="card-heading">Where does the money come from?</h5>
-                    <p class="text-muted small">
-                        A breakdown of primary revenue streams, highlighting tax collection across the
-                        @Model.BudgetYear draft budget.
-                    </p>
+    <h2 class="h5 mt-5 mb-3">Какво можете да направите тук</h2>
+    <nav class="contents" aria-label="Съдържание">
+        <a asp-controller="Budget" asp-action="National">
+            <span class="n">01</span>
+            <span><strong>Откъде идват и къде отиват парите</strong>Приходи и разходи по проектобюджета, обяснени на разбираем език</span>
+            <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a href="/projects/map">
+            <span class="n">02</span>
+            <span><strong>Какво се строи близо до мен</strong>Карта на проектите с бюджет, изплатени суми и напредък</span>
+            <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a href="/measures">
+            <span class="n">03</span>
+            <span><strong>Кои нови мерки ме засягат</strong>Изберете „Родител“, „Шофьор“ или „Пенсионер“ и вижте какво се променя</span>
+            <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a asp-controller="Budget" asp-action="National" asp-fragment="execution">
+            <span class="n">04</span>
+            <span><strong>Колко от плана вече е изпълнено</strong>Планирано срещу реално събрано и похарчено към последния отчет</span>
+            <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a href="/open-data">
+            <span class="n">05</span>
+            <span><strong>Не снимки на таблици, а отворени данни</strong>CSV за Excel и JSON API за журналисти и разработчици</span>
+            <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a asp-controller="Sources" asp-action="Index">
+            <span class="n">06</span>
+            <span><strong>Откъде са числата</strong>Документите-източници и кое е официално и кое демонстрационно</span>
+            <span class="arrow" aria-hidden="true">→</span>
+        </a>
+    </nav>
 
-                    <div class="revenue-bars mt-3">
+    <div class="row g-4 mt-4">
+        <div class="col-lg-7">
+            <div class="app-card h-100">
+                <div class="app-card-body d-flex flex-column h-100">
+                    <h2 class="card-heading h5">Откъде идват парите</h2>
+                    <p class="text-muted small">Най-голям дял има ДДС — данъкът, който плащаме при всяка покупка.</p>
+                    <div class="revenue-bars mt-2">
                         @foreach (var s in revenueStreams)
                         {
                             <div class="revenue-bar-row">
                                 <span class="revenue-bar-label">@s.CategoryName</span>
-                                <div class="revenue-bar-track">
-                                    <span style="width:@(((double)(s.Amount / maxStream) * 100).ToString("F1"))%"></span>
-                                </div>
-                                <span class="revenue-bar-value mono">@Bn(s.Amount)</span>
+                                <div class="revenue-bar-track"><span style="width:@Pct(s.Amount, maxStream)%"></span></div>
+                                <span class="revenue-bar-value mono">@Money(s.Amount)</span>
                             </div>
                         }
                     </div>
-
-                    <div class="source-ref">Source: @Model.SourceTitle</div>
+                    <div class="source-ref">@Model.SourceTitle · план @Model.BudgetYear · официални</div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-6">
+        <div class="col-lg-5">
             <div class="app-card h-100">
-                <div class="app-card-body d-flex flex-column">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h5 class="card-heading">Where does it go?</h5>
-                            <p class="text-muted small mb-0">
-                                Categorized public spending across social services, administration and infrastructure.
-                            </p>
-                        </div>
-                        <span class="status-badge status-demo">⚠ Demo</span>
+                <div class="app-card-body d-flex flex-column h-100">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                        <h2 class="card-heading h5">Къде отиват</h2>
+                        <span class="status-badge status-demo">Демо</span>
                     </div>
-
-                    <div class="donut-wrap flex-grow-1">
-                        <canvas id="spendingDonut"></canvas>
-                    </div>
-
-                    <div class="source-ref">Source: Danucite360 demo distribution</div>
+                    <p class="text-muted small">Примерно разпределение по области — илюстрация, не официално.</p>
+                    <div class="revenue-bars mt-2" id="spendingList" aria-live="polite"></div>
+                    <div class="source-ref demo">Демонстрационно разпределение на Danucite360 · не е официално</div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="deep-dive mt-4">
-        <div>
-            <h4 class="mb-1">Deep dive into the data</h4>
-            <p class="mb-0">
-                Access the source documents, methodology notes, and regional breakdowns behind every figure.
-            </p>
-        </div>
-        <a class="btn btn-primary" asp-controller="Sources" asp-action="Index">View Sources</a>
     </div>
 </section>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="~/js/chart-theme.js" asp-append-version="true"></script>
     <script src="~/js/home-overview.js" asp-append-version="true"></script>
 }

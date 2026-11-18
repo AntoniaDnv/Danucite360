@@ -5,23 +5,85 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Danucite360.Data.Data;
 
-public static class SeedData
+public static partial class SeedData
 {
     public static async Task SeedAsync(
         ApplicationDbContext context,
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager)
+        RoleManager<IdentityRole> roleManager,
+        string? adminPassword = null)
     {
         await context.Database.MigrateAsync();
 
         await SeedRolesAsync(roleManager);
-        await SeedAdminUserAsync(userManager);
+        await SeedAdminUserAsync(userManager, adminPassword);
         await SeedSourcesAsync(context);
         await SeedCategoriesAsync(context);
         await SeedRegionsAsync(context);
         await SeedBudgetRecordsAsync(context);
         await SeedProjectsAsync(context);
         await SeedDebtAsync(context);
+        await SeedMeasuresAsync(context);
+        await LocalizeAsync(context);
+    }
+
+    private static async Task SeedMeasuresAsync(ApplicationDbContext context)
+    {
+        if (await context.BudgetMeasures.AnyAsync())
+        {
+            return;
+        }
+
+        const string demoSource = "Демонстрационен запис — илюстративна мярка за прототипа, не е официален документ";
+
+        BudgetMeasure M(string slug, string title, string category, string audiences, string ages,
+            decimal? impact, string status, DateTime? effective, string summary, string means) => new()
+        {
+            Slug = slug, Title = title, Category = category, Audiences = audiences, AgeGroups = ages,
+            FiscalImpact = impact, Unit = DataConstants.DefaultUnit, Status = status, EffectiveDate = effective,
+            Summary = summary, WhatItMeans = means, BudgetYear = DataConstants.BudgetYear,
+            IsDemo = true, SourceTitle = demoSource
+        };
+
+        context.BudgetMeasures.AddRange(
+            M("danachno-oblekchenie-za-deca", "Данъчно облекчение за деца", "Данъци",
+                "parent;employee;self-employed", "under30;30-50;50-65", -120_000m, MeasureStatuses.Proposed, new DateTime(2026, 1, 1),
+                "Родителите могат да намалят облагаемия си доход за всяко ненавършило пълнолетие дете.",
+                "Ако работите и отглеждате деца, ще плащате по-малко данък общ доход. За бюджета това е по-малко приходи."),
+            M("cena-na-vinetka", "Промяна в цената на годишната винетка", "Такси",
+                "driver;employer", "all", 35_000m, MeasureStatuses.Proposed, new DateTime(2026, 3, 1),
+                "Цената на годишната електронна винетка за леки автомобили се актуализира.",
+                "Ако шофирате по републиканската пътна мрежа, годишната винетка ще ви струва повече. Приходите отиват за поддръжка на пътищата."),
+            M("indeksacia-na-pensii", "Индексация на пенсиите от 1 юли", "Социални плащания",
+                "pensioner", "over65;50-65", -450_000m, MeasureStatuses.Adopted, new DateTime(2026, 7, 1),
+                "Всички пенсии се увеличават с процент, определен по швейцарското правило.",
+                "Ако получавате пенсия, тя ще нарасне от юли. За бюджета това е допълнителен разход."),
+            M("minimalna-rabotna-zaplata", "Увеличение на минималната работна заплата", "Труд и доходи",
+                "employee;employer", "under30;30-50;50-65", 60_000m, MeasureStatuses.InForce, new DateTime(2026, 1, 1),
+                "Минималната месечна работна заплата се повишава.",
+                "Ако работите на минимална заплата, ще получавате повече. Работодателите плащат повече осигуровки, което увеличава приходите."),
+            M("osiguritelen-dohod-samoosiguryavashti", "Минимален осигурителен доход за самоосигуряващи се", "Осигуровки",
+                "self-employed", "under30;30-50;50-65", 25_000m, MeasureStatuses.Proposed, new DateTime(2026, 1, 1),
+                "Минималният месечен осигурителен доход за свободни професии и самоосигуряващи се се увеличава.",
+                "Ако сте на свободна практика, минималните ви месечни осигуровки се повишават."),
+            M("pomosht-za-parvoklasnici", "Еднократна помощ за първокласници", "Семейство",
+                "parent", "under30;30-50", -18_000m, MeasureStatuses.InForce, new DateTime(2026, 9, 1),
+                "Семействата получават еднократна помощ при записване на дете в първи клас.",
+                "Ако детето ви тръгва на училище, можете да подадете заявление за помощ в дирекция „Социално подпомагане“."),
+            M("mladezhka-zaetost", "Насърчаване на заетостта на младежи", "Труд и доходи",
+                "employee;employer", "under30", -15_000m, MeasureStatuses.Proposed, new DateTime(2026, 4, 1),
+                "Работодателите, наемащи младежи до 29 г. без опит, получават частично покриване на осигуровките.",
+                "Ако сте млад човек, търсещ първа работа, работодателите имат стимул да ви наемат."),
+            M("evro-zakrugliane", "Правила за закръгляне на цени след въвеждане на еврото", "Потребители",
+                "everyone", "all", null, MeasureStatuses.InForce, new DateTime(2026, 1, 1),
+                "Цените се преизчисляват по фиксирания курс 1,95583 лв. за 1 евро и се закръглят до цент.",
+                "Засяга всички граждани. Мярката няма пряк ефект върху бюджета, а защитава потребителите при смяната на валутата."),
+            M("dds-restoranti", "ДДС ставка за ресторантьорски услуги", "Данъци",
+                "employer;everyone", "all", 90_000m, MeasureStatuses.Proposed, new DateTime(2026, 1, 1),
+                "Намалената ставка на ДДС за ресторанти се връща към стандартните 20%.",
+                "Храненето навън може да поскъпне. За бюджета това означава повече приходи от ДДС."));
+
+        await context.SaveChangesAsync();
     }
 
     private static async Task SeedDebtAsync(ApplicationDbContext context)
@@ -105,15 +167,20 @@ public static class SeedData
         }
     }
 
-    private static async Task SeedAdminUserAsync(UserManager<ApplicationUser> userManager)
+    private static async Task SeedAdminUserAsync(UserManager<ApplicationUser> userManager, string? adminPassword)
     {
         const string adminEmail = "admin@danucite360.local";
-        const string adminPassword = "Admin123!";
 
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
         if (adminUser == null)
         {
+            // The password comes from configuration (Seed:AdminPassword), never from source control.
+            if (string.IsNullOrWhiteSpace(adminPassword))
+            {
+                return;
+            }
+
             adminUser = new ApplicationUser
             {
                 UserName = adminEmail,

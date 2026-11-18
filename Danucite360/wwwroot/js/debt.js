@@ -15,8 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
             data: {
                 labels,
                 datasets: [
-                    { label: "Domestic", data: domestic, backgroundColor: C.palette.navy, stack: "d", borderRadius: 2, maxBarThickness: 44 },
-                    { label: "External", data: external, backgroundColor: C.palette.teal, stack: "d", borderRadius: 2, maxBarThickness: 44 }
+                    { label: "Вътрешен", data: domestic, backgroundColor: C.palette.navy, stack: "d", borderRadius: 2, maxBarThickness: 44 },
+                    { label: "Външен", data: external, backgroundColor: C.palette.teal, stack: "d", borderRadius: 2, maxBarThickness: 44 }
                 ]
             },
             options: {
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
             type: "line",
             data: {
                 datasets: [{
-                    label: "Avg. yield",
+                    label: "Средна доходност",
                     data: points,
                     borderColor: C.palette.navy,
                     backgroundColor: "rgba(19,27,46,0.10)",
@@ -83,8 +83,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     tooltip: { callbacks: { label: ctx => `${ctx.raw.x}y: ${ctx.raw.y}%` } }
                 },
                 scales: {
-                    x: { type: "linear", title: { display: true, text: "Maturity (years)" }, grid: { color: C.palette.border } },
-                    y: { title: { display: true, text: "Yield %" }, grid: { color: C.palette.border }, ticks: { callback: v => v + "%" } }
+                    x: { type: "linear", title: { display: true, text: "Срок (години)" }, grid: { color: C.palette.border } },
+                    y: { title: { display: true, text: "Доходност %" }, grid: { color: C.palette.border }, ticks: { callback: v => v + "%" } }
                 }
             }
         });

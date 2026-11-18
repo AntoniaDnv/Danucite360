@@ -27,6 +27,13 @@ public class ProjectsController : Controller
         return View(model);
     }
 
+    [HttpGet("/projects/map")]
+    public async Task<IActionResult> Map()
+    {
+        var model = await projectService.GetAllProjectsAsync(DataConstants.BudgetYear);
+        return View(model);
+    }
+
     [HttpGet("/projects/regions/{slug}")]
     public async Task<IActionResult> Region(string slug)
     {

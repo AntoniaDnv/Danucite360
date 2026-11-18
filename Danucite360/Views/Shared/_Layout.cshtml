@@ -4,16 +4,16 @@
     var routeAction = ViewContext.RouteData.Values["action"]?.ToString();
     string NavActive(bool isActive) => isActive ? "nav-link active" : "nav-link";
     var overviewActive = routeController == "Home" && routeAction == "Index";
-    var projectsActive = routeController == "Projects";
+    var budgetActive = routeController == "Budget";
+    var projectsActive = routeController == "Projects" || routeController == "Funding";
     var regionsActive = routeController == "Map" || routeController == "Regions";
-    var categoriesActive = routeController == "Budget" && routeAction == "Categories";
-    var fundingActive = routeController == "Funding";
+    var measuresActive = routeController == "Measures";
     var debtActive = routeController == "Debt";
-    var sourcesActive = routeController == "Sources";
+    var sourcesActive = routeController == "Sources" || routeController == "OpenData";
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -26,6 +26,8 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/civic.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <header class="app-header">
@@ -35,65 +37,31 @@
                     <span class="brand-mark">D</span>
                     <span>
                         Danucite360
-                        <span class="brand-subtitle d-none d-md-block">See where public money goes.</span>
+                        <span class="brand-subtitle d-none d-md-block">Виж къде отиват публичните пари.</span>
                     </span>
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Меню">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
                     <ul class="navbar-nav mx-auto gap-lg-2">
-                        <li class="nav-item">
-                            <a class="@NavActive(overviewActive)" asp-area="" asp-controller="Home" asp-action="Index">Overview</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="@NavActive(projectsActive)" asp-area="" asp-controller="Projects" asp-action="Index">Projects</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="@NavActive(regionsActive)" asp-area="" asp-controller="Map" asp-action="Index">Regions</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="@NavActive(categoriesActive)" asp-area="" asp-controller="Budget" asp-action="Categories">Categories</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="@NavActive(fundingActive)" asp-area="" asp-controller="Funding" asp-action="Index">Funding</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="@NavActive(debtActive)" asp-area="" asp-controller="Debt" asp-action="Index">Debt</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="@NavActive(sourcesActive)" asp-area="" asp-controller="Sources" asp-action="Index">Sources</a>
-                        </li>
-
+                        <li class="nav-item"><a class="@NavActive(overviewActive)" asp-area="" asp-controller="Home" asp-action="Index">Начало</a></li>
+                        <li class="nav-item"><a class="@NavActive(budgetActive)" asp-area="" asp-controller="Budget" asp-action="National">Бюджет</a></li>
+                        <li class="nav-item"><a class="@NavActive(projectsActive)" href="/projects/map">Проекти</a></li>
+                        <li class="nav-item"><a class="@NavActive(measuresActive)" href="/measures">Мерки</a></li>
+                        <li class="nav-item"><a class="@NavActive(regionsActive)" asp-area="" asp-controller="Map" asp-action="Index">Региони</a></li>
+                        <li class="nav-item"><a class="@NavActive(debtActive)" asp-area="" asp-controller="Debt" asp-action="Index">Дълг</a></li>
+                        <li class="nav-item"><a class="@NavActive(sourcesActive)" asp-area="" asp-controller="Sources" asp-action="Index">Данни и източници</a></li>
                         @if (User.IsInRole(RoleConstants.Admin))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Admin</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Администрация</a></li>
                         }
                     </ul>
 
                     <div class="d-flex align-items-center gap-3">
-                        <div class="nav-search d-none d-lg-block">
-                            <input type="search" aria-label="Search" placeholder="Search data…" disabled />
-                        </div>
-
-                        <span class="live-status d-none d-md-inline-flex" title="Prototype data feed">Live Status</span>
-
-                        <div class="language-switcher d-none d-md-flex">
-                            <span>BG</span>
-                            <span class="active">EN</span>
-                        </div>
-
                         <partial name="_LoginPartial" />
                     </div>
                 </div>
@@ -113,39 +81,32 @@
                         <span class="brand-mark">D</span>
                         <strong>Danucite360</strong>
                     </div>
-                    <p class="footer-text">
-                        Civic budget transparency for a stronger Bulgaria.
-                    </p>
-                    <p class="footer-text mb-0">
-                        © 2026 Danucite360. All rights reserved.
-                    </p>
+                    <p class="footer-text">Публичните финанси на България — разбираемо, проверимо и отворено.</p>
+                    <p class="footer-text mb-0">© 2026 Danucite360. Граждански прототип, не е държавен сайт.</p>
                 </div>
-
                 <div class="col-6 col-md-2">
-                    <h6>Explore</h6>
-                    <a asp-area="" asp-controller="Budget" asp-action="National">National Budget</a>
-                    <a asp-area="" asp-controller="Map" asp-action="Index">Regions</a>
-                    <a asp-area="" asp-controller="Budget" asp-action="Categories">Categories</a>
-                    <a asp-area="" asp-controller="Sources" asp-action="Index">Sources</a>
+                    <h6>Бюджет</h6>
+                    <a asp-area="" asp-controller="Budget" asp-action="National">Държавен бюджет</a>
+                    <a asp-area="" asp-controller="Budget" asp-action="Categories">Разходи по области</a>
+                    <a asp-area="" asp-controller="Debt" asp-action="Index">Държавен дълг</a>
                 </div>
-
                 <div class="col-6 col-md-2">
-                    <h6>About</h6>
-                    <a asp-area="" asp-controller="Home" asp-action="Privacy">About Danucite360</a>
-                    <a asp-area="" asp-controller="Sources" asp-action="Index">Methodology</a>
-                    <a asp-area="" asp-controller="Sources" asp-action="Index">Data Sources</a>
+                    <h6>Проекти и мерки</h6>
+                    <a href="/projects/map">Карта на проектите</a>
+                    <a href="/projects/explorer">Всички проекти</a>
+                    <a asp-area="" asp-controller="Funding" asp-action="Index">Източници на финансиране</a>
+                    <a href="/measures">Регистър на мерките</a>
                 </div>
-
                 <div class="col-6 col-md-2">
-                    <h6>Legal</h6>
-                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
-                    <a asp-area="" asp-controller="Sources" asp-action="Index">Data Disclaimer</a>
+                    <h6>Данни</h6>
+                    <a asp-area="" asp-controller="Sources" asp-action="Index">Източници и методология</a>
+                    <a href="/open-data">Отворени данни (CSV / JSON)</a>
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Поверителност</a>
                 </div>
-
                 <div class="col-6 col-md-2">
-                    <h6>Data Status</h6>
-                    <span class="status-badge status-official mb-2">✓ Official Data</span>
-                    <span class="status-badge status-demo">⚠ Demo Data</span>
+                    <h6>Статус на данните</h6>
+                    <span class="status-badge status-official mb-2">Официални данни</span>
+                    <span class="status-badge status-demo">Демо данни</span>
                 </div>
             </div>
         </div>

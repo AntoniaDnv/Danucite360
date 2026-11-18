@@ -94,9 +94,12 @@ public class ProjectService : IProjectService
             Budget = project.Budget,
             Unit = project.Unit,
             BudgetYear = project.BudgetYear,
-            RegionName = project.Region?.Name ?? "National",
+            RegionName = project.Region?.Name ?? "Национален обхват",
             RegionSlug = project.Region?.Slug,
             SourceTitle = project.BudgetSource?.Title ?? string.Empty,
+            Spent = project.Spent,
+            City = project.City,
+            IsDemo = project.IsDemo,
             FundingShares = shares,
             RelatedProjects = related.Select(ToListItem).ToList()
         };
@@ -205,9 +208,15 @@ public class ProjectService : IProjectService
             CompletionPercent = p.CompletionPercent,
             Budget = p.Budget,
             Unit = p.Unit,
-            RegionName = p.Region?.Name ?? "National",
+            RegionName = p.Region?.Name ?? "Национален обхват",
             RegionSlug = p.Region?.Slug,
-            PrimaryFundingSource = primary?.SourceName ?? string.Empty
+            PrimaryFundingSource = primary?.SourceName ?? string.Empty,
+            Spent = p.Spent,
+            City = p.City,
+            Latitude = p.Latitude,
+            Longitude = p.Longitude,
+            Description = p.Description,
+            IsDemo = p.IsDemo
         };
     }
 }

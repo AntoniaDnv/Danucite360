@@ -23,7 +23,7 @@
             labels: data.labels,
             datasets: [
                 {
-                    label: `Amount (${data.unit})`,
+                    label: "Сума",
                     data: data.values,
                     backgroundColor: C ? [C.palette.teal, C.palette.navy, C.palette.amber] : undefined,
                     borderWidth: 0,
@@ -80,7 +80,7 @@ function renderExecutionTrajectory() {
         data: {
             labels,
             datasets: [{
-                label: "Cumulative revenue (YTD)",
+                label: "Натрупани приходи от началото на годината",
                 data: values,
                 borderColor: C ? C.palette.teal : "#0D9488",
                 backgroundColor: "rgba(13, 148, 136, 0.12)",

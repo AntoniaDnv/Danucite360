@@ -1,7 +1,7 @@
-@model IEnumerable<Danucite360.Services.Models.RegionListServiceModel>
+﻿@model IEnumerable<Danucite360.Services.Models.RegionListServiceModel>
 
 @{
-    ViewData["Title"] = "Regional Comparison";
+    ViewData["Title"] = "Сравнение на областите";
     var regions = Model.ToList();
 
     // TotalDemoSpending is in "thousand EUR".
@@ -23,16 +23,16 @@
     <div class="page-header mb-3">
         <div>
             <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="status-badge status-demo">⚠ Demo Data</span>
-                <span class="last-updated">Last updated: 28 May 2026</span>
+                <span class="status-badge status-demo">Демо данни</span>
+                <span class="last-updated">Бюджет 2026</span>
             </div>
-            <h1 class="section-title mb-2">Regional Comparison</h1>
+            <h1 class="section-title mb-2">Сравнение на областите</h1>
             <p class="section-subtitle mb-0">
-                Comparative analysis of public expenditure across Bulgarian regions.
+                Колко публични средства се харчат на човек в различните области (демонстрационни стойности).
             </p>
         </div>
         <div class="page-actions">
-            <span class="status-badge status-draft">⛁ Source: Ministry of Finance</span>
+            <span class="status-badge status-demo">Демонстрационни регионални данни</span>
         </div>
     </div>
 
@@ -40,28 +40,28 @@
         <div class="app-card-body">
             <div class="row g-3 align-items-end">
                 <div class="col-md-4">
-                    <label class="form-label small text-muted">Search region</label>
-                    <input id="regionSearch" type="search" class="form-control" placeholder="Search region..." />
+                    <label class="form-label small text-muted" for="regionSearch">Търсене</label>
+                    <input id="regionSearch" type="search" class="form-control" placeholder="Търсене на област…" />
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label small text-muted">Year</label>
+                    <label class="form-label small text-muted" for="regionYear">Година</label>
                     <select id="regionYear" class="form-select"><option selected>2026</option></select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label small text-muted">Data status</label>
+                    <label class="form-label small text-muted" for="regionStatus">Статус на данните</label>
                     <select id="regionStatus" class="form-select">
-                        <option value="all" selected>All</option>
-                        <option value="demo">Demo</option>
-                        <option value="official">Official</option>
+                        <option value="all" selected>Всички</option>
+                        <option value="demo">Демо</option>
+                        <option value="official">Официални</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label small text-muted">Sort by</label>
+                    <label class="form-label small text-muted" for="regionSort">Подреди по</label>
                     <select id="regionSort" class="form-select">
-                        <option value="percapita" selected>Per Capita</option>
-                        <option value="spending">Total Spending</option>
-                        <option value="population">Population</option>
-                        <option value="name">Name</option>
+                        <option value="percapita" selected>На човек</option>
+                        <option value="spending">Общо разходи</option>
+                        <option value="population">Население</option>
+                        <option value="name">Име</option>
                     </select>
                 </div>
             </div>
@@ -72,11 +72,11 @@
         <div class="col-lg-5">
             <div class="app-card h-100">
                 <div class="app-card-body d-flex flex-column">
-                    <h5 class="card-heading">Geographic Distribution</h5>
+                    <h2 class="card-heading h5">На картата</h2>
                     <div class="map-placeholder flex-grow-1">
                         <div class="map-placeholder-inner">
-                            <div class="map-pin">⌖</div>
-                            <p>Interactive map available in the full application.</p>
+                            <p>Вижте публичните проекти по области на интерактивната карта.</p>
+                            <a class="btn btn-primary btn-sm" href="/projects/map">Отвори картата на проектите</a>
                         </div>
                     </div>
                 </div>
@@ -86,14 +86,14 @@
         <div class="col-lg-7">
             <div class="app-card h-100">
                 <div class="app-card-body d-flex flex-column">
-                    <h5 class="card-heading">Top 5 Regions: Spending per Capita (EUR)</h5>
-                    <p class="text-muted small">Demo spending divided by population, in EUR per resident.</p>
+                    <h2 class="card-heading h5">Топ 5 области: разходи на човек (€)</h2>
+                    <p class="text-muted small">Демо разходите, разделени на броя жители.</p>
                     <div class="region-chart flex-grow-1">
                         <canvas id="perCapitaChart"
                                 data-labels='@Html.Raw(chartLabels)'
                                 data-values='@Html.Raw(chartValues)'></canvas>
                     </div>
-                    <div class="source-ref">Source: Danucite360 demo distribution</div>
+                    <div class="source-ref demo">Източник: демонстрационно разпределение</div>
                 </div>
             </div>
         </div>
@@ -103,8 +103,8 @@
         <div class="app-card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                    <h5 class="card-heading">Detailed Regional Data</h5>
-                    <p class="text-muted small mb-0">Select a region to open its full spending dashboard.</p>
+                    <h2 class="card-heading h5">Данни по области</h2>
+                    <p class="text-muted small mb-0">Изберете област, за да видите подробностите.</p>
                 </div>
             </div>
 
@@ -112,10 +112,10 @@
                 <table class="table align-middle" id="regionsTable">
                     <thead>
                         <tr>
-                            <th>Region</th>
-                            <th class="num">Population</th>
-                            <th class="num">Spending (€M)</th>
-                            <th class="num">Per Capita (EUR)</th>
+                            <th>Област</th>
+                            <th class="num">Население</th>
+                            <th class="num">Разходи (млн. €)</th>
+                            <th class="num">На човек (€)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -129,9 +129,9 @@
                                 <td>
                                     <a class="fw-semibold text-decoration-none" href="/regions/@r.Slug">@r.Name</a>
                                 </td>
-                                <td class="num">@r.Population.ToString("N0")</td>
-                                <td class="num">@SpendMillions(r.TotalDemoSpending).ToString("N1")</td>
-                                <td class="num">€@r.PerCapita.ToString("N0")</td>
+                                <td class="num">@r.Population.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("bg-BG"))</td>
+                                <td class="num">@SpendMillions(r.TotalDemoSpending).ToString("N1", System.Globalization.CultureInfo.GetCultureInfo("bg-BG"))</td>
+                                <td class="num">@r.PerCapita.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("bg-BG"))</td>
                             </tr>
                         }
                     </tbody>
@@ -139,16 +139,15 @@
             </div>
 
             <div id="regionsEmptyState" class="empty-state d-none">
-                <div class="empty-state-icon">🔍</div>
-                <h5>No regions match your filters.</h5>
-                <p>Try changing the search text or data status.</p>
+                <h5>Няма области по тези критерии.</h5>
+                <p>Променете търсенето или статуса на данните.</p>
             </div>
         </div>
     </div>
 </section>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="~/js/chart-theme.js" asp-append-version="true"></script>
     <script src="~/js/regions-compare.js" asp-append-version="true"></script>
 }

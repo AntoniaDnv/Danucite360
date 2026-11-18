@@ -1,0 +1,109 @@
+﻿@using Danucite360.Common.Constants
+@model IEnumerable<Danucite360.Services.Models.ProjectListItemServiceModel>
+@{
+    ViewData["Title"] = "Карта на проектите";
+    var projects = Model.ToList();
+    var regions = projects.Where(p => p.RegionSlug != null).Select(p => (p.RegionSlug, p.RegionName)).Distinct().OrderBy(r => r.RegionName).ToList();
+
+    // Everything the map/side panel needs, already labelled in Bulgarian.
+    var mapData = projects.Select(p => new
+    {
+        p.Slug, p.Title, p.Description, p.City, p.RegionName, p.RegionSlug,
+        lat = p.Latitude, lng = p.Longitude,
+        type = Labels.ToBg(p.ProjectType),
+        status = Labels.ToBg(p.Status),
+        statusKey = p.Status,
+        budget = MoneyFormatter.FormatThousandEur(p.Budget),
+        spent = p.Spent.HasValue ? MoneyFormatter.FormatThousandEur(p.Spent.Value) : null,
+        financialPercent = p.Spent.HasValue && p.Budget > 0 ? (int)Math.Round(p.Spent.Value / p.Budget * 100) : (int?)null,
+        physicalPercent = p.CompletionPercent,
+        funder = Labels.ToBg(p.PrimaryFundingSource),
+        p.IsDemo
+    });
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+}
+
+<section class="page-shell">
+    <div class="page-header mb-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="status-badge status-demo">Демо данни</span>
+                <span class="last-updated">Бюджет 2026 · местоположенията са приблизителни (ниво град)</span>
+            </div>
+            <h1 class="section-title mb-2">Карта на капиталовите проекти</h1>
+            <p class="section-subtitle mb-0">Изберете проект на картата, за да видите колко струва, колко е изплатено и докъде е стигнал.</p>
+        </div>
+        <div class="page-actions">
+            <label class="visually-hidden" for="mapRegion">Област</label>
+            <select id="mapRegion" class="form-select form-select-sm">
+                <option value="all">Всички области</option>
+                @foreach (var r in regions)
+                {
+                    <option value="@r.RegionSlug">@r.RegionName</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="app-card map-card">
+                <div id="projectMap" class="project-map" role="region" aria-label="Карта на България с проекти"></div>
+                <div id="mapFallback" class="map-fallback" hidden>
+                    Картата не можа да се зареди (няма връзка с картографската услуга). Всички проекти са в списъка по-долу.
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <aside class="app-card project-panel" id="projectPanel" aria-live="polite">
+                <div class="app-card-body">
+                    <p class="text-muted mb-0" id="panelEmpty">Изберете маркер на картата или проект от списъка.</p>
+                    <div id="panelBody" hidden></div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <h2 class="h5 mt-5 mb-3">Всички проекти</h2>
+    <div class="table-responsive app-card">
+        <table class="table table-hover align-middle mb-0 projects-table">
+            <thead>
+                <tr>
+                    <th scope="col">Проект</th>
+                    <th scope="col">Място</th>
+                    <th scope="col">Статус</th>
+                    <th scope="col" class="text-end">Бюджет</th>
+                    <th scope="col" class="text-end">Изплатено</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in projects)
+                {
+                    <tr data-region="@(p.RegionSlug ?? "national")">
+                        <td><button type="button" class="btn btn-link p-0 text-start project-pick" data-slug="@p.Slug">@p.Title</button></td>
+                        <td>@(p.City ?? p.RegionName)</td>
+                        <td>@Labels.ToBg(p.Status)</td>
+                        <td class="text-end num">@MoneyFormatter.FormatThousandEur(p.Budget)</td>
+                        <td class="text-end num">@(p.Spent.HasValue ? MoneyFormatter.FormatThousandEur(p.Spent.Value) : "—")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="small text-muted mt-3 mb-0">
+        <strong>Физически напредък</strong> — каква част от работата е извършена. <strong>Финансов напредък</strong> — каква част от бюджета е изплатена.
+        Двете могат да се различават.
+    </p>
+    <div class="source-ref demo">Демонстрационни проекти на Danucite360 · бюджет 2026 · местоположения на ниво град · не са официални данни</div>
+</section>
+
+@section Scripts {
+    <script id="projectData" type="application/json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(mapData, new System.Text.Json.JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Default, PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }))</script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="~/js/projects-map.js" asp-append-version="true"></script>
+}
