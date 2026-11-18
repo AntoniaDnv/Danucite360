@@ -1,11 +1,11 @@
 ﻿@model Danucite360.Web.ViewModels.Admin.RegionInputModel
 
 @{
-    ViewData["Title"] = "Create Region";
+    ViewData["Title"] = "Нова област";
 }
 
 <div class="container py-5">
-    <h1 class="fw-bold mb-4">Create Region</h1>
+    <h1 class="fw-bold mb-4">Нова област</h1>
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
@@ -22,7 +22,7 @@
 
                 <div class="mb-3">
                     <label asp-for="Slug" class="form-label"></label>
-                    <input asp-for="Slug" class="form-control" placeholder="example: sofia" />
+                    <input asp-for="Slug" class="form-control" placeholder="пример: sofia" />
                     <span asp-validation-for="Slug" class="text-danger"></span>
                 </div>
 
@@ -43,9 +43,9 @@
                     <label asp-for="IsDemo" class="form-check-label"></label>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="submit" class="btn btn-primary">Създай</button>
                 <a class="btn btn-outline-secondary" asp-area="Admin" asp-controller="Regions" asp-action="Index">
-                    Cancel
+                    Отказ
                 </a>
             </form>
         </div>

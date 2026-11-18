@@ -1,21 +1,21 @@
 ﻿@model Danucite360.Web.ViewModels.Admin.BudgetRecordInputModel
 
 @{
-    ViewData["Title"] = "Edit Budget Record";
+    ViewData["Title"] = "Редакция на бюджетен запис";
 }
 
 <section class="admin-shell">
     <div class="admin-page-header mb-4">
         <div>
             <div class="d-flex align-items-center gap-2 mb-2">
-                <span class="status-badge status-official">✓ Admin</span>
-                <span class="last-updated">Editing existing record</span>
+                <span class="status-badge status-official">Администратор</span>
+                <span class="last-updated">Редакция на съществуващ запис</span>
             </div>
 
-            <h1 class="section-title mb-2">Edit Budget Record</h1>
+            <h1 class="section-title mb-2">Редакция на бюджетен запис</h1>
 
             <p class="section-subtitle mb-0">
-                Update a budget value used by public charts and dashboard summaries.
+                Променете стойност, използвана в публичните графики.
             </p>
         </div>
 
@@ -24,25 +24,25 @@
                asp-area="Admin"
                asp-controller="BudgetRecords"
                asp-action="Index">
-                Back to Records
+                Към записите
             </a>
         </div>
     </div>
 
     <div class="admin-layout">
         <aside class="admin-sidebar">
-            <div class="admin-sidebar-title">Admin</div>
+            <div class="admin-sidebar-title">Администрация</div>
 
             <nav class="admin-nav">
-                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
-                <a asp-area="Admin" asp-controller="Regions" asp-action="Index">Regions</a>
-                <a class="active" asp-area="Admin" asp-controller="BudgetRecords" asp-action="Index">Budget Records</a>
-                <a asp-area="" asp-controller="Sources" asp-action="Index">Sources</a>
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Табло</a>
+                <a asp-area="Admin" asp-controller="Regions" asp-action="Index">Области</a>
+                <a class="active" asp-area="Admin" asp-controller="BudgetRecords" asp-action="Index">Бюджетни записи</a>
+                <a asp-area="" asp-controller="Sources" asp-action="Index">Източници</a>
             </nav>
 
             <div class="admin-sidebar-note">
-                <strong>Careful</strong>
-                <span>Changes here update the public dashboard after saving.</span>
+                <strong>Внимание</strong>
+                <span>Промените тук се показват на публичните страници след запис.</span>
             </div>
         </aside>
 
@@ -54,9 +54,9 @@
                     <div class="col-lg-8">
                         <div class="app-card mb-4">
                             <div class="app-card-body">
-                                <h5 class="card-heading">Record details</h5>
+                                <h5 class="card-heading">Данни за записа</h5>
                                 <p class="text-muted small">
-                                    Edit the amount, classification, source, and data status for this record.
+                                    Редакция на сумата, категорията, източника и статуса на записа.
                                 </p>
 
                                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
@@ -93,21 +93,21 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label asp-for="RegionId" class="form-label">Region</label>
+                                        <label asp-for="RegionId" class="form-label">Област</label>
                                         <select asp-for="RegionId" asp-items="Model.Regions" class="form-select">
-                                            <option value="">National / No region</option>
+                                            <option value="">Национален / без област</option>
                                         </select>
                                         <span asp-validation-for="RegionId" class="text-danger"></span>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label asp-for="BudgetCategoryId" class="form-label">Category</label>
+                                        <label asp-for="BudgetCategoryId" class="form-label">Категория</label>
                                         <select asp-for="BudgetCategoryId" asp-items="Model.Categories" class="form-select"></select>
                                         <span asp-validation-for="BudgetCategoryId" class="text-danger"></span>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label asp-for="BudgetSourceId" class="form-label">Source</label>
+                                        <label asp-for="BudgetSourceId" class="form-label">Източник</label>
                                         <select asp-for="BudgetSourceId" asp-items="Model.Sources" class="form-select"></select>
                                         <span asp-validation-for="BudgetSourceId" class="text-danger"></span>
                                     </div>
@@ -123,12 +123,12 @@
 
                         <div class="app-card">
                             <div class="app-card-body">
-                                <h5 class="card-heading">Data status</h5>
+                                <h5 class="card-heading">Статус на данните</h5>
 
                                 <div class="form-check form-switch">
                                     <input asp-for="IsDemo" class="form-check-input" />
                                     <label asp-for="IsDemo" class="form-check-label">
-                                        Mark as demo data
+                                        Отбележи като демо данни
                                     </label>
                                 </div>
 
@@ -140,22 +140,22 @@
                     <div class="col-lg-4">
                         <div class="app-card mb-4">
                             <div class="app-card-body">
-                                <h5 class="card-heading">Editing guidance</h5>
+                                <h5 class="card-heading">Указания</h5>
 
                                 <div class="methodology-list">
                                     <div>
-                                        <strong>Public impact</strong>
-                                        <span>Changing this value may update public charts immediately.</span>
+                                        <strong>Ефект върху публичните страници</strong>
+                                        <span>Промяната на стойността веднага се отразява в публичните графики.</span>
                                     </div>
 
                                     <div>
-                                        <strong>Regional data</strong>
-                                        <span>Regional MVP values should remain marked as demo data.</span>
+                                        <strong>Регионални данни</strong>
+                                        <span>Регионалните стойности остават отбелязани като демо данни.</span>
                                     </div>
 
                                     <div>
-                                        <strong>Source</strong>
-                                        <span>Keep the source reference connected to the value.</span>
+                                        <strong>Източник</strong>
+                                        <span>Не прекъсвайте връзката между стойността и източника.</span>
                                     </div>
                                 </div>
                             </div>
@@ -163,20 +163,20 @@
 
                         <div class="sticky-action-card app-card">
                             <div class="app-card-body">
-                                <h5 class="card-heading">Save changes</h5>
+                                <h5 class="card-heading">Запази промените</h5>
                                 <p class="text-muted small">
-                                    Review before saving because public pages read from these records.
+                                    Проверете преди запис — публичните страници четат тези данни.
                                 </p>
 
                                 <button type="submit" class="btn btn-primary w-100 mb-2">
-                                    Save Changes
+                                    Запази промените
                                 </button>
 
                                 <a class="btn btn-outline-secondary w-100"
                                    asp-area="Admin"
                                    asp-controller="BudgetRecords"
                                    asp-action="Index">
-                                    Cancel
+                                    Отказ
                                 </a>
                             </div>
                         </div>
